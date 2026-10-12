@@ -45,5 +45,11 @@ public final class GatewayPreferenceKeys {
     public static final String HOST_CONSENT_AGREED = "personal_gateway_host_consent_agreed";
     public static final String CLIENT_CONSENT_AGREED = "personal_gateway_client_consent_agreed";
 
+    // P2P Exit Node Multi-Device Limit & Pro Licensing
+    public static final String EXIT_MAX_DEVICES = "personal_gateway_exit_max_devices";
+    public static final String LICENSE_KEY = "personal_gateway_license_key";
+    public static final String LICENSE_STATUS = "personal_gateway_license_status";
+    public static final String ACTIVATE_LICENSE = "personal_gateway_activate_license";
+
     private GatewayPreferenceKeys() { }
 }

@@ -60,4 +60,28 @@
         <item>only_selected</item>
         <item>bypass_selected</item>
     </string-array>
+
+    <string name="gateway_exit_max_devices_title">Maximum connected devices</string>
+    <string name="gateway_exit_max_devices_summary">%s concurrent peer device(s) allowed (1 to 6)</string>
+    <string-array name="gateway_exit_max_devices_entries">
+        <item>1 Device (Free Tier)</item>
+        <item>2 Devices (KotSafe Pro)</item>
+        <item>3 Devices (KotSafe Pro)</item>
+        <item>4 Devices (KotSafe Pro)</item>
+        <item>5 Devices (KotSafe Pro)</item>
+        <item>6 Devices (KotSafe Pro Max)</item>
+    </string-array>
+    <string-array name="gateway_exit_max_devices_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+    <string name="gateway_license_category">KotSafe Pro &amp; License Activation</string>
+    <string name="gateway_license_status_title">P2P License Status</string>
+    <string name="gateway_license_activate_title">Activate KotSafe Pro</string>
+    <string name="gateway_license_activate_summary">Unlock 2–6 concurrent exit devices &amp; high-speed cloud relay</string>
 </resources>

@@ -134,6 +134,13 @@ public class P2PExitNodeServer {
         return mBytesTransferred.get();
     }
 
+    public int getMaxAllowedExitDevices() {
+        if (mContext != null) {
+            return com.kotsafe.security.p2p.P2PLicenseManager.getInstance(mContext).getMaxAllowedExitDevices();
+        }
+        return 1;
+    }
+
     public void setStateListener(StateListener listener) {
         mStateListener = listener;
     }
@@ -491,6 +498,19 @@ public class P2PExitNodeServer {
                 return;
             }
 
+            // ── Max Connected Devices Enforcement (1 to 6 limit) ──
+            int maxAllowedDevices = getMaxAllowedExitDevices();
+            if (!mRemoteClients.containsKey(clientIp) && mRemoteClients.size() >= maxAllowedDevices) {
+                Log.w(TAG, "[P2P Remote: " + clientIp + "] REJECTED: Exit Node maximum device capacity (" 
+                        + maxAllowedDevices + ") reached! Active devices: " + mRemoteClients.size());
+                sendSocksReply(out, 0x05); // SOCKS5 Connection refused
+                clientSocket.close();
+                if (targetSocket != null) {
+                    try { targetSocket.close(); } catch (Exception ignored) {}
+                }
+                return;
+            }
+
             // Send SOCKS5 Success reply only after the target tunnel is established.
             sendSocksReply(out, 0x00);
             activeClient = true;
@@ -499,7 +519,7 @@ public class P2PExitNodeServer {
             if (connections == 1 && mStateListener != null) {
                 mStateListener.onClientCountChanged(mActiveClients.get());
             }
-            Log.i(TAG, "Client tunnel established from " + clientIp + " (active devices: " + mActiveClients.get() + ")");
+            Log.i(TAG, "Client tunnel established from " + clientIp + " (active devices: " + mActiveClients.get() + " / max: " + maxAllowedDevices + ")");
 
             // 3. Bidirectional data piping with inspection
             pipeSockets(clientSocket, targetSocket, clientIp);

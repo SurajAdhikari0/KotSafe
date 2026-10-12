@@ -43,6 +43,14 @@
             app:title="Battery Saver Guard"
             app:summary="Conserve host battery when discharging below 20%"
             app:defaultValue="true" />
+        <ListPreference
+            app:key="personal_gateway_exit_max_devices"
+            app:title="@string/gateway_exit_max_devices_title"
+            app:summary="@string/gateway_exit_max_devices_summary"
+            app:entries="@array/gateway_exit_max_devices_entries"
+            app:entryValues="@array/gateway_exit_max_devices_values"
+            app:defaultValue="2"
+            app:useSimpleSummaryProvider="true" />
         <Preference
             android:key="personal_gateway_show_pairing_qr"
             app:title="@string/gateway_show_pairing_title"
@@ -51,6 +59,24 @@
             android:key="personal_gateway_exit_revoke"
             app:title="@string/gateway_exit_revoke_title"
             app:summary="@string/gateway_exit_revoke_summary" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="personal_gateway_license_category"
+        app:title="@string/gateway_license_category"
+        app:iconSpaceReserved="true">
+        <Preference
+            android:key="personal_gateway_license_status"
+            app:title="@string/gateway_license_status_title"
+            app:summary="Community Free Tier (Max 1 Device)"
+            app:icon="@drawable/ic_lock"
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_activate_license"
+            app:title="@string/gateway_license_activate_title"
+            app:summary="@string/gateway_license_activate_summary"
+            app:icon="@drawable/ic_lock_open"
+            app:iconSpaceReserved="true" />
     </PreferenceCategory>
 
     <PreferenceCategory

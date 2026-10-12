@@ -86,6 +86,7 @@ import com.kotsafe.security.model.Prefs;
 import com.kotsafe.security.model.backend.BackendProviderFactory;
 import com.kotsafe.security.model.backend.CustomHttpProvider;
 import com.kotsafe.security.p2p.GatewayPreferenceKeys;
+import com.kotsafe.security.p2p.P2PLicenseManager;
 import com.kotsafe.security.p2p.GatewayStatusFormatter;
 import com.kotsafe.security.p2p.SecurePairingBundle;
 import com.kotsafe.security.p2p.TransportSelectionPolicy;
@@ -394,7 +395,104 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
             });
         }
 
+        // ── P2P Exit Node Multi-Device Limit (1 to 6) ──
+        androidx.preference.ListPreference maxDevicesPref = findPreference(GatewayPreferenceKeys.EXIT_MAX_DEVICES);
+        if (maxDevicesPref != null) {
+            maxDevicesPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                try {
+                    int requestedLimit = Integer.parseInt(newValue.toString());
+                    if (requestedLimit > 1 && !P2PLicenseManager.getInstance(requireContext()).isProActivated()) {
+                        showActivationKeyDialog("Unlock Multi-Device Exit Node",
+                                "Connecting " + requestedLimit + " devices concurrently requires KotSafe Pro. Enter your activation code to unlock 2 to 6 devices.");
+                        return false;
+                    }
+                } catch (Exception ignored) {}
+                return true;
+            });
+        }
+
+        // ── KotSafe Pro License Category ──
+        androidx.preference.Preference licStatusPref = findPreference(GatewayPreferenceKeys.LICENSE_STATUS);
+        androidx.preference.Preference licActivatePref = findPreference(GatewayPreferenceKeys.ACTIVATE_LICENSE);
+        updateLicenseUI(licStatusPref, licActivatePref);
+
+        if (licActivatePref != null) {
+            licActivatePref.setOnPreferenceClickListener(preference -> {
+                showActivationKeyDialog("Activate KotSafe Pro",
+                        "Enter your KotSafe Pro or Enterprise activation code to unlock multi-device exit nodes and unlimited cloud relay.");
+                return true;
+            });
+        }
+
         updateLiveStatusUI();
+    }
+
+    private void showActivationKeyDialog(String title, String message) {
+        if (getContext() == null) return;
+        Context ctx = requireContext();
+        final android.widget.EditText input = new android.widget.EditText(ctx);
+        input.setHint("KOT-PRO-XXXXX-XXXXX");
+        input.setSingleLine(true);
+        input.setText(P2PLicenseManager.getInstance(ctx).getActiveLicenseKey());
+
+        int padding = (int) (18 * getResources().getDisplayMetrics().density);
+        android.widget.FrameLayout container = new android.widget.FrameLayout(ctx);
+        container.setPadding(padding, padding / 2, padding, padding / 2);
+        container.addView(input);
+
+        new AlertDialog.Builder(ctx)
+                .setTitle(title)
+                .setMessage(message)
+                .setView(container)
+                .setPositiveButton("Activate", (dialog, which) -> {
+                    String key = input.getText().toString().trim();
+                    if (key.isEmpty()) {
+                        Toast.makeText(ctx, "Please enter a valid key", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    P2PLicenseManager.getInstance(ctx).activateLicense(key, new P2PLicenseManager.LicenseCallback() {
+                        @Override
+                        public void onSuccess(P2PLicenseManager.Tier tier, int maxDevices, long expiresAt) {
+                            Toast.makeText(ctx, "KotSafe " + tier + " Activated! Up to " + maxDevices + " devices unlocked.", Toast.LENGTH_LONG).show();
+                            Preference licStatus = findPreference(GatewayPreferenceKeys.LICENSE_STATUS);
+                            Preference licActivate = findPreference(GatewayPreferenceKeys.ACTIVATE_LICENSE);
+                            updateLicenseUI(licStatus, licActivate);
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            Toast.makeText(ctx, error, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void updateLicenseUI(Preference statusPref, Preference activatePref) {
+        if (getContext() == null) return;
+        P2PLicenseManager lm = P2PLicenseManager.getInstance(requireContext());
+        if (lm.isProActivated()) {
+            if (statusPref != null) {
+                statusPref.setTitle("License Status: " + lm.getLicenseTier() + " (Active)");
+                statusPref.setSummary("Unlocked up to 6 concurrent exit devices & high-speed cloud relay");
+                statusPref.setIcon(R.drawable.ic_shield);
+            }
+            if (activatePref != null) {
+                activatePref.setTitle("Manage / Change License Key");
+                activatePref.setSummary("Active Key: " + lm.getActiveLicenseKey());
+            }
+        } else {
+            if (statusPref != null) {
+                statusPref.setTitle("License Status: Free Tier");
+                statusPref.setSummary("Limited to 1 connected exit device (Local LAN mode)");
+                statusPref.setIcon(R.drawable.ic_lock);
+            }
+            if (activatePref != null) {
+                activatePref.setTitle(R.string.gateway_license_activate_title);
+                activatePref.setSummary(R.string.gateway_license_activate_summary);
+            }
+        }
     }
 
     private String getOrCreateDeviceId(SharedPreferences prefs) {
