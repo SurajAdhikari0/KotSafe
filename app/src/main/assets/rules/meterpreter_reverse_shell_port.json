@@ -1,0 +1,40 @@
+{
+  "id": "RULE-NET-002",
+  "name": "Anomalous Meterpreter / Remote Access C2 Port Connection",
+  "severity": "CRITICAL",
+  "triggerSchedule": "REALTIME_NET",
+  "mitreTechniques": [
+    "T1095",
+    "T1571"
+  ],
+  "tactics": [
+    "Command and Control"
+  ],
+  "description": "Alerts when an app initiates an outbound socket on well-known offensive reverse shell ports (e.g. 4444 Metasploit, 1337 Elite, 31337 BackOrifice, 5555 unauthorized ADB over TCP).",
+  "target": "network",
+  "iocs": {
+    "ips": [
+      "185.220.101.5",
+      "45.33.32.156"
+    ]
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "port",
+        "operator": "in",
+        "values": [
+          4444,
+          5555,
+          1337,
+          31337,
+          8554,
+          9999,
+          2323
+        ]
+      }
+    ]
+  },
+  "remediation": "Isolate the device network connection immediately and terminate suspicious background process."
+}

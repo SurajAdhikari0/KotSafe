@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_ai_defense"
+        app:title="AI &amp; Autonomous Cyber Defense"
+        app:icon="@drawable/ic_cat_ai"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="ai_protection_settings"
+            app:key="ai_protection_settings"
+            app:title="@string/ai_protection_title"
+            app:summary="@string/ai_protection_summary"
+            app:icon="@drawable/ic_pref_ai_engine"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.AiProtectionSettings" />
+
+        <Preference
+            android:key="threat_intel_settings"
+            app:title="@string/threat_intel_apis"
+            app:summary="@string/threat_intel_apis_desc"
+            app:icon="@drawable/ic_pref_threat_intel"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.ThreatIntelApiSettings" />
+
+        <Preference
+            android:key="antivirus_scan_action"
+            app:title="@string/antivirus_scan"
+            app:summary="@string/antivirus_scan_desc"
+            app:icon="@drawable/ic_pref_antivirus"
+            app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="pref_auto_daily_deep_scan"
+            app:title="Automatic Daily Deep Scan"
+            app:summary="Run automated deep vulnerability &amp; antivirus audit in the background every 24 hours"
+            app:icon="@drawable/ic_pref_deep_scan"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+
+        <SwitchPreference
+            app:key="pref_detection_rules_enabled"
+            app:title="@string/detection_rules_title"
+            app:summary="@string/detection_rules_desc"
+            app:icon="@drawable/ic_pref_threat_intel"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="malware_detection"
+            app:title="@string/malware_detection"
+            app:icon="@drawable/ic_pref_malware"
+            app:iconSpaceReserved="true"
+            app:summary="@string/malware_detection_summary"
+            app:defaultValue="true" />
+
+        <Preference
+            app:key="quarantine_vault_settings"
+            android:key="quarantine_vault_settings"
+            android:selectable="true"
+            app:title="Sandboxed Quarantine Vault"
+            app:summary="View, restore, or permanently shred isolated threat artifacts"
+            app:icon="@drawable/ic_pref_vault"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

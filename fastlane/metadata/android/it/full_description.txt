@@ -1,0 +1,21 @@
+<i>KotSafe</i> è un'app open source privacy-friendly che permette di tracciare, analizzare e bloccare le connessioni effettuate dalle altre app sul dispositivo.
+Può inoltre esportare un dump PCAP del traffico, ispezionare le richieste HTTP, decrittare il traffico TLS e molto altro.
+
+Per funzionare senza root, KotSafe simula una connessione VPN. Non viene usato alcun server di VPN remoto. Al contrario, il traffico è processato localmente sul dispositivo.
+
+<b>Funzionalità principali:</b>
+
+* Registra e analizza le connessioni effettuate dalle app utente e di sistema
+* Ottieni un riepilogo di quanti dati ogni app ha inviato e ricevuto
+* Basso consumo di batteria, per una cattura continua per tutto il giorno
+* Estrai host e indirizzi IP da DNS, TLS e HTTP
+* Registra il traffico in file PCAP, con metadati aggiuntivi sulle app
+* Invia il traffico tramite PCAP-over-IP per l'analisi in tempo reale (es. su Wireshark)
+* Decritta il traffico HTTPS/TLS, estrai gli URL e salva lo SSLKEYLOGFILE
+* Ispeziona le richieste/risposte HTTP ed esportale in formato HAR
+* Identifica la nazione e l'ASN del server remoto tramite ricerche in database offline
+* Su dispositivi con root, cattura il traffico mentre altre app di VPN sono in esecuzione
+
+Se utilizzi KotSafe per effettuare l'analisi dei pacchetti di rete, fai riferimento <a href='https://kotsafe.github.io/KotSafe/quick_start#14-packet-analysis'>alla sezione specifica</a> del manuale.
+
+Unisciti alla community internazionale di KotSafe <a href="https://t.me/KotSafe">su Telegram</a> o <a href="https://matrix.to/#/#kotsafe:matrix.org">su Matrix</a>.

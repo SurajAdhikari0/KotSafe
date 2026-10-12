@@ -1,0 +1,36 @@
+{
+  "id": "RULE-FILE-004",
+  "name": "Embedded ELF Exploit Binary / DirtyPipe Kernel Privilege Escalation",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1068",
+    "T1404"
+  ],
+  "tactics": [
+    "Privilege Escalation"
+  ],
+  "description": "Detects native Linux ELF binaries embedded in unauthorized directories or APK assets attempting kernel ring-0 exploitation via DirtyPipe (CVE-2022-0847) or DirtyCOW.",
+  "target": "file",
+  "iocs": {
+    "sha256": [
+      "b2f8a1c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1"
+    ]
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "content_strings",
+        "operator": "contains_any",
+        "values": [
+          "CVE-2022-0847",
+          "splice() to pipe",
+          "/etc/passwd overwrite",
+          "pipe_buffer"
+        ]
+      }
+    ]
+  },
+  "remediation": "Quarantine the ELF binary immediately and verify Android Security Patch Level in Settings."
+}

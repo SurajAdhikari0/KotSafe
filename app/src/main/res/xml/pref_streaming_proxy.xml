@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_core_modes"
+        app:title="Core Tunnel, Proxy &amp; Mesh Modes"
+        app:icon="@drawable/ic_cat_streaming"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="p2p_exit_node_settings"
+            app:title="Tailscale Mode (P2P Mesh &amp; Exit Node)"
+            app:summary="Decentralized P2P mesh tunneling. Route 4G/5G mobile traffic via home exit node with zero router ports. Mandatory Ed25519 pairing."
+            app:icon="@drawable/ic_pref_p2p"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.P2PExitNodeSettings" />
+
+        <Preference
+            android:key="socks5_settings"
+            app:title="Shadowsocks / v2rayNG Mode (SOCKS5 Client)"
+            app:summary="Transparent SOCKS5 client engine. Route traffic through home router or remote VPS proxy. Mandatory user/password authentication."
+            app:icon="@drawable/ic_pref_socks5"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.Socks5Settings" />
+
+        <Preference
+            android:key="wireguard_tunnel_settings"
+            app:title="WireGuard Mode (Private VPN Tunnel)"
+            app:summary="Zero-copy C-kernel encrypted VPN tunnel. Curve25519 key-pair and Pre-Shared Key (PSK) authentication."
+            app:icon="@drawable/ic_pref_vpn_exempt"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="netguard_firewall_settings"
+            app:title="NetGuard Mode (Local No-Root Firewall)"
+            app:summary="Per-app and per-packet rule enforcement. Lock rules behind biometric/PIN re-authentication."
+            app:icon="@drawable/ic_pref_firewall"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="adguard_dns_settings"
+            app:title="AdGuard Mode (DNS Proxy &amp; Ad Shield)"
+            app:summary="System-wide host domain blocking with authenticated DNS-over-HTTPS (DoH)."
+            app:icon="@drawable/ic_pref_dns"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.AdBlockSettings" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="cat_router_automation"
+        app:title="Router Tools &amp; Port Forwarding"
+        app:icon="@drawable/ic_pref_wizard"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="port_mapping"
+            app:title="Local Port Mapping &amp; Redirection"
+            app:summary="Configure port redirection rules to redirect traffic on ports 8080/1080 to specific endpoints."
+            app:icon="@drawable/ic_pref_restart"
+            app:iconSpaceReserved="true">
+            <intent
+                android:targetPackage="com.kotsafe.security"
+                android:targetClass="com.kotsafe.security.activities.prefs.PortMapActivity" />
+        </Preference>
+
+        <Preference
+            android:key="upnp_auto_port_map"
+            app:title="Automated Router Port Mapping (UPnP / NAT-PMP)"
+            app:summary="1-Tap router port forwarder. Automatically opens port 1080 on your Wi-Fi router gateway without manual login."
+            app:icon="@drawable/ic_pref_wizard"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="wake_on_lan_tool"
+            app:title="Remote Wake-on-LAN (Magic Packet)"
+            app:summary="Send Magic Packet to wake sleeping home PC/server running exit node or proxy."
+            app:icon="@drawable/ic_pref_boot"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="cat_streaming_pcap"
+        app:title="Live PCAP Streaming &amp; Exporter"
+        app:icon="@drawable/ic_pref_exporter"
+        app:iconSpaceReserved="true">
+
+        <EditTextPreference
+            app:key="http_server_port"
+            app:title="Live HTTP PCAP Port"
+            app:summary="Stream raw capture packets over local HTTP server endpoint"
+            app:defaultValue="8080"
+            app:icon="@drawable/ic_pref_http_server"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="collector_host"
+            app:title="Remote Exporter Host"
+            app:summary="Destination IP or hostname for UDP/TCP live packet stream"
+            app:icon="@drawable/ic_pref_exporter"
+            app:iconSpaceReserved="true"
+            app:defaultValue="@string/default_collector_host"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="collector_port"
+            app:title="Remote Exporter Port"
+            app:summary="Destination port for live packet streaming collector"
+            app:icon="@drawable/ic_pref_exporter"
+            app:iconSpaceReserved="true"
+            app:defaultValue="@string/default_collector_port"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

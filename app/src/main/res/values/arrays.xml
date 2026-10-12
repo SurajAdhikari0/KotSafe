@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pcap_dump_modes">
+        <item>none</item>
+        <item>http_server</item>
+        <item>pcap_file</item>
+        <item>udp_exporter</item>
+        <item>tcp_exporter</item>
+    </string-array>
+    <string-array name="pcap_dump_modes_labels">
+        <item>@string/no_dump</item>
+        <item>@string/http_server</item>
+        <item>@string/pcap_file</item>
+        <item>@string/udp_exporter</item>
+        <item>@string/tcp_exporter</item>
+    </string-array>
+    <string-array name="pcap_dump_modes_descriptions">
+        <item>@string/no_dump_info</item>
+        <item>@string/http_server_info</item>
+        <item>@string/pcap_file_info</item>
+        <item>@string/udp_exporter_info</item>
+        <item>@string/tcp_exporter_info</item>
+    </string-array>
+
+    <string-array name="ip_mode">
+        <item>ipv4</item>
+        <item>ipv6</item>
+        <item>both</item>
+    </string-array>
+    <string-array name="ip_mode_labels">
+        <item>@string/ipv4_only</item>
+        <item>@string/ipv6_only</item>
+        <item>@string/ip_both</item>
+    </string-array>
+
+    <string-array name="block_quic">
+        <item>never</item>
+        <item>always</item>
+        <item>to_decrypt</item>
+    </string-array>
+    <string-array name="block_quic_labels">
+        <item>@string/never</item>
+        <item>@string/always</item>
+        <item>@string/for_connections_to_decrypt</item>
+    </string-array>
+
+    <string-array name="theme_mode">
+        <item>system</item>
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
+    <string-array name="theme_mode_labels">
+        <item>@string/theme_system</item>
+        <item>@string/theme_light</item>
+        <item>@string/theme_dark</item>
+    </string-array>
+
+    <string-array name="ai_providers">
+        <item>LOCAL_QWEN_0_5B</item>
+        <item>LOCAL_SMOLLM_135M</item>
+        <item>LOCAL_GEMMA_2B</item>
+        <item>OPENAI</item>
+        <item>GEMINI</item>
+        <item>CLAUDE</item>
+        <item>LOCAL_CUSTOM</item>
+    </string-array>
+    <string-array name="ai_providers_labels">
+        <item>Qwen 2.5 0.5B (On-Device AI - Recommended, ~350 MB)</item>
+        <item>SmolLM-135M (On-Device Micro AI - Ultra-Light, ~90 MB)</item>
+        <item>Google Gemma 2B (On-Device Local AI - Heavy, ~1.35 GB)</item>
+        <item>ChatGPT (OpenAI)</item>
+        <item>Google Gemini</item>
+        <item>Anthropic Claude</item>
+        <item>Local AI / Custom Endpoint (Ollama)</item>
+    </string-array>
+
+    <string-array name="adblock_feed_ids">
+        <item>stevenblack</item>
+        <item>oisd_small</item>
+        <item>adaway_default</item>
+        <item>peter_lowe</item>
+    </string-array>
+    <string-array name="adblock_feed_names">
+        <item>StevenBlack Unified (Trackers + Malware)</item>
+        <item>OISD Small (Essential Tracking Shield)</item>
+        <item>Community Protection Hosts</item>
+        <item>Peter Lowe Tracking &amp; Privacy Feed</item>
+    </string-array>
+    <string-array name="adblock_default_feed_ids">
+        <item>stevenblack</item>
+        <item>oisd_small</item>
+    </string-array>
+
+    <string-array name="doh_provider_keys">
+        <item>cloudflare</item>
+        <item>quad9</item>
+        <item>adguard</item>
+        <item>google</item>
+        <item>mullvad</item>
+        <item>controld</item>
+        <item>cleanbrowsing</item>
+    </string-array>
+    <string-array name="doh_provider_names">
+        <item>Cloudflare (1.1.1.1)</item>
+        <item>Quad9 (9.9.9.9 Secure)</item>
+        <item>AdGuard DNS (Family / Protected)</item>
+        <item>Google DNS (8.8.8.8)</item>
+        <item>Mullvad DNS (Privacy &amp; Tracker)</item>
+        <item>Control D (Malware Block)</item>
+        <item>CleanBrowsing Family (SafeSearch)</item>
+    </string-array>
+
+    <string-array name="siem_format_values">
+        <item>ECS</item>
+        <item>SYSLOG_JSON</item>
+        <item>CEF</item>
+    </string-array>
+    <string-array name="siem_format_labels">
+        <item>Elastic Common Schema (ECS JSON)</item>
+        <item>RFC-5424 Syslog JSON</item>
+        <item>Common Event Format (CEF)</item>
+    </string-array>
+</resources>

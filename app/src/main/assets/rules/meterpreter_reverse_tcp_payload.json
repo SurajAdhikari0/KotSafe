@@ -1,0 +1,34 @@
+{
+  "id": "RULE-FILE-003",
+  "name": "Meterpreter Reverse Shell or Screen Surveillance Payload",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1059",
+    "T1407"
+  ],
+  "tactics": [
+    "Execution"
+  ],
+  "description": "Detects Metasploit Android meterpreter payload strings, hidden reverse TCP commands, and unauthorized screencap dumps.",
+  "target": "file",
+  "iocs": {
+    "sha256": []
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "content_strings",
+        "operator": "contains_any",
+        "values": [
+          "meterpreter",
+          "reverse_tcp",
+          "/system/bin/screencap -p",
+          "dalvik.system.DexClassLoader"
+        ]
+      }
+    ]
+  },
+  "remediation": "Shred the suspicious binary and check running processes."
+}

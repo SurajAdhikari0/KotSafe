@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Use these commands to remotely control KotSafe from terminal, ADB or automation apps."
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginBottom="12dp" />
+
+        <!-- ADB Start -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADB Command (Start Capture)"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
+
+            <TextView
+                android:id="@+id/code_adb_start"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                tools:text="adb shell am broadcast -a ... -e action start" />
+
+            <ImageView
+                android:id="@+id/btn_copy_adb_start"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Copy" />
+        </LinearLayout>
+
+        <!-- ADB Stop -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="ADB Command (Stop Capture)"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
+
+            <TextView
+                android:id="@+id/code_adb_stop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                tools:text="adb shell am broadcast -a ... -e action stop" />
+
+            <ImageView
+                android:id="@+id/btn_copy_adb_stop"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Copy" />
+        </LinearLayout>
+
+        <!-- ADB Status -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="ADB Command (Query Status)"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
+
+            <TextView
+                android:id="@+id/code_adb_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                tools:text="adb shell am broadcast -a ... -e action get_status" />
+
+            <ImageView
+                android:id="@+id/btn_copy_adb_status"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Copy" />
+        </LinearLayout>
+
+        <!-- Tasker / Automate -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Tasker / Automate Action Setup"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
+
+            <TextView
+                android:id="@+id/code_tasker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                tools:text="Action: com.kotsafe.security.Control" />
+
+            <ImageView
+                android:id="@+id/btn_copy_tasker"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Copy" />
+        </LinearLayout>
+
+        <!-- Termux / Bash Script -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Termux / Shell Script"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:layout_marginVertical="4dp">
+
+            <TextView
+                android:id="@+id/code_bash"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textSize="11sp"
+                tools:text="#!/bin/bash..." />
+
+            <ImageView
+                android:id="@+id/btn_copy_bash"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Copy" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

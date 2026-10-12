@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/profile_dialog_bg"
+    android:padding="20dp">
+
+    <!-- Top Handle Bar -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_bg"
+        android:backgroundTint="@color/lightGray"
+        android:alpha="0.4" />
+
+    <!-- Header with KotSafe Logo, Title and Version Chip -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="14dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/nav_logo_bg" />
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher"
+                android:scaleType="fitCenter"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dialog_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Build &amp; System Diagnostics"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/highContrast" />
+
+            <TextView
+                android:id="@+id/dialog_build_flavor_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="KotSafe v1.8.0 • Debug / Native arm64-v8a"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorAccent" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btn_copy_quick"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/about_icon_circle"
+            android:src="@drawable/ic_copy"
+            android:padding="8dp"
+            app:tint="?attr/colorAccent"
+            android:contentDescription="Copy to clipboard" />
+    </LinearLayout>
+
+    <!-- Scrollable Diagnostics List -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:maxHeight="440dp"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Section 1: Application & Compilation Details -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="APPLICATION &amp; BUILD"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/colorPrimaryLight"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/profile_stat_card_bg"
+                android:padding="12dp">
+
+                <!-- Package & Version -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:text="App Version / Code"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_app_version"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="v1.8.0 (Build 120)" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Build Variant / Flavor -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:text="Variant &amp; Flavor"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_build_variant"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="debug (withoutUshark)" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Native Core / Engine -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:text="Native Engine"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_native_engine"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="CMake (libchash)" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- MITM Addon -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:text="MITM Addon"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_mitm_addon"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="Not installed" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section 2: Device Hardware & Operating System -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DEVICE &amp; OPERATING SYSTEM"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/colorPrimaryLight"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/profile_stat_card_bg"
+                android:padding="12dp">
+
+                <!-- Device Model -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Device / Model"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_device_model"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="Google Pixel 7 (panther)" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Architecture ABI -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Primary Architecture / ABI"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_device_abi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="arm64-v8a" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Android OS & API -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Android OS / API Level"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_android_os"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="Android 14 (API 34)" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Security Patch -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Security Patch Level"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_security_patch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="2024-05-01" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Root Status -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Superuser / Root"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_root_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/ok"
+                        tools:text="Non-Root Sandbox (Standard)" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section 3: Active Security Sentinels & Engine -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SECURITY SENTINELS &amp; ENGINE"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/colorPrimaryLight"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/profile_stat_card_bg"
+                android:padding="12dp">
+
+                <!-- VPN Mode Engine -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="VPN Packet Inspection"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_vpn_engine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="Ready / On Demand" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Dual-Mode API Passive Sentinels -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Passive API Subsystem"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_api_sentinels"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/ok"
+                        android:text="Active (Exfiltration + Phishing + Sideload)" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Threat Intelligence Multi-Router -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Threat Intelligence Router"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_threat_router"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        android:text="ThreatFox + URLhaus + MalwareBazaar + VT" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section 4: Network & Private DNS -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="NETWORK &amp; CONNECTIVITY"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/colorPrimaryLight"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/profile_stat_card_bg"
+                android:padding="12dp">
+
+                <!-- Local IP -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Local IP Address"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_local_ip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="192.168.1.105" />
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/cardBorderSubtle" android:layout_marginVertical="6dp"/>
+
+                <!-- Private DNS Mode -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Private DNS Mode"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                    <TextView
+                        android:id="@+id/spec_private_dns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"
+                        tools:text="Automatic / Opportunistic" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Buttons: Copy and Close -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_copy_all"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Copy Diagnostics"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            app:icon="@drawable/ic_copy"
+            app:iconTint="#FFFFFF"
+            app:backgroundTint="?attr/colorAccent"
+            app:cornerRadius="14dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_dialog_close"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Close"
+            android:textColor="@color/highContrast"
+            app:cornerRadius="14dp" />
+    </LinearLayout>
+
+</LinearLayout>

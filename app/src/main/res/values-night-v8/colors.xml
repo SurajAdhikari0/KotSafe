@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tab bar adaptive colors (overridden for Night Mode) -->
+    <color name="tabBarBg">#0D1A2E</color>
+    <color name="tabBarDivider">#1E2D42</color>
+    <color name="tabTextSelected">#FFFFFF</color>
+    <color name="tabTextUnselected">#7A94B0</color>
+    <color name="tabSwitchTint">#7A94B0</color>
+    <color name="tabIndicatorColor">#3DDC84</color>
+    <color name="tacticalGreen">#3DDC84</color>
+    <color name="tacticalBlue">#38A8FF</color>
+    <color name="tacticalAmber">#F5B942</color>
+    <color name="tapToStartBg">#1A3DDC84</color>
+    <color name="tapToStartFg">#3DDC84</color>
+
+    <!-- Nav drawer (Night Mode) -->
+    <color name="drawerItemSelectedBg">#2E1065</color>
+    <color name="drawerItemSelectedText">#A78BFA</color>
+    <color name="drawerSeparatorColor">#1E2D42</color>
+    <color name="drawerGroupLabelColor">#7A94B0</color>
+
+    <!-- Activity Timeline (Night Mode) -->
+    <color name="timelineSurface">#0A0F1D</color>
+    <color name="timelinePanelBg">#111827</color>
+    <color name="timelineCardBg">#0F172A</color>
+    <color name="timelineBorder">#334155</color>
+    <color name="timelineTextPrimary">#F8FAFC</color>
+    <color name="timelineTextSecondary">#CBD5E1</color>
+    <color name="cardBgSecondary">#161B22</color>
+
+    <color name="colorTab">#00E5FF</color>
+    <color name="colorTabText">#94A3B8</color>
+    <color name="colorTabTextSelected">#00E5FF</color>
+    <color name="colorPrimary">#6C52AB</color>
+    <color name="colorPrimaryDark">#24144D</color>
+    <color name="colorActionBar">#121212</color>
+    <color name="colorAccent">#00E5FF</color>
+    <color name="colorAccentLight">#BCEBE7</color>
+    <color name="colorBackgroundGray">#1CFFFFFF</color>
+    <color name="navViewBackground">#FF202020</color>
+    <color name="backgroundColor">#070D1A</color>
+    <color name="drawerItemColor">#F8FAFC</color>
+    <color name="highContrast">#FFFFFF</color>
+    <color name="cardBorder">#1C2A45</color>
+    <color name="appBadgeBg">#616161</color>
+    <color name="appBadgeText">#FFFFFF</color>
+    <color name="cardBackground">#0E1729</color>
+    <color name="card_background">#0E1729</color>
+    <color name="cardBorderSubtle">#1C2A45</color>
+
+    <!-- Tactical Guardian Workbench Cards (Night Mode) -->
+    <color name="cardWorkbenchBg">#0E1729</color>
+    <color name="cardWorkbenchBorder">#1C2A45</color>
+    <color name="cardWorkbenchText">#E6EEFA</color>
+    <color name="cardWorkbenchSubtext">#8A9BBA</color>
+
+    <!-- Posture Bar Pills (Night Mode) -->
+    <color name="posturePillBg">#0E1729</color>
+    <color name="posturePillBorder">#1C2A45</color>
+
+    <!-- Tactical Guardian Status Circle (Night Mode) -->
+    <color name="statusCircleGradStart">#0E1729</color>
+    <color name="statusCircleGradMid">#070D1A</color>
+    <color name="statusCircleGradEnd">#040810</color>
+    <color name="statusCircleStroke">#3DDC84</color>
+    <color name="statusCircleText">#3DDC84</color>
+
+    <color name="badgeActiveBg">#163824</color>
+    <color name="badgeActiveFg">#4ADE80</color>
+    <color name="badgeClosedBg">#262833</color>
+    <color name="badgeClosedFg">#94A3B8</color>
+    <color name="badgeProtoBg">#2E1B4E</color>
+    <color name="badgeProtoFg">#C084FC</color>
+    <color name="badgeBlockedBg">#3B181E</color>
+    <color name="badgeBlockedFg">#F87171</color>
+    <color name="badgeTxBg">#1E293B</color>
+    <color name="badgeTxFg">#60A5FA</color>
+    <color name="badgeRxBg">#143825</color>
+    <color name="badgeRxFg">#4ADE80</color>
+    <color name="payloadBoxBg">#14131C</color>
+    <color name="payloadBoxBorder">#2D2B3F</color>
+    <color name="telemetryCardBg">#141D2C</color>
+    <color name="metricTextPrimary">#F8FAFC</color>
+    <color name="metricTextSecondary">#94A3B8</color>
+    <color name="surfaceColor">#141D2C</color>
+    <color name="surfaceVariant">#101724</color>
+    <color name="colorPrimaryLight">#8B5CF6</color>
+
+    <!-- Repeater styling -->
+    <color name="repeaterInputBg">#14131C</color>
+    <color name="repeaterInputBorder">#2D2B3F</color>
+    <color name="repeaterSpinnerBg">#2E1B4E</color>
+    <color name="repeaterSpinnerBorder">#5B21B6</color>
+    <color name="repeaterSpinnerText">#C084FC</color>
+
+    <!-- Bottom Navigation (Night Mode) -->
+    <color name="bottomNavBg">#0F172A</color>
+    <color name="bottomNavBorder">#1E293B</color>
+    <color name="bottomNavItemActive">#3DDC84</color>
+    <color name="bottomNavItemInactive">#94A3B8</color>
+    <color name="bottomNavIndicator">#162E44</color>
+
+    <!-- Security Profile (Night Mode) -->
+    <color name="profileSheetBg">#0F172A</color>
+    <color name="profileCardBg">#16202E</color>
+    <color name="profileCardBorder">#2A3C54</color>
+    <color name="profileTierBadgeBg">#162E44</color>
+    <color name="profileTierBadgeFg">#3DDC84</color>
+
+    <!-- KotSafe AI Assistant Chat (Night / Dark Mode) -->
+    <color name="aiChatBackground">#0B0F19</color>
+    <color name="aiChatBannerBg">#1E1B4B</color>
+    <color name="aiChatBannerText">#C7D2FE</color>
+    <color name="aiChatBannerIcon">#818CF8</color>
+    <color name="aiChatChipBg">#16202E</color>
+    <color name="aiChatChipText">#F8FAFC</color>
+    <color name="aiChatChipStroke">#2A3C54</color>
+    <color name="aiChatUserBubbleBg">#312E81</color>
+    <color name="aiChatUserBubbleStroke">#4338CA</color>
+    <color name="aiChatUserBubbleText">#FFFFFF</color>
+    <color name="aiChatAssistantBubbleBg">#141D2C</color>
+    <color name="aiChatAssistantBubbleStroke">#2E3F58</color>
+    <color name="aiChatAssistantBubbleText">#F8FAFC</color>
+    <color name="aiChatAssistantSenderText">#38BDF8</color>
+    <color name="aiChatInputBarBg">#0F172A</color>
+    <color name="aiChatInputBg">#141D2C</color>
+    <color name="aiChatInputBorder">#2A3C54</color>
+    <color name="aiChatInputText">#F8FAFC</color>
+    <color name="aiChatInputHint">#64748B</color>
+
+    <!-- About Screen (Night Mode) -->
+    <color name="aboutCardBg">#141D2C</color>
+    <color name="aboutFeatureIconBg">#1E1B4B</color>
+    <color name="aboutFeatureIconFg">#A78BFA</color>
+    <color name="aboutLinkColor">#00E5FF</color>
+    <!-- KotSafe Redesign Colors (Night) -->
+    <color name="ks_ground">#070D1A</color>
+    <color name="ks_card">#0E1729</color>
+    <color name="ks_stroke">#1C2A45</color>
+    <color name="ks_ink">#E6EEFA</color>
+    <color name="ks_grey">#8A9BBA</color>
+    <color name="ks_accent">#3DDC84</color>
+    <color name="ks_blue">#38A8FF</color>
+    <color name="ks_purple">#B79AE0</color>
+    <color name="ks_amber">#F5B942</color>
+    <color name="ks_danger">#FF5A5F</color>
+    <color name="ks_tab_strip">#0A1222</color>
+    <color name="ks_navy">#13213D</color>
+    <color name="ks_on_navy">#E6EEFA</color>
+    <color name="ks_gold">#F5B942</color>
+    <color name="ks_ring_start">#3DDC84</color>
+    <color name="ks_ring_end">#38A8FF</color>
+    <color name="ks_ring_tint">#143DDC84</color>
+    <color name="ks_ring_text">#D8F8E6</color>
+    <color name="ks_hero_num">#3DDC84</color>
+    <color name="ks_pill_bg">#1F3DDC84</color>
+    <color name="ks_tint_green">#12362F</color>
+    <color name="ks_tint_blue">#1B2842</color>
+    <color name="ks_tint_red">#3A2219</color>
+    <color name="ks_tint_amber">#3A311A</color>
+    <color name="ks_tint_purple">#2A2140</color>
+    <color name="ks_nav_tint">#2961DC84</color>
+    <integer name="ks_glow_alpha">204</integer>
+</resources>

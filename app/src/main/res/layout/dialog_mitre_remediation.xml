@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Drag handle -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/about_version_pill" />
+
+        <!-- Top row: ID, Tactic Pill, Close -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/remediation_technique_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryLight"
+                android:background="@drawable/about_version_pill"
+                android:text="T1437" />
+
+            <TextView
+                android:id="@+id/remediation_tactic_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/badge_pill_bg"
+                android:text="Persistence" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/remediation_status_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="3dp"
+                android:paddingBottom="3dp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/badge_pill_bg"
+                android:text="🔴 ACTIVE THREAT" />
+        </LinearLayout>
+
+        <!-- Technique Name -->
+        <TextView
+            android:id="@+id/remediation_technique_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/highContrast"
+            android:text="Abuse Accessibility Features" />
+
+        <!-- Technique Description -->
+        <TextView
+            android:id="@+id/remediation_technique_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textSize="13sp"
+            android:textColor="@color/metricTextSecondary"
+            android:lineSpacingMultiplier="1.2"
+            android:text="Malware abuses accessibility services to perform UI spoofing and keylogging." />
+
+        <!-- MITRE D3FEND Countermeasure Box -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#3310B981"
+            app:cardBackgroundColor="#0A10B981">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/remediation_d3fend_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#10B981"
+                    android:text="🛡️ MITRE D3FEND Countermeasure: D3-SVE" />
+
+                <TextView
+                    android:id="@+id/remediation_d3fend_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/highContrast"
+                    android:text="Screen Verification &amp; Accessibility Watchdog active." />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Live Device Evidence Box -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/remediation_evidence_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/cardBorderSubtle"
+            app:cardBackgroundColor="@color/cardBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/highContrast"
+                    android:text="🔍 Live Device Telemetry &amp; Incidents" />
+
+                <TextView
+                    android:id="@+id/remediation_evidence_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary"
+                    android:text="Sensor active • No anomalous activity observed" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action Buttons Section Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryLight"
+            android:text="DEFENSIVE ACTION CENTER" />
+
+        <!-- 1. Ask AI SOC Analyst Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_ask_ai_soc"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:text="🤖 Consult Autonomous AI SOC Analyst"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="10dp"
+            app:backgroundTint="@color/colorPrimary" />
+
+        <!-- 2. Apply Firewall Drop Rule Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_remediate_firewall"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:text="🛡️ Apply Firewall Isolation Rule"
+            android:textSize="13sp"
+            android:textColor="@color/highContrast"
+            app:cornerRadius="10dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/cardBorderSubtle"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+        <!-- 3. Quarantine App Button (Only visible if mapped apps exist) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_remediate_quarantine"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="8dp"
+            android:text="📦 Quarantine Associated App"
+            android:textSize="13sp"
+            android:textColor="#EF4444"
+            app:cornerRadius="10dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#EF4444"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+        <!-- 4. Open MITRE Knowledge Base Link -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_open_mitre_url"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="🌐 View Official MITRE ATT&amp;CK Specification"
+            android:textSize="12sp"
+            android:textColor="@color/metricTextSecondary"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:title="@string/firewall"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="firewall"
+            app:title="@string/firewall_master_toggle"
+            app:summary="@string/firewall_master_toggle_summary"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            app:key="firewall_wl_mode"
+            app:title="@string/whitelist_mode"
+            app:summary="@string/whitelist_mode_summary"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            app:key="block_new_apps"
+            app:title="@string/block_new_apps"
+            app:summary="@string/block_new_apps_summary"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            app:key="firewall_screen_off_block"
+            app:title="@string/firewall_screen_off_block"
+            app:summary="@string/firewall_screen_off_block_summary"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/firewall_rules"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="manage_firewall_rules"
+            app:title="@string/manage_firewall_rules"
+            app:summary="@string/manage_firewall_rules_summary"
+            app:iconSpaceReserved="false">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.kotsafe.security"
+                android:targetClass="com.kotsafe.security.activities.FirewallActivity" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

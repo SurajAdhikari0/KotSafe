@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:overScrollMode="ifContentScrolls"
+    android:paddingBottom="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Top Drag Handle -->
+        <View
+            android:layout_width="44dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="14dp"
+            android:background="@drawable/bg_badge_neutral" />
+
+        <!-- Header Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:id="@+id/iv_header_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_search"
+                app:tint="#38BDF8"
+                android:background="@drawable/bg_investigation_score_ring"
+                android:padding="6dp"
+                android:layout_marginEnd="10dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Deep Threat Investigation"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Multi-Source OSINT &amp; AI Correlation"
+                    android:textSize="11sp"
+                    android:textColor="#94A3B8" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/btn_close_dialog"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_close"
+                app:tint="#94A3B8"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Close Dialog" />
+        </LinearLayout>
+
+        <!-- Monospace IOC Pill Container with Copy Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_investigation_ioc_container"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tv_investigate_ioc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:textColor="#38BDF8"
+                android:fontFamily="monospace"
+                android:maxLines="2"
+                android:ellipsize="middle"
+                android:textIsSelectable="true"
+                tools:text="185.220.101.5 (IP)" />
+
+            <TextView
+                android:id="@+id/tv_investigate_mode_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OTX + AI"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:textColor="#38BDF8"
+                android:background="@drawable/badge_pill_bg"
+                android:backgroundTint="#1E293B"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:layout_marginEnd="6dp" />
+
+            <ImageView
+                android:id="@+id/btn_copy_ioc"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:padding="5dp"
+                android:src="@drawable/ic_copy"
+                app:tint="#94A3B8"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Copy IOC" />
+        </LinearLayout>
+
+        <!-- Loading Progress Bar -->
+        <ProgressBar
+            android:id="@+id/pb_investigation_loading"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:indeterminate="true"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone" />
+
+        <!-- Executive Posture & Decision Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_threat_posture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1E293B"
+            app:cardBackgroundColor="#0F172A">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Score Circle / Badge Container -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:id="@+id/tv_threat_score"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--%"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="#EF4444" />
+
+                        <TextView
+                            android:id="@+id/tv_threat_level"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ANALYZING..."
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:textColor="#94A3B8"
+                            android:background="@drawable/badge_pill_bg"
+                            android:backgroundTint="#1E293B"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="56dp"
+                        android:background="#1E293B"
+                        android:layout_marginEnd="16dp" />
+
+                    <!-- Verdict and Action Decision -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_ai_verdict"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="CORRELATING THREAT INTEL..."
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="#F59E0B"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
+
+                        <TextView
+                            android:id="@+id/tv_ai_decision"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="ACTION: PENDING ANALYSIS"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#38BDF8"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
+
+                        <TextView
+                            android:id="@+id/tv_ai_confidence"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Multi-source correlation active"
+                            android:textSize="11sp"
+                            android:textColor="#94A3B8"
+                            android:maxLines="1"
+                            android:ellipsize="end" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Malware Family / Campaign Banner -->
+                <LinearLayout
+                    android:id="@+id/layout_malware_family"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="8dp"
+                    android:background="@drawable/badge_pill_bg"
+                    android:backgroundTint="#1F2937">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_skull"
+                        app:tint="#EF4444"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Threat Family: "
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#E2E8F0" />
+
+                    <TextView
+                        android:id="@+id/tv_malware_family"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Unknown Threat / Unclassified"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#F87171"
+                        android:maxLines="2"
+                        android:ellipsize="end" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Multi-Source Threat Intelligence Section Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MULTI-SOURCE THREAT INTEL MATRIX"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#94A3B8"
+            android:letterSpacing="0.06"
+            android:layout_marginBottom="6dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1E293B"
+            app:cardBackgroundColor="#0F172A">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <!-- Horizontally Scrollable Badges Row - Never clips on small screens -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:overScrollMode="never"
+                    android:layout_marginBottom="10dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/badge_otx"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AlienVault OTX"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#38BDF8"
+                            android:background="@drawable/badge_pill_bg"
+                            android:backgroundTint="#1E293B"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="5dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/badge_threatfox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ThreatFox"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#A78BFA"
+                            android:background="@drawable/badge_pill_bg"
+                            android:backgroundTint="#1E293B"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="5dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/badge_urlhaus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="URLhaus"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#34D399"
+                            android:background="@drawable/badge_pill_bg"
+                            android:backgroundTint="#1E293B"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="5dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/badge_vt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="VirusTotal"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#FBBF24"
+                            android:background="@drawable/badge_pill_bg"
+                            android:backgroundTint="#1E293B"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="5dp" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/tv_intel_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#E2E8F0"
+                    android:lineSpacingExtra="4dp"
+                    tools:text="AlienVault OTX reported 14 pulses with high threat confidence. ThreatFox lists this IOC as a botnet C2 node." />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Indicator Purpose & Motivation Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="INDICATOR PURPOSE &amp; FORENSIC BREAKDOWN"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#94A3B8"
+            android:letterSpacing="0.06"
+            android:layout_marginBottom="6dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#1E293B"
+            app:cardBackgroundColor="#0F172A">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <!-- Purpose Box -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_bolt"
+                        app:tint="#F59E0B"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Why was this IOC used?"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#F1F5F9" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_indicator_purpose"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#E2E8F0"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginBottom="12dp"
+                    tools:text="Command &amp; Control (C2) server used to receive exfiltrated credentials and issue reverse shell payloads." />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1E293B"
+                    android:layout_marginBottom="10dp" />
+
+                <!-- Reasoning & Evidence -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI Forensic Reasoning"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#94A3B8"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_ai_reasoning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#CBD5E1"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginBottom="12dp"
+                    tools:text="The IP is tied to active brute-force scanners and malicious HTTP endpoints with zero benign CDN attributes." />
+
+                <!-- Recommended Remediation -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Recommended Action"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#94A3B8"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_ai_remediation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#34D399"
+                    android:lineSpacingExtra="4dp"
+                    tools:text="Block this IP immediately at firewall level. Terminate connection and isolate calling app." />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 1-Click Action Center -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SECURITY ACTIONS"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#94A3B8"
+            android:letterSpacing="0.06"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Primary Action: Block Firewall Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_block_firewall"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="🛡️ Block in Firewall"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="#DC2626"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Isolate App Button (Conditional) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_isolate_app"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="46dp"
+                android:text="📱 Isolate Calling App"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#F59E0B"
+                app:strokeColor="#F59E0B"
+                app:strokeWidth="1dp"
+                app:cornerRadius="12dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <!-- External Threat Intel Buttons (VirusTotal & AlienVault OTX) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_open_otx"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="🌐 AlienVault OTX"
+                    android:textSize="12sp"
+                    android:textColor="#38BDF8"
+                    app:strokeColor="#0284C7"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="10dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_open_vt"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="🔍 VirusTotal"
+                    android:textSize="12sp"
+                    android:textColor="#FBBF24"
+                    app:strokeColor="#D97706"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="10dp" />
+            </LinearLayout>
+
+            <!-- Bottom Row: Share Dossier & Whitelist -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_share_dossier"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
+                    android:layout_weight="1"
+                    android:text="📋 Copy Dossier"
+                    android:textSize="12sp"
+                    android:textColor="#94A3B8"
+                    android:layout_marginEnd="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_whitelist"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
+                    android:layout_weight="1"
+                    android:text="✓ Mark as Safe"
+                    android:textSize="12sp"
+                    android:textColor="#94A3B8"
+                    android:layout_marginStart="4dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,43 @@
+{
+  "id": "RULE-NET-004",
+  "name": "Cryptomining Pool Stratum Protocol Traffic",
+  "severity": "HIGH",
+  "triggerSchedule": "REALTIME_NET",
+  "mitreTechniques": [
+    "T1496"
+  ],
+  "tactics": [
+    "Impact"
+  ],
+  "description": "Detects outbound network sockets attempting connections to Monero / Crypto mining pools using standard mining ports (3333, 5555, 7777, 8888) or known mining pool endpoints.",
+  "target": "network",
+  "iocs": {
+    "domains": [
+      "pool.supportxmr.com",
+      "xmr.nanopool.org",
+      "pool.minexmr.com",
+      "moneroocean.stream",
+      "gulf.moneroocean.stream"
+    ]
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "domain",
+        "operator": "regex",
+        "value": ".*(supportxmr|nanopool|minexmr|moneroocean|hashvault).*"
+      },
+      {
+        "field": "port",
+        "operator": "in",
+        "values": [
+          3333,
+          7777,
+          8888
+        ]
+      }
+    ]
+  },
+  "remediation": "Check battery and CPU usage in Settings, identify the mining app, and block pool traffic in Firewall."
+}

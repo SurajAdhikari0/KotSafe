@@ -1,0 +1,505 @@
+# Changelog
+
+## [2.1.0] - KotSafe Clean-Room Architecture - 2026-10-03
+- **Clean-Room Native Engine (KotEngine)**: Complete replacement of legacy packet capture core with high-performance C11 engine (`libkotengine.so`).
+- **Lock-Free SPSC Circular Ring Buffer**: Eliminated Java heap per-packet allocation overhead during Gigabit capture.
+- **FoxIO JA4 / JA4+ TLS Fingerprinting**: Real-time client hello parsing and hashing directly in native C.
+- **Shannon Entropy Engine**: Real-time payload entropy scoring for C2 beacon and DGA detection.
+- **Sub-Microsecond Radix Trie Filter**: Zero-copy CIDR and IP blocklist evaluation.
+- **Modular Kotlin VPN Layer**: Decomposed `CaptureService` into Kotlin controllers (`VpnNotificationManager`, `VpnNetworkMonitor`, `VpnDumperController`).
+- **Zero Legacy PCAPdroid Native Code**: Upstream C code and submodules (nDPI, libpcap, zdtun) 100% removed.
+
+## [2.0.1] - 2026-09-09
+- Update maltrail malware blacklist URL
+- Bump mitm addon to 2.4, fixes decryption with root
+- Fix null mitm certificate after export on some devices (#887)
+- Fix firewall not working with always-on VPN when root capture is enabled
+- Fix other inconsistencies when running via always-on VPN / from Intent
+- Fix possible crash in ConnectionsFragment
+
+## [2.0.0] - 2026-08-19
+- PCAPdroid now requires Android 23+
+- The mitm addon now requires Android 24+ and it drops support for the x86 and armeabi-v7a ABIs
+- Add Capture List: show past captures and their size on disk (#281)
+- Implement app isolation (#536)
+- Add settings export and import (#379)
+- Android 17 support: the "Nearby devices" permission is now required
+- Add port mapping exemptions (#861)
+- Make connections log size configurable (#849)
+- Allow to specify the UDP/TCP collector as a domain name (#807)
+- Bump mitm addon to v2.3 (mitmproxy 12.2.3, full 16 KB devices support, fix IPv6 decryption and AttributeError)
+- Bump ushark decryption module (wireshark v4.7.1)
+- Simplify open/decrypt PCAP/Pcapng
+- New translations: BN, FR, HI, JA, KO, MS, UR, VI
+- Fix auto-update from the Github build to the Google Play build
+- Fix binary body corruption in HAR export (#876)
+- Fix RTL layout issues (#880)
+- Minor bug fixes
+
+## [1.9.1] - 2026-02-22
+- Fix minor crashes
+- Switch to facebook/zstd and build from the source
+
+## [1.9.0] - 2026-02-12
+- New HTTP requests view
+- Export HTTP data in the HAR format
+- Add Portuguese (BR) translation
+- Support the zstd compression
+- Fix HTTP/2 handling (possible mismatch of requests and replies)
+- Fix WebSocket data loading from PCAP file
+- Fix buffer overruns and leaks when decrypting PCAP files
+- New language selector on Android 12 and below
+- Select and export individual connections
+- Pretty-print JSON in HTTP data
+- Support using domain names in port mapping
+- Add toggle to show system apps
+- Export data in background threads to avoid UI hangs
+- Fix ushark crash on x86_64 when decrypting PCAP files (F-Droid only)
+
+## [1.8.8] - 2025-09-03
+- Support 16 KB page size devices
+- Make PCAP/CSV file name prefix configurable
+- Fix possible invalid Pcapng block length with root
+- New API options: full_payload, keylog filename, decryption rules (credits: c4rl2s0n)
+
+## [1.8.7] - 2025-07-24
+- Minor fixes
+- Update billing library (Play build)
+
+## [1.8.6] - 2025-05-13
+- Add TCP exporter dump mode (pcap-over-ip)
+- Allow PCAPdroid capture control without prompt via API key
+
+## [1.8.5] - 2025-04-25
+- Fix GeoIP db download with Arabic language
+
+## [1.8.4] - 2025-03-23
+- Fix possible unaligned memory access on ARMv7 in libndpi.so (is_stun)
+- Fix minor crashes on specific devices
+- Remove BUILD_TIME for reproducible F-Droid builds
+- Change icons and add banners according to the Android TV guidelines
+- Update translations
+
+## [1.8.3] - 2025-03-08
+- Fix crash when adding a protocol filter
+- Fix possible Skus deserialization errors (Play build)
+- Fix empty state not visible in edit list views
+- Support building ushark from the source (F-Droid)
+- Update NDK to r26d
+
+## [1.8.2] - 2025-03-04
+- Fix crash on capture start with port mapping rules
+
+## [1.8.1] - 2025-03-04
+- Fix crash on capture start if the geolocation db was downloaded
+
+## [1.8.0] - 2025-03-03
+- Android 15 support with edge-to-edge UI
+- Decrypt TLS traffic in PCAP/Pcapng files (Wireshark integration)
+- New firewall rules: block by country and by CIDR
+- Add support for PCAPdroid extensions in Pcapng
+- Reduce blacklists RAM usage by ~25 MB and increase limit to 1500k rules
+- Show detailed error information for failed connections in VPN mode
+- New UI filter to show connections bigger than a given bytes threshold
+- Add Azerbaijani translation (Jamil Farajov)
+- Add Tamil translation (credits: தமிழ்நேரம்)
+- Update nDPI to 4.12 and reduce library size by 66%
+- Enable r8 minify to reduce apk size
+- Update to Java 17 and enable desugaring to support older devices
+
+## [1.7.5] - 2024-11-09
+- Fix root capture stall when target apps are set
+
+## [1.7.4] - 2024-10-16
+- Fix root capture start in some non-magisk su binaries (credits: jackyzy823)
+- The mitm addon now uses mitmproxy 11
+- Include the package name in the CSV output (credits: Chris Vanstone)
+
+## [1.7.3] - 2024-09-07
+- Allow setting the app language from the system (for Android 13+)
+- Mitm addon v1.2: allow public files write, fix enabled addons reset, fix addons reload
+- You can now use a compatible mitm addon with the same major version
+- Detect always-on VPN enabled after capture start
+- Catch possible crash in getUserBadgedIcon in Android 8
+- Disable unfinished languages: fr, ja, ko, nb, pl, pt
+
+## [1.7.2] - 2024-04-20
+- Fix broken PCAP file loading feature
+- Minor enhancements
+
+## [1.7.1] - 2024-03-28
+- Add toggle for auto-reconnection on third-party VPN termination
+- Fix uninstalled apps not removed from app filter
+- Add IPv6 bytes stats (credits: myzhan)
+
+## [1.7.0] - 2024-02-10
+- Select multiple target apps
+- Copy/export the connections payload
+- Android 14 support
+- mitmproxy 10.1.6 and Doze fix
+- Ability to block QUIC only on decryption
+- Fix decryption status for QUIC connections
+- Fix inaccurate firewall grace period
+- Integrations to run with Tor and DNSCrypt
+- Use your own mitmproxy addons (experimental)
+- Remove mitm-addon permission
+- Show termux main app instead of its sub-apps
+- Use ISO 8601 dates in CSV export
+
+## [1.6.9] - 2023-12-04
+- Fix root capture start on some devices
+- Fix root permission incorrectly requested on read from pcap file
+- Fix capture control modal incorrectly shown
+- Fix possible crash on null CaptureSettings
+- Fix possible SecurityException while opening PCAP file
+
+## [1.6.8] - 2023-09-01
+- Fix root capture/pcap loading in playstore build due to AAB packaging
+- Fix possible permission denied error on PCAP file open
+
+## [1.6.7] - 2023-08-31
+- Fix root capture start failure due to short timeout
+- Fix NumberFormatException in PCAP open / CSV export
+- Add Ukrainian translation (credits: odkate)
+- Do not resolve socks5 server host if disabled
+
+## [1.6.6] - 2023-08-28
+- Add ability to open PCAP/PCAPNG files
+- Add Arabic translation (credits: Mustafa Hamed Kathem)
+- Fix app not blocked by firewall after reinstallation
+- Fix DNS from unknown app incorrectly blocked in firewall whitelist mode
+- Support IPv6 and host names in socks5 mode
+
+## [1.6.5] - 2023-06-15
+- Add ability to inject javascript into web pages (PCAPdroid-mitm)
+- TLS decryption is now rule-based, it only applies to specified connections
+- App icon on Android 13 can be themed now (credits: incycledream)
+- Allow exporting the SSLKEYLOG after anomalous app stop
+- IPv6 fixes: fix ICMPv6, fix crash on invalid DNS, capture of ULA traffic
+
+## [1.6.4] - 2023-04-24
+- Fix QR code activation crash on Android 32+
+- Update translations
+
+## [1.6.3] - 2023-04-23
+- Add paid features activation via QR code for non-Play builds
+- Fix firewall not working when loading duplicate domain rules
+- Fix repeated local TCP connection attempts on some devices when private DNS is enabled
+- Minor bug fixes
+
+## [1.6.2] - 2023-03-31
+- Update mitm addon to mitmproxy 9.0.1
+- Add SOCKS5 authentication via username and password
+- Add workaround for mitm addon connection failure
+- Update German translation (credits: Mario Herrmann)
+
+## [1.6.1] - 2023-02-10
+- Fix Android TV navigation
+- Fix minor crashes
+
+## [1.6.0] - 2023-01-16
+- Add firewall whitelist mode: block everything, unless whitelisted
+- Add pcapng format: removes the need for a separate SSLKEYLOG (paid feature)
+- Add port mapping: redirect traffic to given hosts/ports
+- Custom rules can now be added from the UI
+- DNS servers are now configurable
+- Add TLS decryption whitelist
+- Simplify PCAP dump to file
+- Sort apps by total/sent/received bytes
+- Full payload can now be disabled in TLS decryption mode
+- Support custom mitmproxy options
+- The application and the mitmproxy logs can now be viewed in-app
+- Apps stats can now be reset
+
+## [1.5.6] - 2022-09-24
+- Extend STUN compatibility
+- Fix Whatsapp calls being dropped (no-root)
+- Add ability to skip TLS certificate installation
+- Fix paid features docs URLs and appearance on first app start
+- Fix capture stopped with always-on and start-on-boot
+
+## [1.5.5] - 2022-08-25
+- You can now buy unlock tokens to access paid features in non-Play builds
+- Fix minor crashes and ANR
+- Fix JNI leaks and prevent local references overflow
+- Fix deprecations
+
+## [1.5.4] - 2022-08-04
+- Unblock newly installed apps via notification action (firewall)
+- Fix context menu action possibly applied to wrong item
+- Fix ICMPv6 not captured with root and app filter
+- Fix package search with uppercase letters
+- Fix PCAP file selection dialog sometimes not appearing
+
+## [1.5.3] - 2022-07-13
+- Add support for Android 13 Tiramisu
+- Add VPN exemptions to exclude specific apps from the VPN
+- Ability to set IPv6-only VPN mode
+- Add filter to only show cleartext connections
+- Ability to block newly installed apps (firewall)
+- Ability to temporary unblock an app (firewall)
+- Show scam-prevention messages
+- Deny sending traffic to remote servers via CaptureCtrl to prevent scams
+- Fix possible IllegalStateException in the status view
+
+## [1.5.2] - 2022-06-22
+- Add ability to only show the connections allowed by the firewall
+- Monitor memory usage and disable full payload on low memory
+- Fix possible SecurityException in Android 11
+- Fix crash on tap on uninstalled app
+- Fix ANR on first root capture start
+
+## [1.5.1] - 2022-06-07
+- Resolve correct apps details with work profiles in root mode
+- Fix app filter icon not shown on capture start
+- Fix crash on screen rotation in connection details
+- Fix some occasional crashes
+
+## [1.5.0] - 2022-06-02
+- No-root firewall: block apps, domains and IP addresses (paid feature)
+- Ability to decrypt TLS traffic, display decrypted data, export the SSLKEYLOGFILE
+- Inspect HTTP requests and replies thanks to the built-in decoders (brotli, deflate, gzip)
+- Uploads in VPN mode are now faster and less cpu intensive
+- Inspect the full connections' payload as hexdump/text
+- Add ability to import/export rules
+- Fix uid resolution failing with root after some time
+- Fix PCAP dump of invalid/unsupported packets in root
+- Reduce APK size: geolocation db is now optional
+- Intent-based API now reports traffic stats
+- Add app on-boarding on first start
+- Add ability to disable blocking of private DNS
+- Add German translation (credits: Robin)
+- Add Indonesian translation (credits: Reza Almanda)
+- Add Turkish translation (credits: Oğuz Ersen)
+- Minor fixes and improvements
+
+## [1.4.8] - 2022-04-22
+- Fix corrupted PCAP file on Android 10+ when overwriting existing file
+- Start the capture by tapping "Ready"
+- Allow inspecting connections after the capture is stopped
+- Support UDP STUN in non-root mode
+- Faster uid resolution and other improvements
+
+## [1.4.7] - 2022-02-10
+- Fix unsolicited capture start when swiping the app from recent apps
+- Fix ForegroundServiceStartNotAllowedException in Android 12
+- Fix ANR when stopping the capture
+- Fix empty stats when there is no traffic
+- Update to nDPI 4.2
+
+## [1.4.6] - 2022-02-06
+- Improve capture performance when PCAP dump is enabled
+- Always-on VPN is now fully supported
+- Add Norwegian translation (credits: Allan Nordhøy)
+- Add French translation (credits: J. Lavoie and Maxime Leroy)
+- Fix Android 11/12 crash when invoked via the Intent-based API
+- Fix SecurityException crash on Android TV with PCAP file dump
+- Fix packets truncated with root on devices with sw/hw offloading
+- Fix use-after-free in root mode
+- Fix memory leak with HTTP server PCAP dump when a client disconnects
+- Add native code testing and fuzzing
+
+## [1.4.5] - 2022-01-06
+- Reduce the memory usage, in particular during the capture
+- Malware detection now blocks malicious connections in non-root mode (paid feature)
+- Add ability to filter connections by capture interface in root mode
+- Add spanish translation (credits: sguinetti)
+- Improve stability: add tests, bounds checks, synchronization
+- Fix crashes when no activity is available to handle intents
+- Fix crash in root mode when the internet interface goes down
+- Workaround for crash due to IndexOutOfBoundsException in RecyclerView
+- Fix long press on a connection which is being updated
+- Re-enable always-on VPN support
+- Improve Android TV support, support devices with no wifi
+
+## [1.4.4] - 2021-11-23
+- New malware detection overview: show blacklists and detection status
+- Show destination country and ASN in the connection details
+- Add ability to start the capture at boot
+- Reduce packet processing delay during UI updates
+- Fix no Internet when a custom private DNS is set
+- Add ability to grant persistent capture control permissions
+
+## [1.4.3] - 2021-10-30
+- Implement blacklist-based malware detection with alerts (paid feature)
+- Filter connections: only plaintext, state (e.g. only open), not hidden, malicious
+- Fix a bug which, in rare cases, caused the connections view to stop being updated
+- Fix some closed connections being marked with the Unknown protocol
+- Improve netd app resolution with root capture
+- Ability to copy host/IP/URL/plaintext on long press
+- Added whois IP lookup button
+- "Whitelist" is now called "Hidden Connections"
+
+## [1.4.2] - 2021-09-11
+- Ability to select the capture interface in root mode
+- Ability to start/stop the capture from other apps via Intent
+- Improve pcapd error reporting
+- The copy action now also dumps the request plaintext
+
+## [1.4.1] - 2021-07-31
+- Fix crash in some devices with PCAPdroid trailer
+- Add ability to build on Windows
+
+## [1.4.0] - 2021-07-20
+- Ability to export app name to Wireshark (PCAPdroid trailer)
+- Add apps details page with app metadata and permissions
+- Allow searching by source and destination port
+- Packet capture optimizations
+- Add in-app purchases to remove ads
+- Add packet drops for root capture
+- Add IPv6 and ICMP support for root capture
+- Fix root capture stall in some cases
+- Fix PCAP dump in root mode
+- Fix truncated full size packets in root mode and handle fragments
+- PCAP timestamps in root mode now correspond to the capture timestamps
+- Fix ping to known DNS servers being blocked
+
+## [1.3.9] - 2021-06-16
+This release brings a set of new features to make it easier to spot unwanted connections!
+
+- Long press a connection to whitelist it, making it easy to filter out background traffic
+- Add ability to search connections
+- Most netd DNS connections are now resolved into actual apps
+- Add Brazilian translation (credits: mezysinc)
+- Add Japanese translation (credits: Akihiro Nagai)
+
+## [1.3.8] - 2021-06-03
+- Fix monodirectional connections with LINUX_SLL in root mode
+- Show plaintext request data (e.g. HTTP headers) in the connection details
+
+## [1.3.7] - 2021-05-19
+- Handle DLT_LINUX_SLL to fix some root daemon start issues
+
+## [1.3.6] - 2021-05-01
+- Implement root based capture to run with other VPN apps
+- Fix bad URL when an HTTP proxy is used
+
+## [1.3.5] - 2021-04-14
+- Fix delays and slow downs with big uploads
+- Add SOCKS5 client, allowing to use the official mitmproxy
+- Implement MSS and TCP window scaling options
+
+## [1.3.4] - 2021-03-30
+- Add dark theme
+- Android TV: fix file selection and other improvements
+- Fix UDP broadcast connections
+
+## [1.3.3] - 2021-03-25
+- You can now donate! Check out the user guide for instructions
+- Add IPv6 support
+- Reduce background battery and RAM consumption
+- Add russian translation (credits: rikishi)
+- Add italian translation
+- Add ability to switch between system language and english
+- Improve TCP and DNS connections handling
+- Connection details stats now automatically refresh
+- Fix DNS resolution failures on main network change
+
+## [1.3.2] - 2021-03-09
+- Add ICMP connections support
+- Reduce app icons load time and RAM usage
+- Fix crash in Bitmap.createBitmap
+
+## [1.3.1] - 2021-03-07
+- Fix startup crash before Oreo
+
+## [1.3.0] - 2021-03-05
+- Retain the connections log during the whole capture
+- Add Android TV support
+- New app layout for easier interaction
+- Export the connections log to a CSV file
+- Filter the connections log by app
+- New Apps view to review the total traffic and connections by app
+- Clipboard copy and export of the connection details
+- Add persistent notification while capture is running
+- Apps can now conveniently searched via the searchbar
+
+## [1.2.16] - 2021-02-23
+- Fix non-selectable text in connections details
+- Fix start button not working on first app run
+
+## [1.2.15] - 2021-02-20
+- Improve connections stability
+- Report fatal native errors to the user
+
+## [1.2.14] - 2021-02-14
+- Fix DNS resolution not working when an IPv6 DNS server is configured
+
+## [1.2.13] - 2021-02-12
+- More sockets checks to prevent crashes
+- Add stats view with traffic and debug information
+- UI improvements: apps loading toast, start button position
+- ViewPager2 migration (credits: TacoTheDank <SkytkRSfan3895@gmail.com>)
+
+## [1.2.12] - 2021-01-26
+- minSdkVersion is now 21 (Lollipop)
+- Improve DNS traffic capture when an app filter is set
+
+## [1.2.11] - 2021-01-25
+- Fix empty apps list in Android 11
+
+## [1.2.10] - 2021-01-23
+- Ask confirmation when another VPNService is running
+- Rework modules dependencies
+
+## [1.2.9] - 2021-01-17
+- Fix crash when app is stopped from the system VPN settings
+
+## [1.2.8] - 2021-01-11
+- Improve TCP connections stability with big packets
+- Add chinese translation (credits: sr093906)
+- Update nDPI and gradle dependencies
+- Fix some crashes
+
+## [1.2.7] - 2021-01-07
+- Fix app ID not resolved on android >= Q
+- Resolve system apps UIDs
+
+## [1.2.6] - 2020-11-16
+- Add support for TLS decryption via mitmproxy
+- Fix occasional crash due to null ConnDescriptor in array
+- Connections view consistency fixed when app filter is in use
+- Update nDPI to 3.4 stable
+- Add links: rate app, telegram channel, user guide
+
+## [1.2.5] - 2020-09-20
+- Fix crash on subsequent app runs
+
+## [1.2.4] - 2020-09-18
+- Traffic monitoring fix
+- JNI fixes and optimizations
+
+## [1.2.3] - 2020-02-19
+- Add polish translation (Atrate <Atrate@protonmail.com>)
+- Add more compact layout for screens lower than 480dp
+- JNI crashes fixes
+
+## [1.2.2] - 2020-01-11
+- Fix crash while clicking on the HTTP server URL
+- Improve local HTTP server IP detection
+
+## [1.2.1] - 2020-01-06
+- New embedded HTTP server to easily download the PCAP from multiple devices
+- Choose how to dump packets: HTTP server, UDP exporter, none.
+- App renamed to PCAPdroid, changed version scheme, added changelog
+
+# Older Releases
+
+Releases available at https://github.com/emanuele-f/RemoteCapture/releases
+
+## [1.2] - 2020-01-01
+- New tab to display the active connections, with server name and traffic volume
+- Show server name, DNS query, L7 protocol information from nDPI
+- Click on a connection to show its details
+- Use the system DNS server (fallback to 8.8.8.8 only if not available)
+
+## [1.1] - 2019-11-03
+- Fix app state loading after resume
+- Add option to enable/disable unknown app traffic capture
+- Add UDP receiver python script to easily pause and resume capture
+
+## [1.0] - 2019-10-26
+- Capture apps traffic without root
+- Send captured traffic via UDP
+- Show captured traffic realtime statistics
+- Apply a filter to only capture traffic for the selected app

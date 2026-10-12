@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/cardBackground"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/cardBorderSubtle"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- App Icon -->
+        <ImageView
+            android:id="@+id/app_icon"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@string/apps"
+            android:scaleType="fitCenter"
+            tools:src="@drawable/ic_apps" />
+
+        <!-- App Information -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Title & Category Pill -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/app_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:singleLine="true"
+                    android:textColor="@color/metricTextPrimary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Google Chrome" />
+
+                <TextView
+                    android:id="@+id/badge_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/badge_pill_active"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="1dp"
+                    android:textColor="@color/badgeActiveFg"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    tools:text="USER" />
+            </LinearLayout>
+
+            <!-- Package Name -->
+            <TextView
+                android:id="@+id/app_package"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:singleLine="true"
+                android:textColor="@color/metricTextSecondary"
+                android:textSize="11sp"
+                tools:text="com.android.chrome" />
+
+            <!-- Metadata Row: UID, Version, Traffic & Firewall Badges -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/badge_uid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_pill_closed"
+                    android:fontFamily="sans-serif"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="1dp"
+                    android:textColor="@color/badgeClosedFg"
+                    android:textSize="10sp"
+                    tools:text="UID 10045" />
+
+                <TextView
+                    android:id="@+id/tv_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif"
+                    android:singleLine="true"
+                    android:textColor="@color/metricTextSecondary"
+                    android:textSize="10sp"
+                    tools:text="v120.0" />
+
+                <TextView
+                    android:id="@+id/badge_traffic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/badge_pill_rx"
+                    android:fontFamily="sans-serif-medium"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="1dp"
+                    android:textColor="@color/badgeRxFg"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:text="⬇ 4.2 MB"
+                    tools:visibility="visible" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <!-- Firewall Badges -->
+                <ImageView
+                    android:id="@+id/blocked"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_block"
+                    android:visibility="gone"
+                    app:tint="@color/statusError"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/wifi_blocked"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginStart="3dp"
+                    android:contentDescription="@string/wifi_blocked"
+                    android:src="@drawable/ic_wifi"
+                    android:visibility="gone"
+                    app:tint="@color/statusError" />
+
+                <ImageView
+                    android:id="@+id/mobile_blocked"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginStart="3dp"
+                    android:contentDescription="@string/mobile_blocked"
+                    android:src="@drawable/ic_mobile"
+                    android:visibility="gone"
+                    app:tint="@color/statusError" />
+
+                <ImageView
+                    android:id="@+id/whitelisted"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_check_solid"
+                    android:visibility="gone"
+                    app:tint="@color/statusOpen" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="6dp"
+            android:src="@drawable/ic_navigate_next"
+            app:tint="@color/metricTextSecondary" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

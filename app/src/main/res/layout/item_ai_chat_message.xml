@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 KotSafe Cyber Security Project
+  ~ GPL-3.0 License
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <!-- Sender label / icon row -->
+    <LinearLayout
+        android:id="@+id/layout_sender_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+
+        <ImageView
+            android:id="@+id/iv_sender_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_bolt"
+            app:tint="@color/aiChatAssistantSenderText" />
+
+        <TextView
+            android:id="@+id/tv_sender_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="KotSafe AI"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/aiChatAssistantSenderText" />
+
+        <TextView
+            android:id="@+id/tv_message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="11sp"
+            android:textColor="@color/aiChatInputHint" />
+    </LinearLayout>
+
+    <!-- Message bubble Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_message_bubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="14dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/aiChatAssistantBubbleStroke"
+        app:cardBackgroundColor="@color/aiChatAssistantBubbleBg">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_message_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textColor="@color/aiChatAssistantBubbleText"
+                android:textSize="14sp"
+                android:lineSpacingMultiplier="1.25"
+                android:textIsSelectable="true" />
+
+            <!-- Dynamic Action Container for Rule Applications -->
+            <LinearLayout
+                android:id="@+id/layout_dynamic_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingBottom="10dp"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_action_apply_rule"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="🛡️ Apply to Firewall"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#EF4444"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="18dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

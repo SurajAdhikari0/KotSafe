@@ -1,0 +1,1976 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:fillViewport="true"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main_screen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="96dp"
+        tools:context="com.kotsafe.security.activities.MainActivity">
+
+        <!-- Executive Security Posture Matrix (2x2 Responsive Grid) -->
+        <LinearLayout
+            android:id="@+id/security_posture_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="14dp"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Row 1: Firewall & Antivirus -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/status_posture_firewall"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="14dp"
+                    android:background="@drawable/posture_pill_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/posture_fw_icon"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:src="@drawable/dot_tactical_green" />
+
+                    <TextView
+                        android:id="@+id/posture_fw_text"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Firewall on"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:textColor="@color/cardWorkbenchText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/status_posture_antivirus"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="14dp"
+                    android:background="@drawable/posture_pill_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/posture_av_icon"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:src="@drawable/dot_tactical_green" />
+
+                    <TextView
+                        android:id="@+id/posture_av_text"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Antivirus armed"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:textColor="@color/cardWorkbenchText" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2: Threat SOC & AI Copilot -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:id="@+id/status_posture_threats"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="14dp"
+                    android:background="@drawable/posture_pill_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/posture_ti_icon"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:src="@drawable/dot_tactical_amber" />
+
+                    <TextView
+                        android:id="@+id/posture_ti_text"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="SOC ready"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:textColor="@color/cardWorkbenchText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/status_posture_ai"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:paddingVertical="12dp"
+                    android:paddingHorizontal="14dp"
+                    android:background="@drawable/card_ask_ai_bg"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:id="@+id/posture_ai_icon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_bolt"
+                        app:tint="#F5B942" />
+
+                    <TextView
+                        android:id="@+id/posture_ai_text"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Ask AI"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:textColor="#F6F3EC" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/collector_info_layout"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/status_subtitle">
+
+            <TextView
+                android:id="@+id/collector_info_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:textSize="11sp"
+                android:textColor="@color/metricTextSecondary"
+                tools:text="Collector Info" />
+
+            <ImageView
+                android:id="@+id/collector_info_icon"
+                android:adjustViewBounds="false"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginVertical="1dp"
+                android:layout_marginStart="4dp"
+                tools:src="@drawable/ic_apps"
+                tools:tint="?attr/colorAccent" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/interface_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:textColor="@color/metricTextSecondary"
+            tools:text="Capturing from eth0..."
+            tools:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/collector_info_layout" />
+
+        <!-- P2P Exit Node / Personal Gateway Live Card -->
+        <LinearLayout
+            android:id="@+id/card_personal_gateway"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:padding="14dp"
+            android:background="@drawable/card_workbench_item_bg"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/interface_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Top Row: Icon + Title/Device + Status Badge -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/gateway_card_icon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_pref_p2p" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/gateway_card_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PERSONAL GATEWAY"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06"
+                        android:textColor="#38BDF8" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_node_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Exit Node"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchText" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/gateway_card_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🟢 CONNECTED"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="#00E676"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:background="@drawable/badge_pill_proto" />
+            </LinearLayout>
+
+            <!-- Middle Row: Egress IP & Routing Info -->
+            <LinearLayout
+                android:id="@+id/gateway_card_ip_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/gateway_card_ip_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🌐 Exit IP: "
+                    android:textSize="12sp"
+                    android:textColor="@color/cardWorkbenchSubtext" />
+
+                <TextView
+                    android:id="@+id/gateway_card_ip_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="59.183.190.54"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#00E676" />
+
+                <TextView
+                    android:id="@+id/gateway_card_transport_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="• Relay Tunnel"
+                    android:textSize="11sp"
+                    android:textColor="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+
+            <!-- Live Telemetry Badges Row (Ping, Battery, Wi-Fi) -->
+            <LinearLayout
+                android:id="@+id/gateway_card_telemetry_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/gateway_card_ping"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ 60 ms"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#38BDF8"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:background="@drawable/posture_pill_bg" />
+
+                <TextView
+                    android:id="@+id/gateway_card_battery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="🔋 100%"
+                    android:textSize="11sp"
+                    android:textColor="@color/cardWorkbenchSubtext"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:background="@drawable/posture_pill_bg" />
+
+                <TextView
+                    android:id="@+id/gateway_card_network"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="📶 Wi-Fi"
+                    android:textSize="11sp"
+                    android:textColor="@color/cardWorkbenchSubtext"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:background="@drawable/posture_pill_bg"
+                    android:ellipsize="end"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <!-- 30-50s Inactivity / Stall Warning Banner -->
+            <LinearLayout
+                android:id="@+id/gateway_card_alert_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:background="@drawable/card_alert_warning_bg"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_warning"
+                        app:tint="#F59E0B" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_alert_title"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/p2p_inactive_alert_title"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#F59E0B" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/gateway_card_alert_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/p2p_inactive_alert_desc"
+                    android:textSize="11sp"
+                    android:textColor="#E2E8F0" />
+
+                <!-- Action Buttons: Keep Waiting vs Disconnect -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/gateway_btn_wait"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="center"
+                        android:paddingVertical="7dp"
+                        android:paddingHorizontal="4dp"
+                        android:background="@drawable/posture_pill_bg"
+                        android:text="@string/p2p_inactive_btn_wait"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#38BDF8"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/gateway_btn_disconnect"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:gravity="center"
+                        android:paddingVertical="7dp"
+                        android:paddingHorizontal="4dp"
+                        android:background="@drawable/posture_pill_bg"
+                        android:text="@string/p2p_inactive_btn_disconnect"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#EF4444"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Subtext note & chevron -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/gateway_card_status_msg"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Traffic routed securely via remote exit node. Tap to configure."
+                    android:textSize="11sp"
+                    android:textColor="@color/cardWorkbenchSubtext" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_navigate_next"
+                    app:tint="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/card_btn_one_tap_harden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="16dp"
+            android:background="@drawable/ks_bg_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintTop_toBottomOf="@id/security_posture_bar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_harden_shield"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_shield_check"
+                app:tint="@color/ks_accent" />
+
+            <TextView
+                android:id="@+id/tv_harden_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="@string/ks_banner"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:textColor="@color/ks_accent" />
+        </LinearLayout>
+
+        <!-- KotSafe Redesign Animated Glowing Hero -->
+        <FrameLayout
+            android:id="@+id/hero_container"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="6dp"
+            app:layout_constraintTop_toBottomOf="@id/card_btn_one_tap_harden"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.kotsafe.security.ui.ShieldHeroView
+                android:id="@+id/shield_hero"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/ks_cd_hero" />
+
+            <TextView
+                android:id="@+id/btn_start_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="12dp"
+                android:gravity="center"
+                android:paddingStart="26dp"
+                android:paddingEnd="26dp"
+                android:text="@string/ks_start"
+                android:textColor="@color/ks_ring_text"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:textAllCaps="true"
+                android:background="@drawable/ks_bg_btn_start"
+                android:clickable="true"
+                android:focusable="true" />
+        </FrameLayout>
+
+        <!-- Hidden legacy views for backward compatibility -->
+        <View
+            android:id="@+id/pulse_ring_1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:id="@+id/pulse_ring_2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/status_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/status_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/ks_defense"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:textAllCaps="true"
+            android:textColor="@color/ks_accent"
+            android:background="@drawable/ks_bg_pill_active"
+            android:drawableStart="@drawable/ks_dot_pill"
+            android:drawablePadding="8dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="9dp"
+            android:paddingBottom="9dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/hero_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Quick Security Workbenches Hub (Visible in Ready State) -->
+        <LinearLayout
+            android:id="@+id/quick_workbenches_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:paddingHorizontal="16dp"
+            app:layout_constraintTop_toBottomOf="@id/card_personal_gateway"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SECURITY WORKBENCHES"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/cardWorkbenchSubtext"
+                    android:letterSpacing="0.08" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@color/cardWorkbenchBorder" />
+            </LinearLayout>
+
+            <!-- Row 1: Firewall & Antivirus Radar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <!-- Card 1: Firewall & NAC -->
+                <LinearLayout
+                    android:id="@+id/card_btn_firewall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:padding="12dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_shield"
+                        app:tint="#00E676" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Firewall &amp; NAC"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5-Way Control"
+                            android:textSize="10sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Card 2: Antivirus Scanner -->
+                <LinearLayout
+                    android:id="@+id/card_btn_antivirus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:padding="12dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_bug"
+                        app:tint="#00E5FF" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Antivirus Scan"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Radar Scan"
+                            android:textSize="10sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2: HTTP Repeater & Action Center -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:baselineAligned="false">
+
+                <!-- Card 3: Applications -->
+                <LinearLayout
+                    android:id="@+id/card_btn_apps"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:padding="12dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_apps"
+                        app:tint="#60A5FA" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/apps"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Per-App Rules"
+                            android:textSize="10sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Card 4: Action Center -->
+                <LinearLayout
+                    android:id="@+id/card_btn_actions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:padding="12dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_block"
+                        app:tint="#FF7043" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Action Center"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rules &amp; Presets"
+                            android:textSize="10sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 3: Physical Security & Storage Hub -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:baselineAligned="false">
+
+                <!-- Card 5: Physical Security -->
+                <LinearLayout
+                    android:id="@+id/card_btn_physical_sec"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:padding="12dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_lock"
+                        app:tint="#FFD54F" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Physical Security"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="App Gate &amp; Device Locks"
+                            android:textSize="10sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Card 6: Storage & Retention -->
+                <LinearLayout
+                    android:id="@+id/card_btn_storage"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:padding="12dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/ic_folder"
+                        app:tint="#AB47BC" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Storage Mgmt"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Logs &amp; Retention"
+                            android:textSize="10sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 4: AI Security Assistant -->
+            <LinearLayout
+                android:id="@+id/card_btn_ai_assistant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"
+                android:background="@drawable/card_workbench_item_bg"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/ic_bolt"
+                    app:tint="#38BDF8" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI Security Assistant"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchText" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ask about live metrics, firewall, attacks &amp; features"
+                        android:textSize="10sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_navigate_next"
+                    app:tint="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+
+            <!-- Row 5: App Privacy Scorecard -->
+            <LinearLayout
+                android:id="@+id/card_btn_privacy_scorecard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="12dp"
+                android:background="@drawable/card_workbench_item_bg"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:src="@drawable/ic_bottom_shield"
+                    app:tint="#26A69A" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="App Privacy Health Scorecard"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchText" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tracker SDKs, Telemetry &amp; Permissions"
+                        android:textSize="10sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_navigate_next"
+                    app:tint="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Live Telemetry Section (Visible when VPN is running) -->
+        <LinearLayout
+            android:id="@+id/live_telemetry_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="18dp"
+            android:paddingHorizontal="16dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@id/card_personal_gateway"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LIVE TELEMETRY &amp; METRICS"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorHint"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Row 1: Download & Upload -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <!-- Card 1: Download (Rx) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/telemetry_widget_bg">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_telemetry_down"
+                            app:tint="@color/ok" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="DOWNLOAD"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorHint"
+                            android:letterSpacing="0.05" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/telemetry_rx_bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="14.8 MB" />
+
+                    <TextView
+                        android:id="@+id/telemetry_rx_pkts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="@color/metricTextSecondary"
+                        tools:text="1,240 pkts" />
+                </LinearLayout>
+
+                <!-- Card 2: Upload (Tx) -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/telemetry_widget_bg">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_telemetry_up"
+                            app:tint="@color/colorAccent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="UPLOAD"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorHint"
+                            android:letterSpacing="0.05" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/telemetry_tx_bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="3.2 MB" />
+
+                    <TextView
+                        android:id="@+id/telemetry_tx_pkts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="@color/metricTextSecondary"
+                        tools:text="450 pkts" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 2: Active Sockets & Total Connections -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:baselineAligned="false">
+
+                <!-- Card 3: Active Sockets -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/telemetry_widget_bg">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_swap_horiz"
+                            app:tint="@color/in_progress" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="ACTIVE SOCKETS"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorHint"
+                            android:letterSpacing="0.05" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/telemetry_active_conns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="6 Open" />
+
+                    <TextView
+                        android:id="@+id/telemetry_dns_queries"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="@color/metricTextSecondary"
+                        tools:text="28 DNS queries" />
+                </LinearLayout>
+
+                <!-- Card 4: Total Inspected -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/telemetry_widget_bg">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_shield"
+                            app:tint="@color/ok" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="TOTAL INSPECTED"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorHint"
+                            android:letterSpacing="0.05" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/telemetry_tot_conns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="74 Total" />
+
+                    <TextView
+                        android:id="@+id/telemetry_dropped"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="@color/metricTextSecondary"
+                        tools:text="0 Dropped" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 3: Live Quick Tools (Unique to Home) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:baselineAligned="false">
+
+                <!-- Tool 1: App Rules / NAC -->
+                <LinearLayout
+                    android:id="@+id/status_action_apps"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_apps"
+                        app:tint="#3B82F6" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="APP RULES"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary" />
+
+                    <TextView
+                        android:id="@+id/status_apps_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:textColor="#3B82F6"
+                        android:text="Control" />
+                </LinearLayout>
+
+                <!-- Tool 2: HTTP / Web Inspector -->
+                <LinearLayout
+                    android:id="@+id/status_action_http"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="4dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_language"
+                        app:tint="#8B5CF6" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="HTTP LOG"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary" />
+
+                    <TextView
+                        android:id="@+id/status_http_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:textColor="#8B5CF6"
+                        android:text="Inspect" />
+                </LinearLayout>
+
+                <!-- Tool 3: App Gate / Physical Security -->
+                <LinearLayout
+                    android:id="@+id/status_action_gate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_lock"
+                        app:tint="#F59E0B" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="APP GATE"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary" />
+
+                    <TextView
+                        android:id="@+id/status_gate_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:textColor="#F59E0B"
+                        android:text="Locker" />
+                </LinearLayout>
+
+                <!-- Tool 4: PCAP Dumps / File Storage -->
+                <LinearLayout
+                    android:id="@+id/status_action_dumps"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_save"
+                        app:tint="#10B981" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="PCAP LOGS"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary" />
+
+                    <TextView
+                        android:id="@+id/status_dumps_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="10sp"
+                        android:textColor="#10B981"
+                        android:text="Export" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Quick Settings Section (Visible in Ready State) -->
+        <LinearLayout
+            android:id="@+id/quick_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:padding="14dp"
+            android:background="@drawable/card_modern_bg"
+            app:layout_constraintTop_toBottomOf="@id/quick_workbenches_section"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Card Header with All Settings Shortcut -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="CAPTURE CONFIGURATION"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorHint"
+                    android:letterSpacing="0.08" />
+
+                <LinearLayout
+                    android:id="@+id/btn_capture_more_settings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/ic_settings"
+                        app:tint="?attr/colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="ALL SETTINGS"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorAccent"
+                        android:letterSpacing="0.04" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Row 1: Target Apps -->
+            <LinearLayout
+                android:id="@+id/row_target_apps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/badge_pill_proto">
+
+                    <ImageView
+                        android:id="@+id/iv_target_apps_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_apps"
+                        app:tint="?attr/colorAccent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/target_apps"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorPrimary" />
+
+                        <TextView
+                            android:id="@+id/tv_target_apps_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:background="@drawable/badge_pill_proto"
+                            android:text="ALL APPS"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/badgeProtoFg" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_target_apps_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Capture all applications &amp; system traffic"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:ellipsize="end"
+                        android:maxLines="2" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="32dp"
+                    android:layout_marginHorizontal="6dp"
+                    android:background="@color/cardBorderSubtle" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/app_filter_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="3dp"
+                android:background="@color/cardBorderSubtle" />
+
+            <!-- Row 2: Traffic Dump Mode -->
+            <LinearLayout
+                android:id="@+id/row_traffic_dump"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/badge_pill_proto">
+
+                    <ImageView
+                        android:id="@+id/iv_dump_mode_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_save"
+                        app:tint="?attr/colorAccent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/traffic_dump"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorPrimary" />
+
+                        <TextView
+                            android:id="@+id/tv_dump_mode_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:background="@drawable/badge_pill_proto"
+                            android:text="NO DUMP"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/badgeProtoFg" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_dump_mode_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/no_dump_info"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:ellipsize="end"
+                        android:maxLines="2" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_expand_more"
+                    app:tint="?android:attr/textColorSecondary" />
+            </LinearLayout>
+
+            <!-- Hidden spinner keeping backwards-compatible PrefSpinner binding -->
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/dump_mode_spinner"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:visibility="invisible"
+                android:spinnerMode="dialog"
+                android:prompt="@string/traffic_dump"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="3dp"
+                android:background="@color/cardBorderSubtle" />
+
+            <!-- Row 3: HTTPS Decryption (TLS) -->
+            <LinearLayout
+                android:id="@+id/row_tls_decryption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/badge_pill_proto">
+
+                    <ImageView
+                        android:id="@+id/iv_tls_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_pref_tls"
+                        app:tint="?attr/colorAccent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="HTTPS Decryption (TLS)"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorPrimary" />
+
+                        <TextView
+                            android:id="@+id/tv_tls_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:background="@drawable/badge_pill_proto"
+                            android:text="OFF"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/badgeProtoFg" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_tls_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Decrypt &amp; inspect TLS/HTTPS traffic payloads"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:ellipsize="end"
+                        android:maxLines="2" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="32dp"
+                    android:layout_marginHorizontal="6dp"
+                    android:background="@color/cardBorderSubtle" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/tls_decryption_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="3dp"
+                android:background="@color/cardBorderSubtle" />
+
+            <!-- Row 4: Full Packet Payload -->
+            <LinearLayout
+                android:id="@+id/row_payload_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/badge_pill_proto">
+
+                    <ImageView
+                        android:id="@+id/iv_payload_icon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_pref_payload"
+                        app:tint="?attr/colorAccent" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Full Packet Payload"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="?android:attr/textColorPrimary" />
+
+                        <TextView
+                            android:id="@+id/tv_payload_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:background="@drawable/badge_pill_proto"
+                            android:text="MINIMAL"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/badgeProtoFg" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_payload_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Headers &amp; protocol metadata only"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:ellipsize="end"
+                        android:maxLines="2" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="32dp"
+                    android:layout_marginHorizontal="6dp"
+                    android:background="@color/cardBorderSubtle" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/payload_mode_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+            </LinearLayout>
+
+            <!-- Decryption overhead warning on root capture -->
+            <LinearLayout
+                android:id="@+id/app_filter_root_decryption_warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:padding="10dp"
+                android:background="@drawable/badge_pill_closed"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_exclamation_triangle_solid"
+                    app:tint="@color/warning" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/decryption_no_filter_warn"
+                    android:textColor="@color/warning"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/last_capture_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/quick_settings"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/last_capture"
+                    android:textSize="11sp"
+                    android:textColor="?android:attr/textColorHint"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.05" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/view_all_btn"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:textColor="@color/colorTabText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/view_all"
+                    android:textSize="11sp"
+                    android:textStyle="normal"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="10dp" />
+            </LinearLayout>
+
+            <include
+                android:id="@+id/last_capture"
+                layout="@layout/capture_list_item"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

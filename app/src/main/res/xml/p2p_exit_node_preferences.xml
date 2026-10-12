@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- 🟢  LIVE P2P MESH STATUS & INDICATOR                 -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <PreferenceCategory
+        app:key="p2p_status_category"
+        app:title="@string/p2p_status_category"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="p2p_live_status_card"
+            app:title="@string/protection_status"
+            app:summary="@string/p2p_status_disconnected"
+            app:icon="@drawable/ic_status_dot_red"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- 🏠  1. SHARE INTERNET (BECOME EXIT NODE / HOST)      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <PreferenceCategory
+        app:key="p2p_host_category"
+        app:title="@string/p2p_host_mode_category"
+        app:icon="@drawable/ic_pref_wifi_security"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="p2p_exit_node_host_enabled"
+            app:title="@string/p2p_host_mode_title"
+            app:summary="@string/p2p_host_mode_summary"
+            app:icon="@drawable/ic_lan"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <EditTextPreference
+            app:key="p2p_exit_node_host_port"
+            app:title="@string/p2p_host_port_title"
+            app:defaultValue="8090"
+            app:icon="@drawable/ic_settings"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            android:key="p2p_host_token_display"
+            app:title="@string/p2p_host_token_title"
+            app:icon="@drawable/ic_lock"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="p2p_generate_token_btn"
+            app:title="@string/p2p_generate_token_title"
+            app:summary="@string/p2p_generate_token_summary"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="p2p_exit_node_upnp_enabled"
+            app:title="@string/p2p_host_upnp_title"
+            app:summary="@string/p2p_host_upnp_summary"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+
+        <Preference
+            android:key="p2p_show_qr_code"
+            app:title="@string/p2p_host_qr_title"
+            app:summary="@string/p2p_host_qr_summary"
+            app:icon="@drawable/ic_share"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="p2p_host_client_deckey"
+            app:title="@string/p2p_host_client_deckey_title"
+            app:summary="@string/p2p_host_client_deckey_summary"
+            app:icon="@drawable/ic_lock_open_alt"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- ✈️  2. ROUTE TRAFFIC (CONNECT TO P2P EXIT NODE)      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <PreferenceCategory
+        app:key="p2p_client_category"
+        app:title="@string/p2p_client_mode_category"
+        app:icon="@drawable/ic_roaming"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="p2p_exit_node_client_enabled"
+            app:title="@string/p2p_client_mode_title"
+            app:summary="@string/p2p_client_mode_summary"
+            app:icon="@drawable/ic_play_arrow"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <Preference
+            android:key="p2p_scan_qr_code"
+            app:title="@string/p2p_client_scan_title"
+            app:summary="@string/p2p_client_scan_summary"
+            app:icon="@drawable/ic_search"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="p2p_probe_candidates_btn"
+            app:title="⚡ Probe All Network Paths"
+            app:summary="Tests Wi-Fi, Mobile Data, IPv6, and Public IP to auto-select fastest gateway"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="p2p_exit_node_client_host"
+            app:title="@string/p2p_client_host_title"
+            app:defaultValue="192.168.1.1"
+            app:icon="@drawable/ic_mobile"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="p2p_exit_node_client_port"
+            app:title="@string/p2p_client_port_title"
+            app:defaultValue="8090"
+            app:icon="@drawable/ic_lan"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="p2p_exit_node_client_token"
+            app:title="@string/p2p_client_token_title"
+            app:icon="@drawable/ic_lock"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <!-- Traffic Decryption Authorization (Client-side) -->
+        <SwitchPreference
+            app:key="p2p_allow_traffic_decryption"
+            app:title="@string/p2p_allow_traffic_decryption_title"
+            app:summary="@string/p2p_allow_traffic_decryption_summary"
+            app:icon="@drawable/ic_shield"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <Preference
+            android:key="p2p_decryption_key_display"
+            app:title="@string/p2p_decryption_key_title"
+            app:icon="@drawable/ic_lock_open_alt"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="p2p_generate_decryption_key_btn"
+            app:title="@string/p2p_generate_decryption_key_title"
+            app:summary="@string/p2p_generate_decryption_key_summary"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="p2p_reset_connection_btn"
+            app:title="Disconnect &amp; Reset Exit Node"
+            app:summary="Clears paired exit node settings and restores direct local traffic"
+            app:icon="@drawable/ic_close"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- ☁️  3. CLOUD BACKEND (OPTIONAL LIVE SIGNALING)        -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <PreferenceCategory
+        app:key="p2p_backend_category"
+        app:title="@string/p2p_backend_category_title"
+        app:icon="@drawable/ic_lan"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="p2p_backend_status"
+            app:title="@string/p2p_backend_status_title"
+            app:summary="@string/p2p_backend_status_none"
+            app:icon="@drawable/ic_status_dot_red"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="p2p_backend_setup_btn"
+            app:title="@string/p2p_backend_setup_btn_title"
+            app:icon="@drawable/ic_settings"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

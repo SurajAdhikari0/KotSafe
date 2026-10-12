@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p2p_backend_wizard_title"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p2p_backend_wizard_subtitle"
+            android:textSize="13sp"
+            android:paddingBottom="16dp" />
+
+        <RadioGroup
+            android:id="@+id/radio_backend_provider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/radio_provider_firebase"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/p2p_backend_option_firebase"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radio_provider_custom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/p2p_backend_option_custom" />
+        </RadioGroup>
+
+        <!-- Firebase fields -->
+        <LinearLayout
+            android:id="@+id/group_firebase_fields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="12dp"
+            android:visibility="visible">
+
+            <EditText
+                android:id="@+id/edit_fb_project_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p2p_backend_fb_project_id_hint"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/edit_fb_api_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p2p_backend_fb_api_key_hint"
+                android:inputType="text" />
+
+            <EditText
+                android:id="@+id/edit_fb_app_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p2p_backend_fb_app_id_hint"
+                android:inputType="text" />
+        </LinearLayout>
+
+        <!-- Self-hosted / custom fields -->
+        <LinearLayout
+            android:id="@+id/group_custom_fields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="12dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/edit_custom_server_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p2p_backend_custom_url_hint"
+                android:inputType="textUri" />
+
+            <EditText
+                android:id="@+id/edit_custom_shared_secret"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/p2p_backend_custom_secret_hint"
+                android:inputType="textPassword" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_test_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="16dp">
+
+            <Button
+                android:id="@+id/btn_test_connection"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/p2p_backend_test_btn" />
+
+            <Button
+                android:id="@+id/btn_save_backend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/p2p_backend_save_btn" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_disable_backend"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/p2p_backend_disable_btn" />
+
+    </LinearLayout>
+</ScrollView>

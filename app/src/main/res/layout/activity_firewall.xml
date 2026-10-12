@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/firewall_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- Hidden Toolbar for AppCompat compat only -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+
+    <!-- ═══════════════════════════════════════════════════════════
+         PREMIUM FIREWALL HEADER CARD
+         Row 1: ← Back  |  Firewall title + subtitle  |  [status badge]
+         Row 2: [INCOMING ──●── 🛡 ──●── FILTERED] data flow strip
+         ═══════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/firewall_brand_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/ks_ground"
+        android:paddingBottom="10dp">
+
+        <!-- Row 1: Back + Title + Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp">
+
+            <ImageButton
+                android:id="@+id/fw_btn_back"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:src="@drawable/ic_arrow_back"
+                android:background="@drawable/ks_bg_btn_circle"
+                android:padding="9dp"
+                android:tint="@color/ks_ink"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/app_intro_back_button" />
+
+            <!-- Title block -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fw_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/firewall"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/ks_ink"
+                    android:includeFontPadding="false" />
+
+                <TextView
+                    android:id="@+id/fw_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NETWORK PROTECTION ENGINE"
+                    android:textSize="9.5sp"
+                    android:textColor="@color/ks_accent"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:layout_marginTop="2dp" />
+            </LinearLayout>
+
+            <!-- Live Status Badge -->
+            <LinearLayout
+                android:id="@+id/fw_status_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="5dp"
+                android:background="@drawable/ks_bg_badge_green">
+
+                <View
+                    android:id="@+id/fw_status_dot"
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/status_circle_bg"
+                    android:backgroundTint="@color/ok" />
+
+                <TextView
+                    android:id="@+id/fw_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ACTIVE"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:textColor="@color/ks_accent" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Row 2: Premium Data Flow Pipeline Card -->
+        <LinearLayout
+            android:id="@+id/firewall_data_flow_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/ks_bg_card"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <!-- LEFT: Incoming Traffic Stat -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start|center_vertical"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/status_circle_bg"
+                        android:backgroundTint="@color/ks_blue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="INCOMING"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.08"
+                        android:textColor="@color/ks_grey" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/fw_flow_in_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="20sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/ks_ink"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="3dp" />
+
+                <TextView
+                    android:id="@+id/fw_flow_in_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Checked Packets"
+                    android:textSize="9sp"
+                    android:textColor="@color/ks_grey"
+                    android:layout_marginTop="1dp" />
+            </LinearLayout>
+
+            <!-- CENTER: Flow Pipeline Track -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="8dp">
+
+                <!-- Inbound flow indicator: line + chevron -->
+                <View
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/ks_stroke" />
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/ks_accent"
+                    android:alpha="0.75" />
+
+                <!-- Central Engine Shield Badge -->
+                <FrameLayout
+                    android:id="@+id/fw_flow_center_shield"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/ks_bg_btn_circle"
+                    android:layout_marginHorizontal="6dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_shield_check"
+                        app:tint="@color/ks_accent" />
+                </FrameLayout>
+
+                <!-- Outbound flow indicator: chevron + line -->
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/ok"
+                    android:alpha="0.75" />
+
+                <View
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/ok"
+                    android:alpha="0.4" />
+            </LinearLayout>
+
+            <!-- RIGHT: Filtered / Secured Stat -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end|center_vertical"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="5dp"
+                        android:background="@drawable/status_circle_bg"
+                        android:backgroundTint="@color/ok" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FILTERED"
+                        android:textSize="9.5sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.08"
+                        android:textColor="@color/ok" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/fw_flow_out_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="20sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/ok"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="3dp"
+                    android:gravity="end" />
+
+                <TextView
+                    android:id="@+id/fw_flow_out_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Threats Blocked"
+                    android:textSize="9sp"
+                    android:textColor="@color/ks_grey"
+                    android:layout_marginTop="1dp"
+                    android:gravity="end" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/cardBorderSubtle" />
+
+    <!-- Main Fragment Content Area -->
+    <FrameLayout
+        android:id="@+id/firewall_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Floating Bottom Navigation Dock -->
+    <FrameLayout
+        android:id="@+id/bottom_nav_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_firewall_bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:strokeColor="@color/bottomNavBorder"
+            app:strokeWidth="1.2dp"
+            app:cardBackgroundColor="@color/bottomNavBg">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/firewall_bottom_nav"
+                android:layout_width="match_parent"
+                android:layout_height="62dp"
+                android:background="@android:color/transparent"
+                app:elevation="0dp"
+                app:paddingBottomSystemWindowInsets="false"
+                app:paddingTopSystemWindowInsets="false"
+                app:itemActiveIndicatorStyle="@style/FirewallBottomNavActiveIndicator"
+                app:itemIconSize="20dp"
+                app:itemIconTint="@color/bottom_nav_item_color"
+                app:itemTextColor="@color/bottom_nav_item_color"
+                app:itemTextAppearanceActive="@style/FirewallBottomNavTextActive"
+                app:itemTextAppearanceInactive="@style/FirewallBottomNavTextInactive"
+                app:itemRippleColor="@color/bottomNavIndicator"
+                app:labelVisibilityMode="labeled"
+                app:menu="@menu/firewall_bottom_nav_menu" />
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
+</LinearLayout>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/telemetry_widget_bg"
+    android:padding="10dp"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/correlated_app_icon"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="@drawable/icon_rounded_bg"
+            android:padding="5dp"
+            android:src="@drawable/ic_apps"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/correlated_app_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
+                tools:text="Subway Surfers" />
+
+            <TextView
+                android:id="@+id/correlated_app_pkg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/metricTextSecondary"
+                android:fontFamily="monospace"
+                tools:text="com.kiloo.subwaysurf • UID 10245" />
+
+            <TextView
+                android:id="@+id/correlated_app_timing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="11sp"
+                android:textColor="#38BDF8"
+                tools:text="Active at same second (via graph.facebook.com)" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_correlated_timeline"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="36dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="@string/app_correlated_timeline"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#38BDF8"
+            app:icon="@drawable/ic_history"
+            app:iconTint="#38BDF8"
+            app:strokeColor="#0284C7"
+            app:strokeWidth="1dp"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_correlated_firewall"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="36dp"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="@string/app_correlated_firewall"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="@color/danger"
+            app:icon="@drawable/ic_pref_firewall"
+            app:iconTint="@color/danger"
+            app:strokeColor="@color/danger"
+            app:strokeWidth="1dp"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+</LinearLayout>

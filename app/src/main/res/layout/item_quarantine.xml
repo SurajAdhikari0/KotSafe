@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#22808080"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_shield"
+                app:tint="#E91E63"
+                android:layout_marginEnd="12dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_quarantine_filename"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="payload.apk"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:ellipsize="middle"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:id="@+id/tv_quarantine_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RANSOMWARE / EVASION DROPPER"
+                    android:textSize="11sp"
+                    android:textColor="#E91E63"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_quarantine_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2.4 MB"
+                android:textSize="12sp"
+                android:alpha="0.7" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_quarantine_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="/storage/emulated/0/Download/payload.apk"
+            android:textSize="12sp"
+            android:alpha="0.8"
+            android:layout_marginTop="6dp"
+            android:ellipsize="start"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/tv_quarantine_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quarantined on Sep 16, 2026, 22:30"
+            android:textSize="11sp"
+            android:alpha="0.6"
+            android:layout_marginTop="2dp" />
+
+        <!-- Hash container -->
+        <LinearLayout
+            android:id="@+id/layout_quarantine_hash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp"
+            android:background="#1558A6FF"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SHA-256: "
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:textColor="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/tv_quarantine_sha256"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:textColor="#C9D1D9"
+                android:ellipsize="middle"
+                android:singleLine="true" />
+
+            <ImageView
+                android:id="@+id/btn_copy_quarantine_hash"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_content_copy_small"
+                android:layout_marginStart="6dp"
+                app:tint="@color/colorAccent"
+                android:contentDescription="Copy Hash" />
+        </LinearLayout>
+
+        <!-- Actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="10dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_quarantine_inspect"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Threat Intel"
+                android:textSize="11sp"
+                android:layout_marginEnd="8dp"
+                app:strokeColor="@color/colorAccent"
+                android:textColor="@color/colorAccent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_quarantine_restore"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Restore"
+                android:textSize="11sp"
+                android:layout_marginEnd="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_quarantine_delete"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shred &amp; Delete"
+                android:textSize="11sp"
+                app:backgroundTint="#D32F2F" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

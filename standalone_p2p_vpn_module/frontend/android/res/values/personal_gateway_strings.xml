@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gateway_status_category">Personal Gateway status</string>
+    <string name="gateway_status_title">Gateway status</string>
+    <string name="gateway_status_disconnected">No encrypted exit route is active</string>
+    <string name="gateway_exit_category">Share this device connection</string>
+    <string name="gateway_exit_enabled_title">Enable this device as an exit</string>
+    <string name="gateway_exit_enabled_summary">Paired devices can use this phone as their Internet exit</string>
+    <string name="gateway_show_pairing_title">Show pairing QR code</string>
+    <string name="gateway_show_pairing_summary">Pair a trusted device; no IP address or SOCKS password is shared</string>
+    <string name="gateway_exit_revoke_title">Revoke Pairing &amp; Disconnect Client</string>
+    <string name="gateway_exit_revoke_summary">Kick connected clients and generate a new secret; clients must re-scan to reconnect</string>
+    <string name="gateway_client_category">Use a personal exit</string>
+    <string name="gateway_client_enabled_title">Route through paired exit</string>
+    <string name="gateway_client_enabled_summary">Route protected app traffic through a paired personal gateway</string>
+    <string name="gateway_scan_pairing_title">Scan pairing QR code</string>
+    <string name="gateway_scan_pairing_summary">Pair with an exit device before connecting</string>
+    <string name="gateway_transport_title">Connection method</string>
+    <string name="gateway_kill_switch_title">Block traffic if gateway disconnects</string>
+    <string name="gateway_kill_switch_summary">Prevents protected traffic from silently using this phone\'s normal Internet</string>
+    <string name="gateway_disconnect_title">Disconnect personal gateway</string>
+    <string name="gateway_disconnect_summary">Stop tunnel services and remove the current pairing</string>
+    <string-array name="gateway_transport_entries">
+        <item>Automatic — direct first, relay fallback</item>
+        <item>Direct only — never use relay</item>
+        <item>Relay only — maximum compatibility</item>
+    </string-array>
+    <string-array name="gateway_transport_values">
+        <item>automatic</item>
+        <item>direct_only</item>
+        <item>relay_only</item>
+    </string-array>
+
+    <string name="gateway_relay_category">Relay &amp; Tunnel Infrastructure</string>
+    <string name="gateway_relay_mode_title">Relay Connection Mode</string>
+    <string name="gateway_relay_mode_summary">Choose direct high-speed VPS or Cloudflare tunneling</string>
+    <string-array name="gateway_relay_mode_entries">
+        <item>⚡ Dedicated VPS / Oracle Cloud Relay</item>
+        <item>☁️ Cloudflare Secure Tunnel (trycloudflare.com)</item>
+        <item>🛠️ Custom Server / Tunnel URL</item>
+    </string-array>
+    <string-array name="gateway_relay_mode_values">
+        <item>direct_vps</item>
+        <item>cloudflare_tunnel</item>
+        <item>custom</item>
+    </string-array>
+    <string name="gateway_custom_relay_url_title">Custom Relay URL</string>
+    <string name="gateway_custom_relay_url_summary">Specify custom IP:port or tunnel URL (e.g. http://1.2.3.4:8081)</string>
+
+    <string name="gateway_app_routing_title">P2P App Routing</string>
+    <string name="gateway_select_apps_title">Select P2P Routed Apps</string>
+    <string name="gateway_select_apps_summary">Choose which apps route through your home exit node</string>
+    <string-array name="gateway_app_routing_entries">
+        <item>🌐 All Apps — full device tunnel</item>
+        <item>🎯 Only Selected Apps — split tunnel</item>
+        <item>⚡ Bypass Selected Apps — exempt high-bandwidth</item>
+    </string-array>
+    <string-array name="gateway_app_routing_values">
+        <item>all</item>
+        <item>only_selected</item>
+        <item>bypass_selected</item>
+    </string-array>
+</resources>

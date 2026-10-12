@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_shield_protection"
+        app:title="@string/defender_mode_category"
+        app:icon="@drawable/ic_shield"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="pref_defender_auto_pilot"
+            app:title="@string/defender_mode_title"
+            app:summary="@string/defender_mode_summary"
+            app:icon="@drawable/ic_shield"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

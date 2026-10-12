@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="28dp"
+    android:background="#FA0B0F14">
+
+    <ImageView
+        android:id="@+id/iv_lock_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/ic_lock"
+        app:tint="?attr/colorAccent"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lock_overlay_title"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="6dp" />
+
+    <TextView
+        android:id="@+id/tv_lock_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lock_overlay_prompt"
+        android:textColor="#B3FFFFFF"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_marginBottom="28dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_biometric_unlock"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="240dp"
+        android:layout_height="52dp"
+        android:text="@string/lock_overlay_biometric_btn"
+        android:textColor="@android:color/white"
+        app:icon="@drawable/ic_fingerprint"
+        app:iconTint="@android:color/white"
+        app:strokeColor="?attr/colorAccent"
+        app:strokeWidth="1.5dp"
+        android:layout_marginBottom="20dp" />
+
+    <View
+        android:layout_width="160dp"
+        android:layout_height="1dp"
+        android:background="#33FFFFFF"
+        android:layout_marginBottom="20dp" />
+
+    <EditText
+        android:id="@+id/et_lock_pin"
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="@string/lock_overlay_pin_hint"
+        android:inputType="numberPassword"
+        android:maxLength="8"
+        android:textColor="@android:color/white"
+        android:textColorHint="#80FFFFFF"
+        android:backgroundTint="?attr/colorAccent"
+        android:textSize="22sp"
+        android:letterSpacing="0.2"
+        android:layout_marginBottom="20dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_unlock"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="240dp"
+        android:layout_height="52dp"
+        android:text="@string/lock_overlay_unlock_btn"
+        android:layout_marginBottom="12dp" />
+
+</LinearLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Main shield circle button background - Cyber Glassmorphic Standby/Disabled -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#2294A3B8">
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <gradient
+                        android:angle="135"
+                        android:startColor="#1E293B"
+                        android:centerColor="#0F172A"
+                        android:endColor="#0A0F1D"
+                        android:type="linear" />
+                    <stroke
+                        android:width="2dp"
+                        android:color="#475569" />
+                </shape>
+            </item>
+            <item android:top="7dp" android:bottom="7dp" android:left="7dp" android:right="7dp">
+                <shape android:shape="oval">
+                    <stroke
+                        android:width="1dp"
+                        android:color="#1E293B" />
+                    <solid android:color="@android:color/transparent" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</ripple>

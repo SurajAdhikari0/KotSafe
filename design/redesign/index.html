@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KotSafe – Fresh Classic Home Redesign Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070D1A;
+      --surface: #0E1729;
+      --border: #1C2A45;
+      --accent-green: #3DDC84;
+      --accent-blue: #38A8FF;
+      --accent-teal: #0E9F83;
+      --text-main: #E6EEFA;
+      --text-muted: #8A9BBA;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0E9F83 0%, #3DDC84 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #070D1A;
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title span {
+      color: var(--accent-green);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-left: 8px;
+      padding: 2px 8px;
+      background: rgba(61, 220, 132, 0.12);
+      border: 1px solid rgba(61, 220, 132, 0.3);
+      border-radius: 6px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(7, 13, 26, 0.6);
+      padding: 5px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Manrope', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn.active {
+      background: var(--surface);
+      color: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .tab-btn.active.dark-mode {
+      color: var(--accent-green);
+      border-color: rgba(61, 220, 132, 0.4);
+    }
+
+    .tab-btn.active.light-mode {
+      color: #0E9F83;
+      border-color: rgba(14, 159, 131, 0.4);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: radial-gradient(circle at 50% 30%, #0E1A33 0%, #070D1A 80%);
+    }
+
+    .phone-container {
+      position: relative;
+      width: 412px;
+      height: 1040px;
+      background: #000;
+      border-radius: 44px;
+      padding: 10px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1), 0 0 40px rgba(61, 220, 132, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 20px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .camera-lens {
+      width: 10px;
+      height: 10px;
+      background: #0c1424;
+      border-radius: 50%;
+      border: 1px solid #1c2a45;
+    }
+
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 36px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .footer-bar {
+      padding: 16px 32px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer-bar a {
+      color: var(--accent-green);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-bar a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">K</div>
+    <div>
+      <div class="brand-title">KotSafe Home <span>Fresh Classic Redesign</span></div>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active dark-mode" onclick="loadView('home_dark_tactical_guardian.html', this, 'dark')">
+      🛡️ Dark (Tactical Guardian)
+    </button>
+    <button class="tab-btn light-mode" onclick="loadView('home_light.html', this, 'light')">
+      ☀️ Light Mode
+    </button>
+    <button class="tab-btn dark-mode" onclick="loadView('home_running_dark.html', this, 'dark')">
+      🟢 Running (Dark)
+    </button>
+    <button class="tab-btn light-mode" onclick="loadView('home_running_light.html', this, 'light')">
+      🟢 Running (Light)
+    </button>
+    <button class="tab-btn dark-mode" onclick="loadView('home_dark_tab_switch.html', this, 'dark')">
+      📊 Traffic Tab
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="phone-container">
+    <div class="phone-notch">
+      <div class="camera-lens"></div>
+    </div>
+    <iframe id="preview" class="preview-frame" src="home_dark_tactical_guardian.html"></iframe>
+  </div>
+</main>
+
+<div class="footer-bar">
+  <div>KotSafe Cyber Security • Android 14+ UI / Material Design 3 Spec</div>
+  <div>
+    <a href="KotSafe%20%E2%80%93%20Fresh%20Classic%20Redesign.html" target="_blank">Open Raw Multi-Board Showcase &rarr;</a>
+  </div>
+</div>
+
+<script>
+  function loadView(url, btn, theme) {
+    document.getElementById('preview').src = url;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

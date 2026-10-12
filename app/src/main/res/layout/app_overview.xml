@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/app_overview"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"
+    android:padding="8dp">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/layout"
+    android:padding="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/app_icon"
+        tools:src="@drawable/ic_apps"
+        tools:tint="@color/colorAccent"
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:adjustViewBounds="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TableLayout
+        android:id="@+id/table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_icon"
+        android:layout_marginTop="20dp">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/app_name" />
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="KotSafe" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/package_name_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/package_name" />
+            <TextView
+                android:id="@+id/package_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="com.kotsafe.security" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/network_access_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="Access" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/app_network_access_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="viewStart"
+                    tools:text="All Networks Allowed" />
+                <ImageView
+                    android:id="@+id/app_network_access_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_settings"
+                    app:tint="?attr/colorControlNormal"
+                    android:contentDescription="@string/network_access_control" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/privacy_score_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="Privacy Health" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/app_privacy_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="viewStart"
+                    android:textStyle="bold"
+                    tools:text="🟢 EXCELLENT (100/100)" />
+                <TextView
+                    android:id="@+id/app_privacy_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="0 trackers • TLS only" />
+            </LinearLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/uid" />
+            <TextView
+                android:id="@+id/uid"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="12345" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/version_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/version" />
+            <TextView
+                android:id="@+id/version"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="1.3.9" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/target_sdk_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/target_sdk" />
+            <TextView
+                android:id="@+id/target_sdk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="23" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/install_date_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/installed_on" />
+            <TextView
+                android:id="@+id/install_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="01/02/20 00:45:01" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/last_update_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/last_update" />
+            <TextView
+                android:id="@+id/last_update"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="01/02/20 00:45:01" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/network_traffic" />
+            <TextView
+                android:id="@+id/detail_bytes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="410 B received — 590 B sent" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/connections_view" />
+            <TextView
+                android:id="@+id/connections"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="2" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/conns_blocked_row"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="4dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:textAlignment="viewStart"
+                android:textStyle="bold"
+                android:text="@string/connections_blocked" />
+            <TextView
+                android:id="@+id/conns_blocked"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:textAlignment="viewStart"
+                android:textIsSelectable="true"
+                tools:text="5" />
+        </TableRow>
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/vapp_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textStyle="italic"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/table" />
+
+    <TextView
+        android:id="@+id/permissions_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/table"
+        android:text="@string/permissions"/>
+
+    <HorizontalScrollView
+        android:id="@+id/permissionsSv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/permissions_label"
+        android:background="@color/colorBackgroundGray"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/permissions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="0sp"
+            android:textIsSelectable="true"
+            android:focusable="true"
+            android:nextFocusUp="@id/show_connections"
+            android:fontFamily="monospace"
+            android:textSize="12sp"
+            android:scrollHorizontally="true"
+            tools:text="android.permission.INTERNET\nandroid.permission.FOREGROUND_SERVICE"/>
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

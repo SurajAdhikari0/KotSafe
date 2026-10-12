@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_advanced_control"
+        app:title="@string/advanced_mode_category"
+        app:icon="@drawable/ic_pref_wizard"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="enable_advanced_features"
+            app:title="@string/advanced_mode_title"
+            app:summary="@string/advanced_mode_summary"
+            app:icon="@drawable/ic_pref_root_capture"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <Preference
+            app:key="pref_enable_all_advanced_now"
+            app:title="@string/advanced_mode_enable_all"
+            app:summary="@string/advanced_mode_enable_all_summary"
+            app:icon="@drawable/ic_pref_deep_scan"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="cat_traffic_decryption"
+        app:title="Traffic Inspection &amp; Decryption"
+        app:icon="@drawable/ic_cat_traffic"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="tls_decryption"
+            app:title="@string/tls_decryption"
+            app:icon="@drawable/ic_pref_tls"
+            app:iconSpaceReserved="true"
+            app:summary="@string/tls_decryption_summary"
+            app:defaultValue="false" />
+
+        <Preference
+            app:key="mitm_setup_wizard"
+            app:title="@string/mitm_setup_wizard"
+            app:summary="@string/mitm_wizard_description"
+            app:icon="@drawable/ic_pref_wizard"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="mitmproxy_opts"
+            app:title="@string/mitmproxy_opts"
+            app:summary="@string/mitmproxy_opts_description"
+            app:icon="@drawable/ic_pref_wizard"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <DropDownPreference
+            app:key="block_quic_mode"
+            app:title="@string/block_quick"
+            app:summary="Forces QUIC UDP traffic to fall back to standard TCP/TLS for deep packet and firewall inspection"
+            android:entries="@array/block_quic_labels"
+            android:entryValues="@array/block_quic"
+            app:icon="@drawable/ic_pref_quic"
+            app:iconSpaceReserved="true"
+            app:defaultValue="never"
+            app:useSimpleSummaryProvider="false" />
+
+        <SwitchPreference
+            android:key="auto_block_private_dns"
+            app:title="@string/block_private_dns"
+            app:summary="@string/block_private_dns_summary"
+            app:icon="@drawable/ic_pref_block_dns"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+
+        <SwitchPreference
+            app:key="full_payload"
+            app:title="@string/full_payload"
+            app:icon="@drawable/ic_pref_payload"
+            app:iconSpaceReserved="true"
+            app:summary="@string/full_payload_summary"
+            app:defaultValue="false" />
+
+        <Preference
+            app:key="max_connections"
+            app:title="@string/connections_log_size"
+            app:icon="@drawable/ic_pref_stats"
+            app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="hide_system_traffic"
+            app:title="@string/hide_system_traffic"
+            app:summary="@string/hide_system_traffic_summary"
+            app:icon="@drawable/ic_pref_vpn_exempt"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <Preference
+            android:key="geolocation"
+            app:title="@string/geolocation"
+            app:summary="@string/geolocation_summary"
+            app:icon="@drawable/ic_pref_geo"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.GeoipSettings" />
+
+        <Preference
+            app:key="dnscrypt_link"
+            app:title="@string/dnscrypt_how_to"
+            app:summary="Step-by-step setup guide and security hardening"
+            app:icon="@drawable/ic_pref_dns"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

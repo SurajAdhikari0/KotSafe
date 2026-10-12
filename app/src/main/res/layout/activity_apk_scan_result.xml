@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_apk_scan_result.xml
+  Full-screen verdict screen shown after ApkPreInstallScanner completes.
+  Shows app info, verdict hero card, scan details, evidence list, and Install/Cancel buttons.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundColor"
+    tools:context=".activities.ApkScanResultActivity">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:title="Scan Result"
+        app:titleTextColor="@android:color/white"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <!-- Scrollable content -->
+    <ScrollView
+        android:id="@+id/scroll_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- App Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_app_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surfaceColor">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+
+                    <!-- APK icon -->
+                    <ImageView
+                        android:id="@+id/img_app_icon"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_marginEnd="14dp"
+                        android:src="@drawable/ic_file_import"
+                        android:contentDescription="App icon" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_app_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="App Name"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/metricTextPrimary"
+                            tools:text="My Application" />
+
+                        <TextView
+                            android:id="@+id/tv_package_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="com.example.app"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary"
+                            android:layout_marginTop="2dp"
+                            tools:text="com.example.myapp" />
+
+                        <TextView
+                            android:id="@+id/tv_version"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary"
+                            android:layout_marginTop="2dp"
+                            tools:text="v1.0.0 · 12.4 MB" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Verdict Hero Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_verdict"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#FF4CAF50">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/tv_verdict_emoji"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🟢"
+                        android:textSize="40sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_verdict_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CLEAN"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:letterSpacing="0.1"
+                        tools:text="CLEAN" />
+
+                    <TextView
+                        android:id="@+id/tv_verdict_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="No threats detected"
+                        android:textSize="14sp"
+                        android:textColor="#CCffffff"
+                        android:layout_marginTop="4dp"
+                        tools:text="No threats detected" />
+
+                    <!-- Risk score bar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Risk Score: "
+                            android:textSize="14sp"
+                            android:textColor="#CCffffff" />
+
+                        <TextView
+                            android:id="@+id/tv_risk_score"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0 / 100"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            tools:text="12 / 100" />
+
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/progress_risk"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="6dp"
+                        android:progress="12"
+                        android:max="100"
+                        android:progressTint="@android:color/white"
+                        android:progressBackgroundTint="#33ffffff" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Scan Details Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surfaceColor">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scan Details"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- SHA-256 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="110dp"
+                            android:layout_height="wrap_content"
+                            android:text="SHA-256"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary" />
+
+                        <TextView
+                            android:id="@+id/tv_sha256"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="11sp"
+                            android:textColor="@color/metricTextPrimary"
+                            android:fontFamily="monospace"
+                            android:ellipsize="middle"
+                            android:singleLine="true"
+                            tools:text="a1b2c3d4e5f6..." />
+                    </LinearLayout>
+
+                    <!-- DEX -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="110dp"
+                            android:layout_height="wrap_content"
+                            android:text="DEX Analysis"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary" />
+
+                        <TextView
+                            android:id="@+id/tv_dex_result"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextPrimary"
+                            tools:text="Score: 0/100 — No suspicious structures" />
+                    </LinearLayout>
+
+                    <!-- Threat Intel -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="110dp"
+                            android:layout_height="wrap_content"
+                            android:text="Threat Intel"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary" />
+
+                        <TextView
+                            android:id="@+id/tv_ti_result"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextPrimary"
+                            tools:text="Offline — No API keys configured" />
+                    </LinearLayout>
+
+                    <!-- Scan Duration -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="110dp"
+                            android:layout_height="wrap_content"
+                            android:text="Scan Time"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary" />
+
+                        <TextView
+                            android:id="@+id/tv_scan_duration"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextPrimary"
+                            tools:text="1.2 s" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Evidence List Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_evidence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/surfaceColor"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Findings"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/container_evidence_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Fixed bottom action buttons -->
+    <LinearLayout
+        android:id="@+id/layout_action_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/surfaceColor"
+        app:elevation="8dp">
+
+        <!-- Threat warning (visible only for THREAT verdict) -->
+        <TextView
+            android:id="@+id/tv_threat_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚠ This file has been flagged as malicious. Installing is strongly discouraged."
+            android:textSize="12sp"
+            android:textColor="#F44336"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone" />
+
+        <!-- Installing Progress Container (animated spinner, status label, subtext, and progress bar) -->
+        <LinearLayout
+            android:id="@+id/layout_installing_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="14dp"
+            android:padding="12dp"
+            android:background="@drawable/rounded_surface_secondary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ProgressBar
+                    android:id="@+id/progress_installing_spinner"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="12dp"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/colorPrimary" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_installing_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Preparing installation…"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary" />
+
+                    <TextView
+                        android:id="@+id/tv_installing_subtext"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Initializing session"
+                        android:textSize="12sp"
+                        android:textColor="@color/metricTextSecondary" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_installing_pct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
+                    android:text="0%" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_installing_bar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:progress="0"
+                android:max="100"
+                android:progressTint="@color/colorPrimary" />
+
+        </LinearLayout>
+
+        <!-- Primary action (Install / Install with Caution) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_install"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginBottom="8dp"
+            android:text="Install"
+            android:textSize="16sp"
+            app:cornerRadius="12dp" />
+
+        <!-- Secondary action (Cancel / Do Not Install) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Cancel"
+            android:textSize="15sp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

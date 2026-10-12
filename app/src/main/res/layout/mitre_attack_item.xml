@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/cardBorderSubtle">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <!-- Top row: Tactic badge + technique ID + Mapped status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <!-- Tactic color badge -->
+            <TextView
+                android:id="@+id/tactic_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/badge_pill_bg"
+                android:text="C2" />
+
+            <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+
+            <!-- Mapped Detection Pill -->
+            <TextView
+                android:id="@+id/mapped_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/badge_pill_bg"
+                android:layout_marginEnd="6dp"
+                android:visibility="gone"
+                android:text="🎯 MAPPED" />
+
+            <!-- Technique ID chip -->
+            <TextView
+                android:id="@+id/technique_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryLight"
+                android:background="@drawable/about_version_pill"
+                android:text="T1071.001" />
+        </LinearLayout>
+
+        <!-- Technique name -->
+        <TextView
+            android:id="@+id/technique_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/highContrast"
+            android:text="Application Layer Protocol: Web Protocols" />
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/technique_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="@color/metricTextSecondary"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:lineSpacingMultiplier="1.3"
+            android:text="Adversaries may communicate using application layer protocols to avoid detection..." />
+
+        <!-- Evidence row (visible when detected/mapped) -->
+        <LinearLayout
+            android:id="@+id/evidence_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/about_icon_circle"
+            android:padding="8dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_exclamation_triangle_solid"
+                app:tint="@color/danger"
+                android:contentDescription="@null"
+                android:layout_marginEnd="6dp"/>
+
+            <TextView
+                android:id="@+id/evidence_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="11sp"
+                android:textColor="@color/danger"
+                android:text="Evidence" />
+        </LinearLayout>
+
+        <!-- Mitigation hint row -->
+        <LinearLayout
+            android:id="@+id/mitigation_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_shield"
+                app:tint="@color/iconColorSecurity"
+                android:contentDescription="@null"
+                android:layout_marginEnd="5dp"/>
+
+            <TextView
+                android:id="@+id/mitigation_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="11sp"
+                android:textColor="@color/metricTextSecondary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="Mitigation: Inspect TLS SNI and block suspicious requests." />
+        </LinearLayout>
+
+        <!-- Bottom row: Actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/btn_view_mapped_alerts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View Mapped Alerts"
+                android:textSize="11sp"
+                android:textColor="@color/danger"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:paddingEnd="12dp"
+                android:background="?attr/selectableItemBackground"/>
+
+            <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/mitre_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View on MITRE ATT&amp;CK ↗"
+                android:textSize="12sp"
+                android:textColor="@color/aboutLinkColor"
+                android:textStyle="bold"
+                android:background="?attr/selectableItemBackground"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of KotSafe / KotSafe.
+  ~ Copyright 2026 - KotSafe Cyber Security Project
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    android:background="@color/backgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="50dp">
+
+        <!-- Top Emblem / Logo Container (Slide 1) -->
+        <FrameLayout
+            android:id="@+id/slide_icon_container"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_intro_icon_circle"
+            android:elevation="6dp">
+
+            <ImageView
+                android:id="@+id/slide_icon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:contentDescription="Slide Icon"
+                tools:src="@drawable/ic_logo" />
+        </FrameLayout>
+
+        <!-- Hero Image Card (Slides 2 - 6) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/slide_hero_image_card"
+            android:layout_width="match_parent"
+            android:layout_height="165dp"
+            android:layout_marginTop="6dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:strokeColor="#306366F1"
+            app:strokeWidth="1dp"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/slide_hero_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Slide Hero Visual"
+                tools:src="@drawable/intro_slide_antivirus" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Category Badge Pill -->
+        <TextView
+            android:id="@+id/slide_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_intro_pill"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.08"
+            android:textAllCaps="true"
+            android:textColor="@color/colorAccent"
+            android:textSize="11sp"
+            tools:text="KOTSAFE CYBER DEFENSE SUITE" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/slide_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-bold"
+            android:gravity="center"
+            android:textColor="@color/drawerItemColor"
+            android:textSize="21sp"
+            tools:text="Welcome to KotSafe" />
+
+        <!-- Subtitle / Tagline -->
+        <TextView
+            android:id="@+id/slide_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/colorTabText"
+            android:textSize="12.5sp"
+            tools:text="Enterprise-grade Android threat defense, packet inspection &amp; private mesh gateway" />
+
+        <!-- Interactive Playground Container -->
+        <FrameLayout
+            android:id="@+id/slide_interactive_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- Feature Points Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/slide_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#206366F1"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <!-- Feature Item 1 -->
+                <LinearLayout
+                    android:id="@+id/feature_1_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_intro_feature_bullet">
+
+                        <ImageView
+                            android:id="@+id/feature_1_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_check_solid"
+                            app:tint="@color/colorAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/feature_1_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/drawerItemColor"
+                            android:textSize="12.5sp"
+                            tools:text="Zero-Root Packet Engine" />
+
+                        <TextView
+                            android:id="@+id/feature_1_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:textColor="@color/colorTabText"
+                            android:textSize="11.5sp"
+                            tools:text="Full network capture without needing device root access" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#156366F1" />
+
+                <!-- Feature Item 2 -->
+                <LinearLayout
+                    android:id="@+id/feature_2_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_intro_feature_bullet">
+
+                        <ImageView
+                            android:id="@+id/feature_2_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_check_solid"
+                            app:tint="@color/colorAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/feature_2_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/drawerItemColor"
+                            android:textSize="12.5sp"
+                            tools:text="Active Threat Intelligence" />
+
+                        <TextView
+                            android:id="@+id/feature_2_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:textColor="@color/colorTabText"
+                            android:textSize="11.5sp"
+                            tools:text="Multi-feed URLhaus, ThreatFox and MalwareBazaar IOC checks" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#156366F1" />
+
+                <!-- Feature Item 3 -->
+                <LinearLayout
+                    android:id="@+id/feature_3_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_intro_feature_bullet">
+
+                        <ImageView
+                            android:id="@+id/feature_3_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_check_solid"
+                            app:tint="@color/colorAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/feature_3_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/drawerItemColor"
+                            android:textSize="12.5sp"
+                            tools:text="P2P Encrypted Mesh Gateway" />
+
+                        <TextView
+                            android:id="@+id/feature_3_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:textColor="@color/colorTabText"
+                            android:textSize="11.5sp"
+                            tools:text="E2EE AES-GCM tunnel via Cloudflare or direct VPS relay" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="#156366F1" />
+
+                <!-- Feature Item 4 -->
+                <LinearLayout
+                    android:id="@+id/feature_4_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_intro_feature_bullet">
+
+                        <ImageView
+                            android:id="@+id/feature_4_icon"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_check_solid"
+                            app:tint="@color/colorAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/feature_4_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/drawerItemColor"
+                            android:textSize="12.5sp"
+                            tools:text="100% On-Device Privacy" />
+
+                        <TextView
+                            android:id="@+id/feature_4_desc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:textColor="@color/colorTabText"
+                            android:textSize="11.5sp"
+                            tools:text="Zero tracking, no telemetries sold, transparent open source" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>

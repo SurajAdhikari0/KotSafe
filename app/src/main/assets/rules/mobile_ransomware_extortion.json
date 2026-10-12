@@ -1,0 +1,34 @@
+{
+  "id": "RULE-FILE-002",
+  "name": "Mobile Ransomware Extortion Demand & Locker Payload",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1486"
+  ],
+  "tactics": [
+    "Impact"
+  ],
+  "description": "Detects files containing active ransomware ransom notes, onion payment portals, and threat extortion demands threatening permanent file destruction.",
+  "target": "file",
+  "iocs": {
+    "sha256": []
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "content_strings",
+        "operator": "contains_any",
+        "values": [
+          "files have been encrypted",
+          "send bitcoin to",
+          ".onion/restore",
+          "private key will be destroyed",
+          "decrypt your files"
+        ]
+      }
+    ]
+  },
+  "remediation": "Place file in Sandboxed Quarantine Vault and disconnect device from network."
+}

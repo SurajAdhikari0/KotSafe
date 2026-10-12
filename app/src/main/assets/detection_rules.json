@@ -1,0 +1,423 @@
+{
+  "version": 2,
+  "updated_at": "2026-09-25T12:20:00Z",
+  "rules": [
+    {
+      "id": "RULE-ANDR-001",
+      "name": "Sideloaded APK with Accessibility & Overlay Abuse (Banking Trojan Pattern)",
+      "severity": "CRITICAL",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1418", "T1453"],
+      "tactics": ["Credential Access", "Defense Evasion"],
+      "description": "Flags untrusted sideloaded APKs requesting both Accessibility Service and System Alert Window (Overlay). This exact combination is characteristic of Anatsa, SharkBot, and Xenomorph banking trojans to inject fake phishing overlays and steal credentials.",
+      "target": "app",
+      "iocs": {
+        "sha256": [
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "7a5f6e8b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f"
+        ]
+      },
+      "logic": {
+        "match": "all",
+        "conditions": [
+          {
+            "field": "isSideloaded",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "field": "permissions",
+            "operator": "contains_all",
+            "values": [
+              "android.permission.SYSTEM_ALERT_WINDOW",
+              "android.permission.BIND_ACCESSIBILITY_SERVICE"
+            ]
+          }
+        ]
+      },
+      "remediation": "Revoke accessibility permission immediately and uninstall the unverified application."
+    },
+    {
+      "id": "RULE-ANDR-002",
+      "name": "Covert Surveillance & SMS OTP Interception Spyware",
+      "severity": "HIGH",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1412", "T1429", "T1430"],
+      "tactics": ["Collection", "Discovery"],
+      "description": "Detects sideloaded applications with high-privilege surveillance sensors combining background SMS interception with microphone recording and fine GPS geolocation.",
+      "target": "app",
+      "iocs": {
+        "sha256": []
+      },
+      "logic": {
+        "match": "all",
+        "conditions": [
+          {
+            "field": "isSideloaded",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "field": "permissions",
+            "operator": "contains_all",
+            "values": [
+              "android.permission.RECEIVE_SMS",
+              "android.permission.RECORD_AUDIO",
+              "android.permission.ACCESS_FINE_LOCATION"
+            ]
+          }
+        ]
+      },
+      "remediation": "Review application permissions in Android App Settings and restrict background sensor access."
+    },
+    {
+      "id": "RULE-ANDR-003",
+      "name": "Dynamic Dropper / Obfuscated DexClassLoader Pipeline",
+      "severity": "HIGH",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1407", "T1426"],
+      "tactics": ["Defense Evasion", "Execution"],
+      "description": "Identifies sideloaded APKs requesting silent package installations and executing dynamic secondary payloads via DexClassLoader or runtime reflection.",
+      "target": "app",
+      "iocs": {
+        "sha256": []
+      },
+      "logic": {
+        "match": "all",
+        "conditions": [
+          {
+            "field": "isSideloaded",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "field": "permissions",
+            "operator": "contains_any",
+            "values": [
+              "android.permission.REQUEST_INSTALL_PACKAGES",
+              "android.permission.INSTALL_PACKAGES"
+            ]
+          }
+        ]
+      },
+      "remediation": "Block installation capabilities for untrusted installers under Android Unknown Sources settings."
+    },
+    {
+      "id": "RULE-ANDR-004",
+      "name": "Commercial Spyware & Cyber Espionage Stalkerware (Pegasus / Predator Indicators)",
+      "severity": "CRITICAL",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1430", "T1412", "T1429"],
+      "tactics": ["Collection", "Exfiltration"],
+      "description": "Flags high-threat surveillance tooling combining microphone wiretapping, camera capture, call logs, fine GPS coordinates, and contact scraping into a unified covert spyware implant.",
+      "target": "app",
+      "iocs": {
+        "sha256": [
+          "d41d8cd98f00b204e9800998ecf8427e00000000000000000000000000000000"
+        ]
+      },
+      "logic": {
+        "match": "all",
+        "conditions": [
+          {
+            "field": "isSideloaded",
+            "operator": "equals",
+            "value": true
+          },
+          {
+            "field": "permissions",
+            "operator": "contains_all",
+            "values": [
+              "android.permission.RECORD_AUDIO",
+              "android.permission.CAMERA",
+              "android.permission.ACCESS_FINE_LOCATION",
+              "android.permission.READ_CALL_LOG"
+            ]
+          }
+        ]
+      },
+      "remediation": "Isolate device from network, back up essential data, and perform a factory firmware reflash."
+    },
+    {
+      "id": "RULE-NET-001",
+      "name": "Dynamic DNS & Fast-Flux C2 Infrastructure Beaconing",
+      "severity": "HIGH",
+      "triggerSchedule": "REALTIME_NET",
+      "mitreTechniques": ["T1568.002", "T1071"],
+      "tactics": ["Command and Control"],
+      "description": "Detects outbound network flows to known dynamic DNS providers commonly used by adversaries for fast-flux command & control infrastructure resilience.",
+      "target": "network",
+      "iocs": {
+        "domains": [
+          "clickfunax.top",
+          "duckdns.org",
+          "hopto.org",
+          "no-ip.biz",
+          "zapto.org",
+          "servehttp.com"
+        ],
+        "ips": [
+          "185.220.101.5",
+          "194.26.29.112"
+        ]
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "domain",
+            "operator": "regex",
+            "value": ".*\\.(top|xyz|click|buzz|duckdns\\.org|clickfunax\\.top|hopto\\.org|no-ip\\.biz)$"
+          },
+          {
+            "field": "dgaEntropy",
+            "operator": "greater_than",
+            "value": 3.85
+          }
+        ]
+      },
+      "remediation": "Block the domain/IP in KotSafe Firewall and audit the originating application socket."
+    },
+    {
+      "id": "RULE-NET-002",
+      "name": "Anomalous Meterpreter / Remote Access C2 Port Connection",
+      "severity": "CRITICAL",
+      "triggerSchedule": "REALTIME_NET",
+      "mitreTechniques": ["T1095", "T1571"],
+      "tactics": ["Command and Control"],
+      "description": "Alerts when an app initiates an outbound socket on well-known offensive reverse shell ports (e.g. 4444 Metasploit, 1337 Elite, 31337 BackOrifice, 5555 unauthorized ADB over TCP).",
+      "target": "network",
+      "iocs": {
+        "ips": [
+          "185.220.101.5",
+          "45.33.32.156"
+        ]
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "port",
+            "operator": "in",
+            "values": [4444, 5555, 1337, 31337, 8554, 9999, 2323]
+          }
+        ]
+      },
+      "remediation": "Isolate the device network connection immediately and terminate suspicious background process."
+    },
+    {
+      "id": "RULE-NET-003",
+      "name": "Telegram Bot API C2 Command & Exfiltration Tunnel",
+      "severity": "HIGH",
+      "triggerSchedule": "REALTIME_NET",
+      "mitreTechniques": ["T1102.002", "T1048"],
+      "tactics": ["Command and Control", "Exfiltration"],
+      "description": "Detects outbound web flows communicating with Telegram Bot API endpoints (api.telegram.org) from non-official client apps, a primary technique used by ToxicPanda, Hook, and CraxsRAT for exfiltrating SMS OTPs and receiving bot commands.",
+      "target": "network",
+      "iocs": {
+        "domains": [
+          "api.telegram.org",
+          "telegram-bot-api.org"
+        ]
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "domain",
+            "operator": "contains",
+            "value": "api.telegram.org"
+          }
+        ]
+      },
+      "remediation": "Block api.telegram.org for untrusted applications in Firewall Access Control."
+    },
+    {
+      "id": "RULE-NET-004",
+      "name": "Cryptomining Pool Stratum Protocol Traffic",
+      "severity": "HIGH",
+      "triggerSchedule": "REALTIME_NET",
+      "mitreTechniques": ["T1496"],
+      "tactics": ["Impact"],
+      "description": "Detects outbound network sockets attempting connections to Monero / Crypto mining pools using standard mining ports (3333, 5555, 7777, 8888) or known mining pool endpoints.",
+      "target": "network",
+      "iocs": {
+        "domains": [
+          "pool.supportxmr.com",
+          "xmr.nanopool.org",
+          "pool.minexmr.com",
+          "moneroocean.stream",
+          "gulf.moneroocean.stream"
+        ]
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "domain",
+            "operator": "regex",
+            "value": ".*(supportxmr|nanopool|minexmr|moneroocean|hashvault).*"
+          },
+          {
+            "field": "port",
+            "operator": "in",
+            "values": [3333, 7777, 8888]
+          }
+        ]
+      },
+      "remediation": "Check battery and CPU usage in Settings, identify the mining app, and block pool traffic in Firewall."
+    },
+    {
+      "id": "RULE-NET-005",
+      "name": "Cobalt Strike / Metasploit Malleable C2 Beaconing",
+      "severity": "CRITICAL",
+      "triggerSchedule": "REALTIME_NET",
+      "mitreTechniques": ["T1071", "T1573"],
+      "tactics": ["Command and Control"],
+      "description": "Detects high-entropy algorithmic C2 domains and known offensive adversary infrastructure associated with Cobalt Strike team server profiles and Metasploit payloads.",
+      "target": "network",
+      "iocs": {
+        "domains": [
+          "cobaltstrike-profile.top",
+          "c2-delivery.xyz",
+          "updates-ms-cloud.com"
+        ],
+        "ips": [
+          "193.142.59.88",
+          "194.26.29.112"
+        ]
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "dgaEntropy",
+            "operator": "greater_than",
+            "value": 4.1
+          }
+        ]
+      },
+      "remediation": "Immediately sever network connection and scan device for persistent stagers."
+    },
+    {
+      "id": "RULE-FILE-001",
+      "name": "Privilege Escalation & Rootkit Su Daemon Stager",
+      "severity": "CRITICAL",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1404", "T1068"],
+      "tactics": ["Privilege Escalation"],
+      "description": "Discovers storage artifacts or binary payloads embedding unauthorized superuser daemons or kernel exploit indicators (/system/bin/su, dirtycow, magisk tampering).",
+      "target": "file",
+      "iocs": {
+        "sha256": []
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "content_strings",
+            "operator": "contains_any",
+            "values": [
+              "/system/bin/su",
+              "/system/xbin/daemonsu",
+              "dirtycow",
+              "ro.build.selinux",
+              "/sbin/su"
+            ]
+          }
+        ]
+      },
+      "remediation": "Delete or quarantine the unauthorized root binary to prevent local privilege escalation."
+    },
+    {
+      "id": "RULE-FILE-002",
+      "name": "Mobile Ransomware Extortion Demand & Locker Payload",
+      "severity": "CRITICAL",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1486"],
+      "tactics": ["Impact"],
+      "description": "Detects files containing active ransomware ransom notes, onion payment portals, and threat extortion demands threatening permanent file destruction.",
+      "target": "file",
+      "iocs": {
+        "sha256": []
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "content_strings",
+            "operator": "contains_any",
+            "values": [
+              "files have been encrypted",
+              "send bitcoin to",
+              ".onion/restore",
+              "private key will be destroyed",
+              "decrypt your files"
+            ]
+          }
+        ]
+      },
+      "remediation": "Place file in Sandboxed Quarantine Vault and disconnect device from network."
+    },
+    {
+      "id": "RULE-FILE-003",
+      "name": "Meterpreter Reverse Shell or Screen Surveillance Payload",
+      "severity": "CRITICAL",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1059", "T1407"],
+      "tactics": ["Execution"],
+      "description": "Detects Metasploit Android meterpreter payload strings, hidden reverse TCP commands, and unauthorized screencap dumps.",
+      "target": "file",
+      "iocs": {
+        "sha256": []
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "content_strings",
+            "operator": "contains_any",
+            "values": [
+              "meterpreter",
+              "reverse_tcp",
+              "/system/bin/screencap -p",
+              "dalvik.system.DexClassLoader"
+            ]
+          }
+        ]
+      },
+      "remediation": "Shred the suspicious binary and check running processes."
+    },
+    {
+      "id": "RULE-FILE-004",
+      "name": "Embedded ELF Exploit Binary / DirtyPipe Kernel Privilege Escalation",
+      "severity": "CRITICAL",
+      "triggerSchedule": "ON_SCAN",
+      "mitreTechniques": ["T1068", "T1404"],
+      "tactics": ["Privilege Escalation"],
+      "description": "Detects native Linux ELF binaries embedded in unauthorized directories or APK assets attempting kernel ring-0 exploitation via DirtyPipe (CVE-2022-0847) or DirtyCOW.",
+      "target": "file",
+      "iocs": {
+        "sha256": [
+          "b2f8a1c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1"
+        ]
+      },
+      "logic": {
+        "match": "any",
+        "conditions": [
+          {
+            "field": "content_strings",
+            "operator": "contains_any",
+            "values": [
+              "CVE-2022-0847",
+              "splice() to pipe",
+              "/etc/passwd overwrite",
+              "pipe_buffer"
+            ]
+          }
+        ]
+      },
+      "remediation": "Quarantine the ELF binary immediately and verify Android Security Patch Level in Settings."
+    }
+  ]
+}

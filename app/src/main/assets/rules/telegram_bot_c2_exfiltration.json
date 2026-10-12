@@ -1,0 +1,33 @@
+{
+  "id": "RULE-NET-003",
+  "name": "Telegram Bot API C2 Command & Exfiltration Tunnel",
+  "severity": "HIGH",
+  "triggerSchedule": "REALTIME_NET",
+  "mitreTechniques": [
+    "T1102.002",
+    "T1048"
+  ],
+  "tactics": [
+    "Command and Control",
+    "Exfiltration"
+  ],
+  "description": "Detects outbound web flows communicating with Telegram Bot API endpoints (api.telegram.org) from non-official client apps, a primary technique used by ToxicPanda, Hook, and CraxsRAT for exfiltrating SMS OTPs and receiving bot commands.",
+  "target": "network",
+  "iocs": {
+    "domains": [
+      "api.telegram.org",
+      "telegram-bot-api.org"
+    ]
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "domain",
+        "operator": "contains",
+        "value": "api.telegram.org"
+      }
+    ]
+  },
+  "remediation": "Block api.telegram.org for untrusted applications in Firewall Access Control."
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_firewall_rules"
+        app:title="Firewall &amp; Access Control"
+        app:icon="@drawable/ic_cat_firewall"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="firewall_settings"
+            app:title="@string/firewall"
+            app:summary="@string/firewall_settings_summary"
+            app:icon="@drawable/ic_pref_firewall"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.FirewallSettings" />
+
+        <Preference
+            app:key="physical_security_settings"
+            android:key="physical_security_settings"
+            android:selectable="true"
+            app:title="@string/physical_security_title"
+            app:summary="@string/physical_security_desc"
+            app:icon="@drawable/ic_pref_physical_sec"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="security_permissions_setup"
+            app:title="Security Posture &amp; Permissions"
+            app:summary="Configure device protection, VPN access, battery whitelist &amp; runtime posture"
+            app:icon="@drawable/ic_pref_permissions"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="wifi_security_settings"
+            app:title="@string/wifi_security_title"
+            app:summary="@string/wifi_security_summary"
+            app:icon="@drawable/ic_pref_wifi_security"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

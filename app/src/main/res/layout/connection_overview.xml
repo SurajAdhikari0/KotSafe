@@ -1,0 +1,1108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/connection_overview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="?android:attr/colorBackground"
+    android:clipToPadding="false"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 1. HERO APP & STATUS CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_modern_bg"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/overview_app_icon"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/icon_rounded_bg"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_apps"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/detail_app"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textIsSelectable="true"
+                        tools:text="Google Chrome (UID 10245)" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/detail_protocol"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/badge_pill_proto"
+                            android:textColor="@color/badgeProtoFg"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="3dp"
+                            tools:text="TLS (TCP)" />
+
+                        <ImageView
+                            android:id="@+id/protocol_info"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginStart="6dp"
+                            android:src="@drawable/ic_info"
+                            app:tint="?attr/colorControlNormal"
+                            android:visibility="gone"
+                            tools:visibility="visible"
+                            android:contentDescription="@string/protocol" />
+
+                        <TextView
+                            android:id="@+id/detail_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/badge_pill_active"
+                            android:textColor="@color/badgeActiveFg"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="3dp"
+                            tools:text="Connected" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Error Banner (Security / Decryption / Block notice) -->
+            <TextView
+                android:id="@+id/error_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/telemetry_widget_bg"
+                android:padding="10dp"
+                android:textColor="@color/danger"
+                android:textSize="12sp"
+                android:textIsSelectable="true"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="Notice: Encrypted TLS stream without inspection rule" />
+        </LinearLayout>
+
+        <!-- AI FLOW THREAT ANALYSIS CARD -->
+        <!-- AI FLOW THREAT ANALYSIS & DEEP INVESTIGATION CARD -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_ai_flow_analysis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#0284C7"
+            app:cardBackgroundColor="@color/cardWorkbenchBg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="#38BDF8"
+                        android:background="@drawable/badge_pill_bg"
+                        android:backgroundTint="#0C2038"
+                        android:padding="6dp"
+                        android:layout_marginEnd="10dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ai_audit_threat_intelligence_title"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/metricTextPrimary" />
+
+                        <TextView
+                            android:id="@+id/tv_ai_flow_summary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/ai_audit_threat_intelligence_desc"
+                            android:textSize="11sp"
+                            android:textColor="@color/metricTextSecondary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_deep_threat_investigate"
+                        style="@style/Widget.MaterialComponents.Button"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:text="@string/deep_investigate_btn"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        app:backgroundTint="#0284C7"
+                        app:cornerRadius="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_run_ai_flow"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="40dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/ai_flow_audit_btn"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorSecondary"
+                        app:strokeColor="@color/colorSecondary"
+                        app:strokeWidth="1dp"
+                        app:cornerRadius="10dp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_app_activity_timeline"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/app_activity_timeline_btn"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#38BDF8"
+                    app:icon="@drawable/ic_history"
+                    app:iconTint="#38BDF8"
+                    app:iconGravity="textStart"
+                    app:strokeColor="#0284C7"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="10dp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- SOURCE APP ATTRIBUTION / DNS SYSTEM CALLER CORRELATION CARD -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_dns_app_attribution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#F59E0B"
+            app:cardBackgroundColor="@color/cardWorkbenchBg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <!-- Header row with info badge -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_shield"
+                        app:tint="#F59E0B"
+                        android:background="@drawable/badge_pill_bg"
+                        android:backgroundTint="#261E08"
+                        android:padding="6dp"
+                        android:layout_marginEnd="10dp"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dns_source_attribution_title"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/metricTextPrimary" />
+
+                        <TextView
+                            android:id="@+id/tv_dns_source_badge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/dns_system_resolver_badge"
+                            android:textSize="11sp"
+                            android:textColor="#F59E0B" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Explanation text -->
+                <TextView
+                    android:id="@+id/tv_dns_system_explanation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dns_system_attribution_desc"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp"
+                    android:textColor="@color/metricTextSecondary"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Correlated apps title -->
+                <TextView
+                    android:id="@+id/tv_correlated_apps_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/likely_source_apps_header"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/metricTextPrimary"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Container where correlated app items are inflated/added dynamically -->
+                <LinearLayout
+                    android:id="@+id/container_correlated_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- No apps correlated fallback text -->
+                <TextView
+                    android:id="@+id/tv_no_correlated_apps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_correlated_apps_found"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    android:textColor="@color/metricTextSecondary"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 2. ROUTING & NETWORK ENDPOINTS CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_modern_bg"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NETWORK &amp; ROUTING"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/metricTextSecondary"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Endpoints visual: Local -> Remote -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/telemetry_widget_bg"
+                android:padding="10dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CLIENT"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/detail_source"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="monospace"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textIsSelectable="true"
+                        tools:text="10.0.0.2:54321" />
+
+                    <ImageView
+                        android:id="@+id/copy_source_btn"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_content_copy_small"
+                        app:tint="@color/metricTextSecondary"
+                        android:contentDescription="@string/copy_action" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/cardBorderSubtle"
+                    android:layout_marginVertical="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="REMOTE"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/badgeActiveFg"
+                        android:layout_marginEnd="8dp" />
+
+                    <ImageView
+                        android:id="@+id/blacklisted_ip"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_skull"
+                        app:tint="@color/danger"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/detail_destination"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="monospace"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textIsSelectable="true"
+                        tools:text="142.251.152.119:443" />
+
+                    <ImageView
+                        android:id="@+id/copy_dest_btn"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_content_copy_small"
+                        app:tint="@color/metricTextSecondary"
+                        android:contentDescription="@string/copy_action" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- SNI / Host Row -->
+            <LinearLayout
+                android:id="@+id/detail_info_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/detail_info_label"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sni"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <ImageView
+                    android:id="@+id/blacklisted_host"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_skull"
+                    app:tint="@color/danger"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/detail_info"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    tools:text="ssl.google-analytics.com" />
+
+                <ImageView
+                    android:id="@+id/copy_host_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_content_copy_small"
+                    app:tint="@color/metricTextSecondary"
+                    android:contentDescription="@string/copy_action" />
+            </LinearLayout>
+
+            <!-- URL Row -->
+            <LinearLayout
+                android:id="@+id/detail_url_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/url"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <TextView
+                    android:id="@+id/detail_url"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    tools:text="https://example.com/api/v1/sync" />
+
+                <ImageView
+                    android:id="@+id/copy_url_btn"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_content_copy_small"
+                    app:tint="@color/metricTextSecondary"
+                    android:contentDescription="@string/copy_action" />
+            </LinearLayout>
+
+            <!-- Geolocation & ASN -->
+            <LinearLayout
+                android:id="@+id/country_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/country"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <com.haipq.android.flagkit.FlagImageView
+                    android:id="@+id/country_flag"
+                    android:layout_width="20dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/country_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="United States" />
+            </LinearLayout>
+
+            <!-- Source Country Row -->
+            <LinearLayout
+                android:id="@+id/source_country_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="Source Loc"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <com.haipq.android.flagkit.FlagImageView
+                    android:id="@+id/source_country_flag"
+                    android:layout_width="20dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/source_country_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="13sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="Local Network" />
+            </LinearLayout>
+
+            <!-- ASN Row -->
+            <LinearLayout
+                android:id="@+id/asn_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/asn"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <TextView
+                    android:id="@+id/asn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    tools:text="AS15169 - Google LLC" />
+
+                <TextView
+                    android:id="@+id/whois_ip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RDAP ↗"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/badgeProtoFg"
+                    android:background="@drawable/badge_pill_proto"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- SINGLE-SOCKET DIAGNOSTICS & LIFECYCLE CARD -->
+        <LinearLayout
+            android:id="@+id/card_single_socket_diagnostics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_modern_bg"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/single_socket_diagnostics_header"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/metricTextSecondary"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:id="@+id/socket_sessions_count_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_pill_proto"
+                    android:textColor="@color/badgeProtoFg"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    tools:text="1 Socket" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/socket_diagnostics_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:layout_marginBottom="10dp"
+                android:text="@string/single_socket_diagnostics_desc" />
+
+            <LinearLayout
+                android:id="@+id/socket_sessions_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <!-- 3. DATA TRANSFER & TELEMETRY CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_modern_bg"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DATA TRANSFER &amp; TELEMETRY"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/metricTextSecondary"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="10dp" />
+
+            <!-- 2x2 Telemetry Grid -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Traffic Bytes Tile -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:padding="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TOTAL TRAFFIC"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary" />
+
+                    <TextView
+                        android:id="@+id/detail_bytes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="14.2 KB (12.1 KB ↓ / 2.1 KB ↑)" />
+                </LinearLayout>
+
+                <!-- Packets Tile -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:padding="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PACKETS"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary" />
+
+                    <TextView
+                        android:id="@+id/detail_packets"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="18 pkts (12 ↓ / 6 ↑)" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- Payload Tile -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:padding="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/payload"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary" />
+
+                    <TextView
+                        android:id="@+id/detail_payload"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="8.5 KB" />
+                </LinearLayout>
+
+                <!-- Duration Tile -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/telemetry_widget_bg"
+                    android:padding="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/duration"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextSecondary" />
+
+                    <TextView
+                        android:id="@+id/detail_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="1m 24s" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Blocked Packets (if any) -->
+            <LinearLayout
+                android:id="@+id/blocked_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/badge_pill_blocked"
+                android:padding="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/blocked_pkts"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/badgeBlockedFg" />
+
+                <TextView
+                    android:id="@+id/blocked_pkts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/badgeBlockedFg"
+                    tools:text="4 pkts" />
+            </LinearLayout>
+
+            <!-- Timestamps Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/first_seen"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="11sp"
+                    android:textColor="@color/metricTextSecondary"
+                    tools:text="Started: 22:05:14" />
+
+                <TextView
+                    android:id="@+id/last_seen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/metricTextSecondary"
+                    tools:text="Last: 22:06:22" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 4. ACCESS CONTROL, INSPECTION & DIAGNOSTICS CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_modern_bg"
+            android:padding="14dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FIREWALL &amp; SECURITY"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/metricTextSecondary"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Network Access Control Row -->
+            <LinearLayout
+                android:id="@+id/detail_network_access_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/telemetry_widget_bg"
+                android:padding="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_shield"
+                    app:tint="@color/colorAccent"
+                    android:contentDescription="@null"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/detail_network_access_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/metricTextPrimary"
+                    tools:text="All Networks Allowed" />
+
+                <TextView
+                    android:id="@+id/detail_network_access_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manage ➔"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/badgeProtoFg"
+                    android:background="@drawable/badge_pill_proto"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+
+            <!-- Decryption Status Row -->
+            <LinearLayout
+                android:id="@+id/decryption_status_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/decryption_icon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_lock_open"
+                    tools:tint="@color/ok"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/detail_decryption_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="Decrypted (TLS Plaintext Available)" />
+            </LinearLayout>
+
+            <!-- Injected Scripts Row -->
+            <LinearLayout
+                android:id="@+id/injected_scripts_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/injected"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <TextView
+                    android:id="@+id/injected_scripts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    tools:text="ssl_pinning_bypass.js" />
+            </LinearLayout>
+
+            <!-- Capture Interface Row -->
+            <LinearLayout
+                android:id="@+id/interface_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="Interface"
+                    android:textSize="12sp"
+                    android:textColor="@color/metricTextSecondary" />
+
+                <TextView
+                    android:id="@+id/capture_interface"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:textColor="?android:attr/textColorPrimary"
+                    tools:text="tun0" />
+            </LinearLayout>
+
+            <!-- Error Code / Errno Row -->
+            <LinearLayout
+                android:id="@+id/error_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:text="Socket Err"
+                    android:textSize="12sp"
+                    android:textColor="@color/danger" />
+
+                <TextView
+                    android:id="@+id/detail_errno"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="@color/danger"
+                    tools:text="ECONNRESET (104)" />
+
+                <ImageView
+                    android:id="@+id/error_info"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_info"
+                    app:tint="@color/danger"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Invisible legacy table layout retained for backward compatibility with getContents() -->
+        <TableLayout
+            android:id="@+id/table"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>

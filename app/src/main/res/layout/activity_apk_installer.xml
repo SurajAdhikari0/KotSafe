@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_apk_installer.xml
+  Entry screen for the Secure APK Installer — file picker + recent scans list.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundColor"
+    tools:context=".activities.ApkInstallerActivity">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:title="Secure APK Installer"
+        app:titleTextColor="@android:color/white"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- Hero shield icon -->
+            <ImageView
+                android:id="@+id/iv_hero_shield"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="8dp"
+                android:src="@drawable/ic_shield"
+                android:contentDescription="Shield icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scan Before You Install"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/metricTextPrimary"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pick an APK file and KotSafe will check it for threats\nbefore handing it to the system installer."
+                android:textSize="14sp"
+                android:textColor="@color/metricTextSecondary"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Drop zone / picker card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_drop_zone"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginBottom="16dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/colorPrimary"
+                app:cardBackgroundColor="@color/surfaceColor">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:id="@+id/iv_picker_icon"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_file_import"
+                            app:tint="@color/colorPrimary"
+                            android:layout_marginBottom="12dp"
+                            android:contentDescription="APK file icon" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tap to choose an APK file"
+                            android:textSize="16sp"
+                            android:textColor="@color/colorPrimary"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Supports .apk files from Downloads, File Manager, etc."
+                            android:textSize="12sp"
+                            android:textColor="@color/metricTextSecondary"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                    <!-- Laser scanning sweep bar -->
+                    <View
+                        android:id="@+id/view_laser_scanner"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:background="@drawable/laser_beam"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Scanning progress container -->
+            <LinearLayout
+                android:id="@+id/layout_scan_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:id="@+id/progress_scan"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_progress_phase"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorPrimary"
+                    android:text="Scanning APK…" />
+            </LinearLayout>
+
+            <!-- Browse button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_browse_apk"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="32dp"
+                android:text="Browse Files"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_file_import"
+                app:cornerRadius="12dp" />
+
+            <!-- Tip card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="#1A2196F3"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="14dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_shield"
+                        app:tint="#2196F3"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="Info" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="SHA-256 hash · DEX structural analysis · Threat Intelligence (OTX, MalwareBazaar, VirusTotal) if API keys are configured."
+                        android:textSize="12sp"
+                        android:textColor="#2196F3" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Recent scans header -->
+            <TextView
+                android:id="@+id/tv_recent_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Recent Scans"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/metricTextSecondary"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <!-- Recent scans list container -->
+            <LinearLayout
+                android:id="@+id/container_recent_scans"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

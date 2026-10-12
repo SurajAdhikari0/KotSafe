@@ -1,0 +1,21 @@
+<i>KotSafe</i> 是一款注重隐私的开源应用，可跟踪、分析并拦截设备中其他应用建立的连接。
+它还支持导出流量的 PCAP 转储、检查 HTTP 请求、解密 TLS 流量等诸多功能。
+
+KotSafe 通过模拟 VPN 来实现免 root 抓取网络流量。它不使用远程 VPN 服务器，而是在设备本地处理数据。
+
+<b>主要功能：</b>
+
+* 记录并分析用户应用和系统应用建立的连接
+* 查看每个应用发送和接收的数据量汇总
+* 低电量消耗，可全天持续抓包
+* 从 DNS、TLS 和 HTTP 中提取主机名和 IP 地址
+* 将流量记录为 PCAP 文件，并附带额外的应用元数据
+* 通过 PCAP-over-IP 发送流量以进行实时分析（如在 Wireshark 中）
+* 解密 HTTPS/TLS 流量、提取 URL 并保存 SSLKEYLOGFILE
+* 检查 HTTP 请求/响应并导出为 HAR
+* 通过离线数据库查询识别远程服务器的国家和 ASN
+* 在已 root 的设备上，可在其他 VPN 应用运行时抓取流量
+
+如果您打算使用 KotSafe 进行数据包分析，请查阅手册中的<a href='https://kotsafe.github.io/KotSafe/quick_start#14-packet-analysis'>相关章节</a>。
+
+欢迎<a href="https://t.me/KotSafe">在 Telegram</a> 或<a href="https://matrix.to/#/#kotsafe:matrix.org">在 Matrix</a> 上加入 KotSafe 国际社区。

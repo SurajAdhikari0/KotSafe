@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Core brand colors -->
+    <!-- Tab bar adaptive colors (overridden in values-night) -->
+    <color name="tabBarBg">#FFFCF6</color>
+    <color name="tabBarDivider">#DDD6C6</color>
+    <color name="tabTextSelected">#14213D</color>
+    <color name="tabTextUnselected">#7A8498</color>
+    <color name="tabSwitchTint">#14213D</color>
+    <color name="tabIndicatorColor">#0E9F83</color>
+    <color name="tacticalGreen">#0E9F83</color>
+    <color name="tacticalBlue">#2B4170</color>
+    <color name="tacticalAmber">#B8892B</color>
+    <color name="tapToStartBg">#120E9F83</color>
+    <color name="tapToStartFg">#0B5E4D</color>
+
+    <color name="colorTab">#3D1F8A</color>
+    <color name="colorTabText">#64748B</color>
+    <color name="colorTabTextSelected">#3D1F8A</color>
+    <color name="colorPrimary">#3D1F8A</color>
+    <color name="colorActionBar">#0B1D38</color>
+    <color name="colorPrimaryDark">#0A1628</color>
+    <color name="colorPrimaryLight">#6B3FC8</color>
+    <color name="colorAccent">#6366F1</color>
+    <color name="colorAccentLight">#C7D2FE</color>
+    <color name="colorSecondary">#0284C7</color>
+    <color name="colorTertiary">#E11D48</color>
+
+    <!-- Nav drawer -->
+    <color name="navViewBackground">#F8FAFC</color>
+    <color name="navHeaderGradStart">#2A1060</color>
+    <color name="navHeaderGradEnd">#6B3FC8</color>
+    <color name="drawerItemColor">#1E1B4B</color>
+    <color name="drawerItemSelectedBg">#EDE8FF</color>
+    <color name="drawerItemSelectedText">#3D1F8A</color>
+    <color name="drawerSeparatorColor">#E2E8F0</color>
+    <color name="drawerGroupLabelColor">#64748B</color>
+
+    <!-- Settings category icon tint colors -->
+    <color name="iconColorHttp">#2563EB</color>       <!-- blue  - HTTP Server -->
+    <color name="iconColorExporter">#0891B2</color>   <!-- cyan  - TCP/UDP Exporter -->
+    <color name="iconColorInspect">#7C3AED</color>    <!-- violet - Traffic Inspection -->
+    <color name="iconColorCapture">#059669</color>    <!-- green - Capture -->
+    <color name="iconColorFirewall">#DC2626</color>   <!-- red   - Firewall -->
+    <color name="iconColorSecurity">#D97706</color>   <!-- amber - Security -->
+    <color name="iconColorOther">#64748B</color>      <!-- slate - Other -->
+    <color name="iconColorBackup">#0F766E</color>     <!-- teal  - Backup -->
+
+    <!-- Category background pills -->
+    <color name="catBgHttp">#EFF6FF</color>
+    <color name="catBgExporter">#ECFEFF</color>
+    <color name="catBgInspect">#EDE9FE</color>
+    <color name="catBgCapture">#ECFDF5</color>
+    <color name="catBgFirewall">#FEF2F2</color>
+    <color name="catBgSecurity">#FFFBEB</color>
+    <color name="catBgOther">#F8FAFC</color>
+    <color name="catBgBackup">#F0FDFA</color>
+
+    <!-- About page -->
+    <color name="aboutHeaderGradStart">#1A0050</color>
+    <color name="aboutHeaderGradMid">#4527A0</color>
+    <color name="aboutHeaderGradEnd">#7B1FA2</color>
+    <color name="aboutCardBg">#FFFFFF</color>
+    <color name="aboutCardShadow">#1A6B3FC8</color>
+    <color name="aboutFeatureIconBg">#EDE8FF</color>
+    <color name="aboutFeatureIconFg">#5B2FBF</color>
+    <color name="aboutLinkColor">#6B3FC8</color>
+    <color name="aboutVersionPill">#33FFFFFF</color>
+    <color name="aboutVersionText">#FFFFFF</color>
+
+    <!-- Background / surface -->
+    <color name="backgroundColor">#F6F3EC</color>
+    <color name="card_background">#FFFCF6</color>
+    <color name="colorBackgroundGray">#15000000</color>
+    <color name="surfaceColor">#FFFCF6</color>
+    <color name="surfaceVariant">#EDE7DC</color>
+    <color name="highContrast">#14213D</color>
+
+    <!-- Activity Timeline (Day Mode) -->
+    <color name="timelineSurface">#F6F3EC</color>
+    <color name="timelinePanelBg">#FFFCF6</color>
+    <color name="timelineCardBg">#FFFCF6</color>
+    <color name="timelineBorder">#DDD6C6</color>
+    <color name="timelineTextPrimary">#14213D</color>
+    <color name="timelineTextSecondary">#5E6678</color>
+
+    <!-- Status colors -->
+    <color name="statusSuccess">#0E7C66</color>
+    <color name="statusOpen">#0E7C66</color>
+    <color name="statusClosed">#5E6678</color>
+    <color name="statusError">#C92A2A</color>
+    <color name="ok">#0E7C66</color>
+    <color name="warning">#B8892B</color>
+    <color name="danger">#C92A2A</color>
+    <color name="in_progress">#2B4170</color>
+
+    <!-- Payload colors -->
+    <color name="sentPayloadBg">#FDF2E9</color>
+    <color name="sentPayloadFg">#9F1239</color>
+    <color name="rcvdPayloadBg">#DCEFE9</color>
+    <color name="rcvdPayloadFg">#0E7C66</color>
+
+    <!-- General UI -->
+    <color name="lightGray">#5E6678</color>
+    <color name="cardBorder">#DDD6C6</color>
+    <color name="appBadgeBg">#2B4170</color>
+    <color name="appBadgeText">#FFFFFF</color>
+    <color name="cardBackground">#FFFCF6</color>
+    <color name="cardBgSecondary">#F6F3EC</color>
+    <color name="cardBorderSubtle">#DDD6C6</color>
+
+    <!-- Workbench Cards (Day Mode) -->
+    <color name="cardWorkbenchBg">#FFFCF6</color>
+    <color name="cardWorkbenchBorder">#DDD6C6</color>
+    <color name="cardWorkbenchText">#14213D</color>
+    <color name="cardWorkbenchSubtext">#5E6678</color>
+
+    <!-- Posture Bar Pills (Day Mode) -->
+    <color name="posturePillBg">#FFFCF6</color>
+    <color name="posturePillBorder">#DDD6C6</color>
+
+    <!-- Status Circle (Day Mode) -->
+    <color name="statusCircleGradStart">#14213D</color>
+    <color name="statusCircleGradMid">#0E1729</color>
+    <color name="statusCircleGradEnd">#070D1A</color>
+    <color name="statusCircleStroke">#0E9F83</color>
+    <color name="statusCircleText">#0E9F83</color>
+
+    <!-- Badge pills -->
+    <color name="badgeActiveBg">#DCFCE7</color>
+    <color name="badgeActiveFg">#15803D</color>
+    <color name="badgeClosedBg">#F1F5F9</color>
+    <color name="badgeClosedFg">#475569</color>
+    <color name="badgeProtoBg">#EDE9FE</color>
+    <color name="badgeProtoFg">#6D28D9</color>
+    <color name="badgeBlockedBg">#FEE2E2</color>
+    <color name="badgeBlockedFg">#DC2626</color>
+    <color name="badgeTxBg">#DBEAFE</color>
+    <color name="badgeTxFg">#1D4ED8</color>
+    <color name="badgeRxBg">#DCFCE7</color>
+    <color name="badgeRxFg">#15803D</color>
+
+    <!-- Payload / telemetry surfaces -->
+    <color name="payloadBoxBg">#F8FAFC</color>
+    <color name="payloadBoxBorder">#E2E8F0</color>
+    <color name="telemetryCardBg">#FFFFFF</color>
+    <color name="metricTextPrimary">#0F172A</color>
+    <color name="metricTextSecondary">#64748B</color>
+
+    <!-- Repeater styling -->
+    <color name="repeaterInputBg">#F8FAFC</color>
+    <color name="repeaterInputBorder">#CBD5E1</color>
+    <color name="repeaterSpinnerBg">#EDE8FF</color>
+    <color name="repeaterSpinnerBorder">#C4B5FD</color>
+    <color name="repeaterSpinnerText">#3D1F8A</color>
+
+    <!-- Bottom Navigation (Day Mode) -->
+    <color name="bottomNavBg">#FFFFFF</color>
+    <color name="bottomNavBorder">#E2E8F0</color>
+    <color name="bottomNavItemActive">#3D1F8A</color>
+    <color name="bottomNavItemInactive">#64748B</color>
+    <color name="bottomNavIndicator">#EDE8FF</color>
+
+    <!-- Security Profile (Day Mode) -->
+    <color name="profileSheetBg">#FFFFFF</color>
+    <color name="profileCardBg">#F8FAFC</color>
+    <color name="profileCardBorder">#E2E8F0</color>
+    <color name="profileTierBadgeBg">#EDE8FF</color>
+    <color name="profileTierBadgeFg">#432494</color>
+
+    <!-- Multi-Scanner Mode Colors (Files, URL, IP, Hash) -->
+    <color name="mode_file">#58A6FF</color>
+    <color name="mode_url">#BC8CFF</color>
+    <color name="mode_ip">#39D3BB</color>
+    <color name="mode_hash">#F0B429</color>
+    <color name="terminal_bg">#0D1117</color>
+    <color name="terminal_card_bg">#161B22</color>
+    <color name="terminal_border">#21262D</color>
+    <color name="status_suspicious">#DB6D28</color>
+    <color name="status_safe">#2EA44F</color>
+    <color name="status_threat">#F85149</color>
+
+    <!-- KotSafe AI Assistant Chat (Day / Light Mode) -->
+    <color name="aiChatBackground">#F1F5F9</color>
+    <color name="aiChatBannerBg">#EDE8FF</color>
+    <color name="aiChatBannerText">#3D1F8A</color>
+    <color name="aiChatBannerIcon">#6366F1</color>
+    <color name="aiChatChipBg">#FFFFFF</color>
+    <color name="aiChatChipText">#1E1B4B</color>
+    <color name="aiChatChipStroke">#CBD5E1</color>
+    <color name="aiChatUserBubbleBg">#3D1F8A</color>
+    <color name="aiChatUserBubbleStroke">#2D1570</color>
+    <color name="aiChatUserBubbleText">#FFFFFF</color>
+    <color name="aiChatAssistantBubbleBg">#FFFFFF</color>
+    <color name="aiChatAssistantBubbleStroke">#E2E8F0</color>
+    <color name="aiChatAssistantBubbleText">#0F172A</color>
+    <color name="aiChatAssistantSenderText">#6366F1</color>
+    <color name="aiChatInputBarBg">#FFFFFF</color>
+    <color name="aiChatInputBg">#F8FAFC</color>
+    <color name="aiChatInputBorder">#CBD5E1</color>
+    <color name="aiChatInputText">#0F172A</color>
+    <color name="aiChatInputHint">#94A3B8</color>
+    <!-- KotSafe Redesign Colors (Day) -->
+    <color name="ks_ground">#F6F3EC</color>
+    <color name="ks_card">#FFFCF6</color>
+    <color name="ks_stroke">#DDD6C6</color>
+    <color name="ks_ink">#14213D</color>
+    <color name="ks_grey">#5E6678</color>
+    <color name="ks_accent">#0E7C66</color>
+    <color name="ks_blue">#2B4170</color>
+    <color name="ks_purple">#6B4FB3</color>
+    <color name="ks_amber">#B8892B</color>
+    <color name="ks_danger">#C0392B</color>
+    <color name="ks_tab_strip">#EBE5D6</color>
+    <color name="ks_navy">#14213D</color>
+    <color name="ks_on_navy">#F6F3EC</color>
+    <color name="ks_gold">#E9C46A</color>
+    <color name="ks_ring_start">#0E9F83</color>
+    <color name="ks_ring_end">#0E9F83</color>
+    <color name="ks_ring_tint">#140E9F83</color>
+    <color name="ks_ring_text">#0B5E4D</color>
+    <color name="ks_hero_num">#0E9F83</color>
+    <color name="ks_pill_bg">#DCEFE9</color>
+    <color name="ks_tint_green">#DCEFE9</color>
+    <color name="ks_tint_blue">#DDE3F0</color>
+    <color name="ks_tint_red">#F6E3DA</color>
+    <color name="ks_tint_amber">#F3E8CC</color>
+    <color name="ks_tint_purple">#E7DFF0</color>
+    <color name="ks_nav_tint">#DCEFE9</color>
+    <integer name="ks_glow_alpha">90</integer>
+</resources>

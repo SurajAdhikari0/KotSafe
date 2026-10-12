@@ -1,0 +1,38 @@
+{
+  "id": "RULE-ANDR-003",
+  "name": "Dynamic Dropper / Obfuscated DexClassLoader Pipeline",
+  "severity": "HIGH",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1407",
+    "T1426"
+  ],
+  "tactics": [
+    "Defense Evasion",
+    "Execution"
+  ],
+  "description": "Identifies sideloaded APKs requesting silent package installations and executing dynamic secondary payloads via DexClassLoader or runtime reflection.",
+  "target": "app",
+  "iocs": {
+    "sha256": []
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "isSideloaded",
+        "operator": "equals",
+        "value": true
+      },
+      {
+        "field": "permissions",
+        "operator": "contains_any",
+        "values": [
+          "android.permission.REQUEST_INSTALL_PACKAGES",
+          "android.permission.INSTALL_PACKAGES"
+        ]
+      }
+    ]
+  },
+  "remediation": "Block installation capabilities for untrusted installers under Android Unknown Sources settings."
+}

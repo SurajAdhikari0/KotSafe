@@ -1,0 +1,49 @@
+services:
+  relay:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    environment:
+      RELAY_PORT: "9443"
+      RELAY_SIGNING_KEY: ${RELAY_SIGNING_KEY:?set a unique secret in .env}
+      TLS_KEY_PATH: /run/secrets/relay-key.pem
+      TLS_CERT_PATH: /run/secrets/relay-cert.pem
+    ports:
+      - "9443:9443/tcp"
+    volumes:
+      - ${TLS_KEY_FILE:?set absolute key path}:/run/secrets/relay-key.pem:ro
+      - ${TLS_CERT_FILE:?set absolute certificate path}:/run/secrets/relay-cert.pem:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  control:
+    image: node:24-alpine
+    working_dir: /srv/p2p
+    command: ["node", "backend/pairing-service.js"]
+    restart: unless-stopped
+    environment:
+      CONTROL_HOST: 0.0.0.0
+      CONTROL_PORT: "8081"
+      CONTROL_PUBLIC_URL: ${CONTROL_PUBLIC_URL:?set your control HTTPS URL in .env}
+      RELAY_SIGNING_KEY: ${RELAY_SIGNING_KEY:?set a unique secret in .env}
+      CONTROL_API_TOKEN: ${CONTROL_API_TOKEN:?set a different unique secret in .env}
+      TURN_SHARED_SECRET: ${TURN_SHARED_SECRET:?set a third unique secret in .env}
+      TURN_HOST: ${TURN_HOST:?set your TURN DNS name in .env}
+    volumes:
+      - ./:/srv/p2p:ro
+    ports:
+      # Host-loopback only. A local HTTPS reverse proxy publishes this API.
+      - "127.0.0.1:8081:8081/tcp"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

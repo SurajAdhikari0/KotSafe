@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_capture_core"
+        app:title="Capture Engine &amp; Interfaces"
+        app:icon="@drawable/ic_cat_capture"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="pref_key_use_kotengine_nextgen"
+            app:title="Next-Gen KotEngine Analytics"
+            app:summary="Deep C11 analytical engine with JA4 fingerprinting, Shannon entropy, and threat scoring"
+            app:icon="@drawable/ic_pref_deep_scan"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+
+        <SwitchPreference
+            app:key="root_capture"
+            app:title="@string/root_capture"
+            app:icon="@drawable/ic_pref_root_capture"
+            app:iconSpaceReserved="true"
+            app:summary="@string/root_capture_summary"
+            app:defaultValue="false" />
+
+        <DropDownPreference
+            app:key="capture_interface"
+            app:title="@string/capture_interface"
+            app:icon="@drawable/ic_pref_interface"
+            app:iconSpaceReserved="true"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="\@inet" />
+
+        <DropDownPreference
+            app:key="ip_mode"
+            app:title="@string/ip_mode"
+            android:entries="@array/ip_mode_labels"
+            android:entryValues="@array/ip_mode"
+            app:icon="@drawable/ic_pref_ip_mode"
+            app:iconSpaceReserved="true"
+            app:defaultValue="ipv4"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            android:key="dns_settings"
+            app:title="@string/dns_servers"
+            app:summary="@string/dns_servers_summary"
+            app:icon="@drawable/ic_pref_dns"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.DnsSettings" />
+
+        <Preference
+            android:key="adblock_settings"
+            app:title="@string/ad_block_shield"
+            app:summary="@string/ad_block_shield_desc"
+            app:icon="@drawable/ic_pref_block_dns"
+            app:iconSpaceReserved="true"
+            app:fragment="com.kotsafe.security.fragments.prefs.AdBlockSettings" />
+
+        <Preference
+            android:key="vpn_exceptions"
+            app:title="@string/vpn_exemptions"
+            app:summary="@string/vpn_exemptions_summary"
+            app:icon="@drawable/ic_pref_vpn_exempt"
+            app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="start_at_boot"
+            android:title="@string/start_at_boot"
+            app:icon="@drawable/ic_pref_boot"
+            app:iconSpaceReserved="true"
+            app:summary="@string/start_at_boot_summary"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            app:key="restart_on_disconnect"
+            android:title="@string/restart_on_disconnection"
+            app:icon="@drawable/ic_pref_restart"
+            app:iconSpaceReserved="true"
+            app:summary="@string/restart_on_disconnection_summary"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

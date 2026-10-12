@@ -1,0 +1,11 @@
+{
+    "java.errors.incompleteClasspath.severity": "ignore",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "java.import.gradle.wrapper.enabled": true,
+    "java.import.gradle.version": "9.3.1",
+    "java.import.generatesMetadataFilesAtProjectRoot": false,
+    "java.server.launchMode": "Standard",
+    "java.jdt.ls.androidSupport.enabled": true
+}
+

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/connections"
+    android:background="?android:attr/colorBackground"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Unified Header Container (Controls & Filters) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/cardBackground"
+            android:elevation="1dp">
+
+            <!-- Real-time Network Summary Bar -->
+            <HorizontalScrollView
+                android:id="@+id/summary_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:overScrollMode="never"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="9dp"
+                android:paddingBottom="5dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/summary_active_pill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/badge_pill_active"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="● 0 Active"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textColor="@color/badgeActiveFg"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/summary_total_pill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/badge_pill_closed"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="0 Total"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textColor="@color/badgeClosedFg"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/summary_closed_pill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/badge_pill_closed"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="0 Closed"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textColor="@color/badgeClosedFg"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/summary_blocked_pill"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/badge_pill_blocked"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="0 Blocked"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textColor="@color/statusError"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Live Real-Time Bandwidth Wave Graph -->
+            <FrameLayout
+                android:id="@+id/graph_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <com.kotsafe.security.views.GlassWireTrafficGraphView
+                    android:id="@+id/connections_traffic_graph"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_marginHorizontal="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="6dp" />
+            </FrameLayout>
+
+            <!-- Category & App Organization Filter Bar -->
+            <HorizontalScrollView
+                android:id="@+id/category_filters_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:overScrollMode="never"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="7dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/category_chip_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_all"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/connection_all_visible_traffic"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_apps"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="?attr/colorAccent" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_user"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_user_app_traffic"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_mobile"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="?attr/colorAccent" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_system"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_android_system_traffic"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_settings"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="?attr/colorAccent" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_dns"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_dns_lookups"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_dns"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="@color/badgeProtoFg" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_active"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_active"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_play_arrow"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="@color/badgeActiveFg" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_closed"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_closed"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_block"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="?android:attr/textColorSecondary" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_blocked"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_blocked"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_block"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="@color/statusError" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cat_web"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/connection_web_traffic"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:textSize="12sp"
+                            app:chipIcon="@drawable/ic_language"
+                            app:chipIconSize="16dp"
+                            app:chipIconTint="@color/badgeProtoFg" />
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <TextView
+                        android:id="@+id/category_filter_helper_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:paddingBottom="2dp"
+                        android:text="@string/connection_filter_helper_text"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="11sp"
+                        android:lineSpacingExtra="1dp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Active Applied Filter Chips (e.g. firewall: blocked) -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/active_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:paddingBottom="6dp"
+                android:visibility="gone"
+                app:singleSelection="true">
+            </com.google.android.material.chip.ChipGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/cardBorderSubtle" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/old_connections_notice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="74 older connections not shown" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/size_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            app:thumbColor="@color/colorAccent"
+            app:trackColorActive="@color/colorAccent"
+            app:trackColorInactive="@color/colorAccentLight"
+            app:labelBehavior="visible"
+            android:valueFrom="0"
+            android:valueTo="1024"
+            android:stepSize="1"
+            android:visibility="gone"
+            tools:value="100"
+            tools:valueTo="1024"/>
+
+        <TextView
+            android:id="@+id/no_connections"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="32dp"
+            android:drawableTop="@drawable/ic_shield"
+            android:drawablePadding="16dp"
+            android:drawableTint="@color/colorAccent"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="15sp"
+            android:lineSpacingExtra="4dp"
+            android:visibility="gone"
+            tools:text="@string/start_capture_first">
+        </TextView>
+
+        <com.kotsafe.security.views.EmptyRecyclerView
+            android:id="@+id/connections_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:scrollbarStyle="outsideOverlay"
+            android:fillViewport="true" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/colorAccent"
+        app:tint="@null"
+        app:maxImageSize="48dp"
+        android:src="@drawable/ic_arrow_drop_down" />
+</RelativeLayout>

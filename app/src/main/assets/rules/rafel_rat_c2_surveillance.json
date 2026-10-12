@@ -1,0 +1,47 @@
+{
+  "id": "RULE-ANDR-005",
+  "name": "Rafel RAT & SpyNote Advanced Multi-Vector Surveillance Implant",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1437",
+    "T1412",
+    "T1516",
+    "T1624"
+  ],
+  "tactics": [
+    "Credential Access",
+    "Collection",
+    "Exfiltration"
+  ],
+  "description": "Detects Rafel RAT and upgraded SpyNote malware variants combining device administration persistence, 2FA notification interception, covert audio/camera collection, and background SMS exfiltration.",
+  "target": "app",
+  "iocs": {
+    "sha256": [
+      "e2c8a14b5f90372f88d2fba9641774b9e38d7890a597a760c2394017bb523c14",
+      "b671f65d64826bfa588972cd219e27c0f18830113f8c8e1e7925e0eef2a8b94a"
+    ]
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "isSideloaded",
+        "operator": "equals",
+        "value": true
+      },
+      {
+        "field": "permissions",
+        "operator": "contains_all",
+        "values": [
+          "android.permission.BIND_DEVICE_ADMIN",
+          "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE",
+          "android.permission.RECEIVE_BOOT_COMPLETED",
+          "android.permission.RECORD_AUDIO",
+          "android.permission.READ_SMS"
+        ]
+      }
+    ]
+  },
+  "remediation": "Revoke Device Admin privileges in Android settings, revoke Notification Access, and uninstall the malicious application package."
+}

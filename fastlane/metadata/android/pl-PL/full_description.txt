@@ -1,0 +1,21 @@
+<i>KotSafe</i> to przyjazna dla prywatności aplikacja o otwartym kodzie źródłowym, która pozwala śledzić, analizować i blokować połączenia nawiązywane przez inne aplikacje na urządzeniu.
+Umożliwia także eksportowanie zrzutu ruchu PCAP, sprawdzanie żądań HTTP, odszyfrowywanie ruchu TLS i wiele więcej.
+
+KotSafe symuluje VPN w celu przechwytywania ruchu sieciowego bez rootowania. Nie korzysta ze zdalnego serwera VPN, zamiast tego dane są przetwarzane lokalnie na urządzeniu.
+
+<b>Główne funkcje:</b>
+
+* Rejestruj i analizuj połączenia nawiązywane przez aplikacje użytkownika i systemowe
+* Sprawdź podsumowanie, ile danych wysłała i odebrała każda aplikacja
+* Niskie zużycie baterii, pozwalające na ciągłe przechwytywanie przez cały dzień
+* Wyodrębniaj hosty i adresy IP z DNS, TLS i HTTP
+* Zapisuj ruch do plików PCAP wraz z dodatkowymi metadanymi aplikacji
+* Wysyłaj ruch przez PCAP-over-IP do analizy w czasie rzeczywistym (np. w programie Wireshark)
+* Odszyfruj ruch HTTPS/TLS, wyodrębnij adresy URL i zapisz SSLKEYLOGFILE
+* Sprawdzaj żądania i odpowiedzi HTTP oraz eksportuj je do formatu HAR
+* Zidentyfikuj kraj i ASN zdalnego serwera za pomocą wyszukiwania w bazie danych offline
+* Na zrootowanych urządzeniach przechwytuj ruch, gdy działają inne aplikacje VPN
+
+Jeśli planujesz używać KotSafe do przeprowadzania analizy pakietów, sprawdź <a href='https://kotsafe.github.io/KotSafe/quick_start#14-packet-analysis'>konkretną sekcję</a> instrukcji.
+
+Dołącz do międzynarodowej społeczności KotSafe <a href="https://t.me/KotSafe">na Telegramie</a> lub <a href="https://matrix.to/#/#kotsafe:matrix.org">na Matriksie</a>.

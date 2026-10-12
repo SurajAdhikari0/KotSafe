@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorActionBar"
+            app:title="ATT&amp;CK Mobile Navigator"
+            app:subtitle="Threat Matrix &amp; Defensive Posture"
+            app:titleTextColor="#FFFFFF"
+            app:subtitleTextColor="#CCFFFFFF"
+            app:popupTheme="@style/PopupOverlay"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Defensive Posture Score & Metrics Header Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="6dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/cardBorderSubtle">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <!-- Posture Title and Level Badge -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/detected_count_label"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="DEFENSIVE POSTURE: HARDENED"
+                        android:textSize="13sp"
+                        android:textColor="#10B981"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/total_count_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="32 Monitored Techniques"
+                        android:textSize="11sp"
+                        android:textColor="@color/metricTextSecondary"/>
+                </LinearLayout>
+
+                <!-- Posture Progress Bar -->
+                <ProgressBar
+                    android:id="@+id/mapping_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:progress="100"
+                    android:max="100"
+                    android:progressTint="#10B981"/>
+
+                <!-- Metric Pills Row: Threats, Anomalies, Defended -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/badge_active_threats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#EF4444"
+                        android:background="@drawable/posture_pill_bg"
+                        android:text="🔴 0 Threats" />
+
+                    <TextView
+                        android:id="@+id/badge_anomalies"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#F59E0B"
+                        android:background="@drawable/posture_pill_bg"
+                        android:text="🟡 0 Anomalies" />
+
+                    <TextView
+                        android:id="@+id/badge_defended"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="6dp"
+                        android:paddingTop="2dp"
+                        android:paddingBottom="2dp"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#10B981"
+                        android:background="@drawable/posture_pill_bg"
+                        android:text="🟢 32 Defended" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/mapping_percent_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100% Posture"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/highContrast"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Search Bar and View Mode Switcher -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="6dp">
+
+            <!-- Search Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/cardBorderSubtle">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="8dp">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_search"
+                        app:tint="@color/metricTextSecondary"
+                        android:contentDescription="@null"/>
+
+                    <EditText
+                        android:id="@+id/search_input"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:background="@null"
+                        android:hint="Search ID, Tactic, D3FEND..."
+                        android:textSize="12sp"
+                        android:textColor="@color/highContrast"
+                        android:textColorHint="@color/lightGray"
+                        android:imeOptions="actionDone"
+                        android:singleLine="true"/>
+
+                    <ImageView
+                        android:id="@+id/btn_clear_search"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:padding="3dp"
+                        android:src="@drawable/ic_close"
+                        app:tint="@color/metricTextSecondary"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:visibility="gone"
+                        android:contentDescription="Clear search"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Toggle View Mode Button (Matrix vs List) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_toggle_view_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:layout_marginStart="8dp"
+                android:text="🗺️ Matrix"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="10dp"
+                app:backgroundTint="@color/colorPrimary" />
+
+        </LinearLayout>
+
+        <!-- Tactic & Detection Filter Chips Carousel -->
+        <HorizontalScrollView
+            android:id="@+id/chips_scroll_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="4dp">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tactic_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_filter_all"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Tactics"
+                    android:checked="true"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_filter_mapped"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎯 Incidents Only"
+                    android:textColor="#EF4444"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_filter_unmapped"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛡️ Clean / Monitored"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_initial"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Initial Access"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_execution"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Execution"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_persistence"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Persistence"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_privesc"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Privilege Escalation"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_defense"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Defense Evasion"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_credential"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Credential Access"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_discovery"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Discovery"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_collection"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Collection"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_c2"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Command &amp; Control"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_exfil"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exfiltration"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tactic_impact"
+                    style="@style/Widget.MaterialComponents.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Impact"/>
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+
+        <!-- Mode 1: MITRE Mobile Navigator Matrix View (Horizontal Columns) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/matrix_columns_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="16dp"
+            android:visibility="visible"/>
+
+        <!-- Mode 2: Incident / Technique List View -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/attack_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            android:visibility="gone"/>
+
+        <!-- Empty State View -->
+        <LinearLayout
+            android:id="@+id/empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_search"
+                app:tint="@color/lightGray"
+                android:contentDescription="@null"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No Matching Techniques Found"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/highContrast"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Try adjusting your search query or reset the tactic filter."
+                android:textSize="12sp"
+                android:textColor="@color/metricTextSecondary"
+                android:gravity="center"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="16dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_reset_filters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset Filters"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

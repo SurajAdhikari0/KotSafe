@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Deep purple gradient background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:startColor="#1A0050"
+                android:centerColor="#3D1080"
+                android:endColor="#6B3FC8"
+                android:angle="135" />
+        </shape>
+    </item>
+    <!-- Subtle dot pattern overlay -->
+    <item android:gravity="end|top" android:right="16dp" android:top="16dp">
+        <shape android:shape="oval">
+            <solid android:color="#20FFFFFF" />
+            <size android:width="80dp" android:height="80dp" />
+        </shape>
+    </item>
+    <item android:gravity="start|bottom" android:left="8dp" android:bottom="8dp">
+        <shape android:shape="oval">
+            <solid android:color="#15E040FB" />
+            <size android:width="60dp" android:height="60dp" />
+        </shape>
+    </item>
+</layer-list>

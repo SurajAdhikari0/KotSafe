@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 KotSafe Cyber Security Project
+  ~ GPL-3.0 License
+  -->
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 1. Master Switch -->
+    <PreferenceCategory
+        app:title="AI Security Engine"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="pref_ai_protection_enabled"
+            app:title="@string/ai_protection_master_title"
+            app:summary="@string/ai_protection_master_summary"
+            app:icon="@drawable/ic_bolt"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <Preference
+            app:key="pref_ai_open_assistant"
+            app:title="@string/ai_open_assistant_title"
+            app:summary="@string/ai_open_assistant_summary"
+            app:icon="@drawable/ic_heart"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <!-- 2. Provider Configuration -->
+    <PreferenceCategory
+        app:key="cat_ai_provider_config"
+        app:title="LLM Provider &amp; Model Credentials"
+        app:iconSpaceReserved="true">
+
+        <ListPreference
+            app:key="pref_ai_provider"
+            app:title="@string/ai_provider_title"
+            app:entries="@array/ai_providers_labels"
+            app:entryValues="@array/ai_providers"
+            app:defaultValue="OPENAI"
+            app:useSimpleSummaryProvider="true"
+            app:icon="@drawable/ic_settings"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="pref_ai_api_key"
+            app:title="@string/ai_api_key_title"
+            app:summary="@string/ai_api_key_summary"
+            app:icon="@drawable/ic_lock"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="pref_ai_model"
+            app:title="@string/ai_model_title"
+            app:summary="@string/ai_model_summary"
+            app:icon="@drawable/ic_info"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="pref_ai_custom_endpoint"
+            app:title="@string/ai_custom_endpoint_title"
+            app:summary="@string/ai_custom_endpoint_summary"
+            app:icon="@drawable/ic_lan"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="pref_ai_gemma_download"
+            app:title="On-Device AI Model Manager"
+            app:summary="Download on-device models: Qwen 2.5 0.5B (Recommended) or SmolLM-135M"
+            app:icon="@drawable/ic_pref_ai_engine"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="pref_ai_test_connection"
+            app:title="@string/ai_test_connection_title"
+            app:summary="@string/ai_test_connection_summary"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <!-- 3. Granular Privacy & Access Level Toggles (All default to false) -->
+    <PreferenceCategory
+        app:key="cat_ai_access_levels"
+        app:title="@string/ai_access_category"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="pref_ai_full_power_mode"
+            app:title="Full Power Mode (Max Intelligence)"
+            app:summary="Grants the AI complete telemetry, live sockets, and forensic visibility in one tap"
+            app:icon="@drawable/ic_bolt"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_status"
+            app:title="@string/ai_access_status_title"
+            app:summary="@string/ai_access_status_summary"
+            app:icon="@drawable/ic_stacked_bar_chart"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_connections"
+            app:title="@string/ai_access_connections_title"
+            app:summary="@string/ai_access_connections_summary"
+            app:icon="@drawable/ic_swap_horiz"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_http"
+            app:title="@string/ai_access_http_title"
+            app:summary="@string/ai_access_http_summary"
+            app:icon="@drawable/ic_bottom_http"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_repeater"
+            app:title="@string/ai_access_repeater_title"
+            app:summary="@string/ai_access_repeater_summary"
+            app:icon="@drawable/ic_send"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_firewall"
+            app:title="@string/ai_access_firewall_title"
+            app:summary="@string/ai_access_firewall_summary"
+            app:icon="@drawable/ic_shield"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_antivirus"
+            app:title="@string/ai_access_antivirus_title"
+            app:summary="@string/ai_access_antivirus_summary"
+            app:icon="@drawable/ic_bug"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_ai_access_logs"
+            app:title="@string/ai_access_logs_title"
+            app:summary="@string/ai_access_logs_summary"
+            app:icon="@drawable/ic_text_snippet"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

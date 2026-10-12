@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_language">अनुप्रयोग भाषा</string>
+    <string name="system_default">प्रणाली पूर्वनिर्धारित</string>
+    <string name="connection_all_visible_traffic">सबै दृश्य ट्राफिक</string>
+    <string name="connection_user_app_traffic">प्रयोगकर्ता अनुप्रयोग ट्राफिक</string>
+    <string name="connection_android_system_traffic">एन्ड्रोइड प्रणाली ट्राफिक</string>
+    <string name="connection_dns_lookups">DNS लुकअपहरू</string>
+    <string name="connection_active">सक्रिय</string>
+    <string name="connection_closed">बन्द</string>
+    <string name="connection_blocked">ब्लक गरिएको</string>
+    <string name="connection_web_traffic">वेब ट्राफिक</string>
+    <string name="connection_all_count">सबै (%1$d)</string>
+    <string name="connection_user_count">प्रयोगकर्ता एप्स (%1$d)</string>
+    <string name="connection_system_count">प्रणाली (%1$d)</string>
+    <string name="connection_dns_count">DNS (%1$d)</string>
+    <string name="connection_active_count">सक्रिय (%1$d)</string>
+    <string name="connection_closed_count">बन्द (%1$d)</string>
+    <string name="connection_blocked_count">ब्लक गरिएको (%1$d)</string>
+    <string name="connection_web_count">वेब (%1$d)</string>
+    <string name="summary_active_format">● %1$d सक्रिय</string>
+    <string name="summary_total_format">%1$d कुल</string>
+    <string name="summary_closed_format">%1$d बन्द</string>
+    <string name="summary_blocked_format">%1$d ब्लक गरिएको</string>
+    <string name="language_picker_subtitle">अप्नो मनपर्ने भाषा छनोट गर्नुहोस् / भाषा / 语言</string>
+    <string name="language_search_hint">भाषा खोज्नुहोस् / देशबाट खोज्नुहोस्...</string>
+    <string name="language_clear">खालि गर्नुहोस्</string>
+</resources>

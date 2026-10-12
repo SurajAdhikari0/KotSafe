@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/navigate_before"
+        android:title="@string/previous"
+        android:orderInCategory="10"
+        android:icon="@drawable/ic_navigate_before"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/navigate_next"
+        android:title="@string/next"
+        android:orderInCategory="20"
+        android:icon="@drawable/ic_navigate_next"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/inspect_jwt"
+        android:title="JWT Inspector"
+        android:orderInCategory="25"
+        android:icon="@drawable/ic_lock"
+        app:showAsAction="ifRoom"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/inspect_proto"
+        android:title="Protobuf Inspector"
+        android:orderInCategory="26"
+        android:icon="@drawable/ic_protobuf"
+        app:showAsAction="ifRoom"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/inspect_doh"
+        android:title="DoH Inspector"
+        android:orderInCategory="27"
+        android:icon="@drawable/ic_dns"
+        app:showAsAction="ifRoom"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/ai_audit_request"
+        android:title="🤖 AI Security Audit"
+        android:orderInCategory="27"
+        android:icon="@drawable/ic_bolt"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/edit_resend"
+        android:title="Edit &amp; Resend (Repeater)"
+        android:orderInCategory="28"
+        android:icon="@drawable/ic_edit"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/display_as"
+        android:title="@string/display_as_text"
+        android:orderInCategory="30"
+        android:icon="@drawable/ic_short_text"
+        app:showAsAction="never"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/save_as_har"
+        android:title="@string/save_as_har"
+        android:orderInCategory="40"
+        app:showAsAction="never" />
+</menu>

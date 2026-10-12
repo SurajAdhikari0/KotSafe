@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_theme_toggle"
+        android:icon="@drawable/ic_theme_sun"
+        android:title="Theme"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_profile"
+        android:icon="@drawable/ic_profile_avatar"
+        android:title="@string/security_profile_title"
+        android:orderInCategory="2"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_alerts_center"
+        android:icon="@drawable/ic_shield"
+        android:title="Alerts Center &amp; Timeline"
+        android:orderInCategory="3"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_shield_center"
+        android:icon="@drawable/ic_shield"
+        android:title="Shield Protection Center"
+        android:orderInCategory="4"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_mitre_navigator"
+        android:icon="@drawable/ic_shield"
+        android:title="MITRE ATT&amp;CK Matrix"
+        android:orderInCategory="5"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/title_activity_settings"
+        android:orderInCategory="6"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/open_pcap"
+        android:title="@string/open_pcap_file"
+        android:orderInCategory="10"
+        app:showAsAction="never" />
+</menu>

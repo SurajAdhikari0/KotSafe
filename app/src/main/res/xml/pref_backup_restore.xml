@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_backup_config"
+        app:title="Backup, Restore &amp; PCAP Dumps"
+        app:icon="@drawable/ic_cat_backup"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            app:key="export_settings"
+            app:title="@string/export_settings"
+            app:summary="@string/export_settings_summary"
+            app:icon="@drawable/ic_pref_export"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="import_settings"
+            app:title="@string/import_settings"
+            app:summary="@string/import_settings_summary"
+            app:icon="@drawable/ic_pref_import"
+            app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="pcapng_format"
+            app:title="@string/pcapng_format"
+            app:icon="@drawable/ic_pref_pcapng"
+            app:iconSpaceReserved="true"
+            app:summary="@string/pcapng_format_summary"
+            app:defaultValue="true" />
+
+        <SwitchPreference
+            app:key="dump_extensions"
+            app:title="@string/dump_extensions"
+            app:icon="@drawable/ic_pref_logs"
+            app:iconSpaceReserved="true"
+            app:summary="@string/dump_extensions_summary"
+            app:defaultValue="false" />
+
+        <Preference
+            app:key="dump_extensions_how_to"
+            app:title="@string/dump_extensions_how_to"
+            app:summary="Tutorial on displaying App Name and UID in Wireshark"
+            app:icon="@drawable/ic_pref_logs"
+            app:iconSpaceReserved="true" />
+
+        <EditTextPreference
+            app:key="filename_prefix"
+            app:title="@string/filename_prefix"
+            app:summary="@string/filename_prefix_description"
+            app:defaultValue="KotSafe_"
+            app:icon="@drawable/ic_pref_export"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="control_permissions"
+            app:title="@string/control_permissions"
+            app:icon="@drawable/ic_pref_permissions"
+            app:iconSpaceReserved="true"
+            android:summary="@string/control_permissions_summary" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

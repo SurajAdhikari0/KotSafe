@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="?android:attr/colorBackgroundFloating">
+
+    <!-- Top Dialog Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_dns"
+            app:tint="@color/colorPrimary"
+            android:contentDescription="@null" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dns_preset_dialog_title"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:text="@string/dns_preset_picker_summary"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btn_dialog_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="6dp"
+            android:src="@drawable/ic_cancel"
+            app:tint="?android:attr/textColorSecondary"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Close" />
+    </LinearLayout>
+
+    <!-- Category Filter Chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="10dp">
+
+        <LinearLayout
+            android:id="@+id/layout_category_chips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chip_cat_all"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_badge_neutral"
+                android:backgroundTint="@color/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/dns_category_all" />
+
+            <TextView
+                android:id="@+id/chip_cat_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:background="@drawable/bg_badge_neutral"
+                android:backgroundTint="#15808080"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/dns_category_speed" />
+
+            <TextView
+                android:id="@+id/chip_cat_security"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:background="@drawable/bg_badge_neutral"
+                android:backgroundTint="#15808080"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/dns_category_security" />
+
+            <TextView
+                android:id="@+id/chip_cat_adblock"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:background="@drawable/bg_badge_neutral"
+                android:backgroundTint="#15808080"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/dns_category_adblock" />
+
+            <TextView
+                android:id="@+id/chip_cat_family"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:gravity="center"
+                android:paddingHorizontal="12dp"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorSecondary"
+                android:background="@drawable/bg_badge_neutral"
+                android:backgroundTint="#15808080"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="@string/dns_category_family" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Benchmark Progress Indicator -->
+    <LinearLayout
+        android:id="@+id/layout_benchmark_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_marginBottom="8dp"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:id="@+id/tv_benchmark_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/dns_running_benchmark" />
+
+            <ProgressBar
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                style="?android:attr/progressBarStyleSmall" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/pb_benchmark_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:indeterminate="true" />
+    </LinearLayout>
+
+    <!-- Providers List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_dns_providers"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:minHeight="240dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_dns_provider" />
+
+    <!-- Bottom Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_benchmark_speed"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="@string/dns_retest_speed"
+            android:textSize="12sp"
+            app:icon="@drawable/ic_refresh"
+            app:iconSize="16dp"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_apply_dns"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="@string/dns_apply_provider"
+            android:textSize="12sp"
+            app:icon="@drawable/ic_check_solid"
+            app:iconSize="16dp"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+</LinearLayout>

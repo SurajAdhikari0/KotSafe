@@ -1,0 +1,21 @@
+<i>KotSafe</i> là một ứng dụng mã nguồn mở thân thiện với quyền riêng tư, cho phép theo dõi, phân tích và chặn các kết nối được thực hiện bởi các ứng dụng khác trên thiết bị.
+Ứng dụng cũng có thể xuất một tệp PCAP dump của lưu lượng mạng, kiểm tra các yêu cầu HTTP, giải mã lưu lượng TLS và nhiều tính năng khác.
+
+KotSafe giả lập một VPN để thu thập lưu lượng mạng mà không cần quyền root. Nó không sử dụng máy chủ VPN từ xa, thay vào đó dữ liệu được xử lý cục bộ trên thiết bị.
+
+<b>Tính năng chính:</b>
+
+* Ghi nhật ký và phân tích các kết nối được thực hiện bởi ứng dụng của người dùng và hệ thống
+* Xem tóm tắt lượng dữ liệu mà mỗi ứng dụng đã gửi và nhận
+* Tiêu thụ pin thấp, cho phép thu thập liên tục cả ngày
+* Trích xuất máy chủ và địa chỉ IP từ DNS, TLS và HTTP
+* Ghi lưu lượng vào các tệp PCAP kèm theo siêu dữ liệu bổ sung về ứng dụng
+* Gửi lưu lượng qua PCAP-over-IP để phân tích thời gian thực (ví dụ: trên Wireshark)
+* Giải mã lưu lượng HTTPS/TLS, trích xuất các URL và lưu tệp SSLKEYLOGFILE
+* Kiểm tra các yêu cầu/phản hồi HTTP và xuất chúng ra HAR
+* Xác định quốc gia và ASN của máy chủ từ xa thông qua tra cứu cơ sở dữ liệu ngoại tuyến
+* Trên các thiết bị đã root, thu thập lưu lượng ngay cả khi các ứng dụng VPN khác đang chạy
+
+Nếu bạn có kế hoạch sử dụng KotSafe để phân tích gói tin, hãy xem <a href='https://kotsafe.github.io/KotSafe/quick_start#14-packet-analysis'>phần cụ thể</a> trong hướng dẫn.
+
+Tham gia cộng đồng quốc tế KotSafe <a href="https://t.me/KotSafe">trên Telegram</a> hoặc <a href="https://matrix.to/#/#kotsafe:matrix.org">trên Matrix</a>.

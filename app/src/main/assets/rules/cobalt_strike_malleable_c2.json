@@ -1,0 +1,37 @@
+{
+  "id": "RULE-NET-005",
+  "name": "Cobalt Strike / Metasploit Malleable C2 Beaconing",
+  "severity": "CRITICAL",
+  "triggerSchedule": "REALTIME_NET",
+  "mitreTechniques": [
+    "T1071",
+    "T1573"
+  ],
+  "tactics": [
+    "Command and Control"
+  ],
+  "description": "Detects high-entropy algorithmic C2 domains and known offensive adversary infrastructure associated with Cobalt Strike team server profiles and Metasploit payloads.",
+  "target": "network",
+  "iocs": {
+    "domains": [
+      "cobaltstrike-profile.top",
+      "c2-delivery.xyz",
+      "updates-ms-cloud.com"
+    ],
+    "ips": [
+      "193.142.59.88",
+      "194.26.29.112"
+    ]
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "dgaEntropy",
+        "operator": "greater_than",
+        "value": 4.1
+      }
+    ]
+  },
+  "remediation": "Immediately sever network connection and scan device for persistent stagers."
+}

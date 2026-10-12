@@ -1,0 +1,21 @@
+<i>KotSafe</i>, aygıttaki diğer uygulamalar tarafından yapılan bağlantıları izlemeyi, incelemeyi ve engellemeyi sağlayan, gizlilik dostu ve açık kaynaklı bir uygulamadır.
+Ayrıca trafiğin PCAP dökümünü dışa aktarabilir, HTTP isteklerini inceleyebilir, TLS trafiğinin şifresini çözebilir ve çok daha fazlasını yapabilir.
+
+KotSafe, ağ trafiğini root olmadan yakalamak için bir VPN gibi davranır. Uzak bir VPN sunucusu kullanmaz, bunun yerine tüm veriler aygıt üzerinde yerel olarak işlenir.
+
+<b>Başlıca özellikler:</b>
+
+* Kullanıcı ve sistem uygulamaları tarafından yapılan bağlantıları günlüğe kaydedin ve inceleyin
+* Her uygulamanın ne kadar veri gönderip aldığının özetini görün
+* Gün boyu kesintisiz yakalama için düşük pil tüketimi
+* DNS, TLS ve HTTP'den sunucu adlarını ve IP adreslerini ayıklayın
+* Trafiği, ek uygulama üstverileriyle birlikte PCAP dosyalarına kaydedin
+* Gerçek zamanlı inceleme için trafiği PCAP-over-IP ile gönderin (örn. Wireshark'a)
+* HTTPS/TLS trafiğinin şifresini çözün, URL'leri ayıklayın ve SSLKEYLOGFILE dosyasını kaydedin
+* HTTP isteklerini/yanıtlarını inceleyin ve HAR olarak dışa aktarın
+* Çevrim dışı veri tabanı aramaları aracılığıyla uzak sunucunun ülkesini ve ASN'sini belirleyin
+* Root yapılmış aygıtlarda, diğer VPN uygulamaları çalışırken trafiği yakalayın
+
+Paket incelemesi yapmak için KotSafe kullanmayı düşünüyorsanız, kılavuzun <a href='https://kotsafe.github.io/KotSafe/quick_start#14-packet-analysis'>ilgili bölümüne</a> göz atın.
+
+KotSafe uluslararası topluluğuna <a href="https://t.me/KotSafe">Telegram üzerinden</a> veya <a href="https://matrix.to/#/#kotsafe:matrix.org">Matrix üzerinden</a> katılın.

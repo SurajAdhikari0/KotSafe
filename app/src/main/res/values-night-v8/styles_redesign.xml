@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Night mode: heading uses medium weight (no bold) same as day mode -->
+    <style name="KS.Heading" parent="KS.Text">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+</resources>

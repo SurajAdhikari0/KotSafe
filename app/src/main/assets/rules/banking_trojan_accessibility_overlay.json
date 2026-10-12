@@ -1,0 +1,41 @@
+{
+  "id": "RULE-ANDR-001",
+  "name": "Sideloaded APK with Accessibility & Overlay Abuse (Banking Trojan Pattern)",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1418",
+    "T1453"
+  ],
+  "tactics": [
+    "Credential Access",
+    "Defense Evasion"
+  ],
+  "description": "Flags untrusted sideloaded APKs requesting both Accessibility Service and System Alert Window (Overlay). This exact combination is characteristic of Anatsa, SharkBot, and Xenomorph banking trojans to inject fake phishing overlays and steal credentials.",
+  "target": "app",
+  "iocs": {
+    "sha256": [
+      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "7a5f6e8b9c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f"
+    ]
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "isSideloaded",
+        "operator": "equals",
+        "value": true
+      },
+      {
+        "field": "permissions",
+        "operator": "contains_all",
+        "values": [
+          "android.permission.SYSTEM_ALERT_WINDOW",
+          "android.permission.BIND_ACCESSIBILITY_SERVICE"
+        ]
+      }
+    ]
+  },
+  "remediation": "Revoke accessibility permission immediately and uninstall the unverified application."
+}

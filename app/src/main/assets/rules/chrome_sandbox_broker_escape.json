@@ -1,0 +1,47 @@
+{
+  "id": "RULE-FILE-006",
+  "name": "Chrome Sandbox Broker & Android Binder IPC Memory Corruption Exploit",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1068",
+    "T1203"
+  ],
+  "tactics": [
+    "Privilege Escalation",
+    "Execution"
+  ],
+  "description": "Detects weaponized binary stagers targeting Android Binder IPC interfaces and browser sandbox broker services to achieve renderer sandbox escapes.",
+  "target": "file",
+  "iocs": {
+    "sha256": [
+      "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b"
+    ]
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "contentStrings",
+        "operator": "contains_any",
+        "values": [
+          "/dev/binder",
+          "BINDER_WRITE_READ",
+          "content::SandboxBroker",
+          "process_vm_writev"
+        ]
+      },
+      {
+        "field": "contentStrings",
+        "operator": "contains_any",
+        "values": [
+          "setuid(0)",
+          "escalate_privileges",
+          "trampoline_shellcode",
+          "disable_selinux"
+        ]
+      }
+    ]
+  },
+  "remediation": "Immediately remove malicious staging artifact and restart device into recovery mode to inspect kernel integrity."
+}

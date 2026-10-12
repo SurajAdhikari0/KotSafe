@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <!-- Vibrant Gradient Rounded Squircle Base -->
+    <path
+        android:pathData="M8,0 L28,0 A8,8 0 0 1 36,8 L36,28 A8,8 0 0 1 28,36 L8,36 A8,8 0 0 1 0,28 L0,8 A8,8 0 0 1 8,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="36"
+                android:endY="36"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#C33764" />
+                <item android:offset="1.0" android:color="#1D2671" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- Liquid Glass Sheen / Translucent Top Gloss -->
+    <path
+        android:fillColor="#22FFFFFF"
+        android:pathData="M8,0 L28,0 A8,8 0 0 1 36,8 L36,15 C25,13 11,13 0,15 L0,8 A8,8 0 0 1 8,0 Z" />
+    <!-- Crisp Foreground Vector Glyph -->
+    <group android:translateX="6" android:translateY="6">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M7.5,5.6L5,7l1.4,-2.5L5,2l2.5,1.4L10,2 8.6,4.5 10,7 7.5,5.6zm12,9.8L17,14l1.4,2.5L17,19l2.5,-1.4L22,19l-1.4,-2.5L22,14l-2.5,1.4zM22,2l-2.5,1.4L17,2l1.4,2.5L17,7l2.5,-1.4L22,7l-1.4,-2.5L22,2zm-7.63,5.29c-0.39,-0.39 -1.02,-0.39 -1.41,0L1.29,18.96c-0.39,0.39 -0.39,1.02 0,1.41l2.34,2.34c0.39,0.39 1.02,0.39 1.41,0L16.7,11.05c0.39,-0.39 0.39,-1.02 0,-1.41l-2.33,-2.35zm-1.03,5.49l-2.12,-2.12 7.78,-7.78 2.12,2.12 -7.78,7.78z" />
+    </group>
+</vector>

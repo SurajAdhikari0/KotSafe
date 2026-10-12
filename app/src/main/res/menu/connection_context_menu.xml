@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/select_connection"
+        android:title="@string/select"
+        android:orderInCategory="0" />
+
+    <item
+        android:title="@string/hide">
+        <menu>
+            <item
+                android:id="@+id/hide_app"
+                android:title=""
+                tools:title="@string/app_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/hide_ip"
+                android:title=""
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/hide_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/hide_domain"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/hide_proto"
+                android:title=""
+                tools:title="@string/protocol_val" />
+
+            <item
+                android:id="@+id/hide_country"
+                android:title=""
+                tools:title="@string/country_val"
+                android:visible="false" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/block_menu" android:title="@string/block">
+        <menu>
+            <item
+                android:id="@+id/block_app"
+                android:title=""
+                tools:title="@string/app_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/block_ip"
+                android:title=""
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/block_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/block_domain"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/block_country"
+                android:title=""
+                tools:title="@string/country_val"
+                android:visible="false" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/unblock_menu" android:title="@string/unblock">
+        <menu>
+            <item
+                android:id="@+id/unblock_app"
+                android:title=""
+                tools:title="@string/app_val"
+                android:visible="false">
+
+                <menu>
+                    <item
+                        android:id="@+id/unblock_app_permanently"
+                        android:title="@string/unblock_permanently" />
+                    <item
+                        android:id="@+id/unblock_app_10m"
+                        android:title="" />
+                    <item
+                        android:id="@+id/unblock_app_1h"
+                        android:title="" />
+                    <item
+                        android:id="@+id/unblock_app_8h"
+                        android:title="" />
+                </menu>
+            </item>
+
+            <item
+                android:id="@+id/unblock_ip"
+                android:title=""
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/unblock_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/unblock_domain"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/unblock_country"
+                android:title=""
+                tools:title="@string/country_val"
+                android:visible="false" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/app_allowlist_menu" android:title="@string/allowlist" android:visible="false">
+        <menu>
+            <item
+                android:id="@+id/allow_ip"
+                android:title=""
+                tools:title="@string/ip_address_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/deny_ip"
+                android:title=""
+                tools:title="@string/ip_address_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/allow_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/deny_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/allow_domain"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/deny_domain"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/add_to_fw_whitelist"
+        android:title="@string/add_to_fw_whitelist"
+        tools:visible="true"
+        android:visible="false" />
+    <item
+        android:id="@+id/remove_from_fw_whitelist"
+        android:title="@string/remove_from_fw_whitelist"
+        android:visible="false" />
+
+    <item android:title="@string/search">
+        <menu>
+            <item
+                android:id="@+id/search_app"
+                android:title=""
+                tools:title="@string/app_val" />
+
+            <item
+                android:id="@+id/search_ip"
+                android:title=""
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/search_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/search_proto"
+                android:title=""
+                tools:title="@string/protocol_val" />
+        </menu>
+    </item>
+
+    <item android:title="@string/copy_action">
+        <menu>
+            <item
+                android:id="@+id/copy_ip"
+                android:title=""
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/copy_host"
+                android:title=""
+                tools:title="@string/host_val"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/copy_url"
+                android:title=""
+                android:visible="false" />
+
+            <item
+                android:id="@+id/copy_http_request"
+                android:title="@string/string_http_request"
+                android:visible="false" />
+
+            <item
+                android:id="@+id/copy_http_response"
+                android:title="@string/string_http_response"
+                android:visible="false" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/decrypt_menu" android:title="@string/decrypt_action">
+        <menu>
+            <item
+                android:id="@+id/dec_add_app"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/app_val" />
+
+            <item
+                android:id="@+id/dec_add_ip"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/dec_add_host"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/host_val" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/dont_decrypt_menu" android:title="@string/dont_decrypt_action">
+        <menu>
+            <item
+                android:id="@+id/dec_rem_app"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/app_val" />
+
+            <item
+                android:id="@+id/dec_rem_ip"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/dec_rem_host"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/host_val" />
+        </menu>
+    </item>
+
+    <item android:id="@+id/mw_whitelist_menu" android:title="@string/malware_whitelist_action">
+        <menu>
+            <item
+                android:id="@+id/mw_whitelist_app"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/app_val" />
+
+            <item
+                android:id="@+id/mw_whitelist_ip"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/ip_address_val" />
+
+            <item
+                android:id="@+id/mw_whitelist_host"
+                android:title=""
+                android:visible="false"
+                tools:title="@string/host_val" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/open_app_details"
+        android:title="@string/app_details" />
+</menu>

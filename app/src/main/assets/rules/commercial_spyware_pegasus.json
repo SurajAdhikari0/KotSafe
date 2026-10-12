@@ -1,0 +1,43 @@
+{
+  "id": "RULE-ANDR-004",
+  "name": "Commercial Spyware & Cyber Espionage Stalkerware (Pegasus / Predator Indicators)",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1430",
+    "T1412",
+    "T1429"
+  ],
+  "tactics": [
+    "Collection",
+    "Exfiltration"
+  ],
+  "description": "Flags high-threat surveillance tooling combining microphone wiretapping, camera capture, call logs, fine GPS coordinates, and contact scraping into a unified covert spyware implant.",
+  "target": "app",
+  "iocs": {
+    "sha256": [
+      "d41d8cd98f00b204e9800998ecf8427e00000000000000000000000000000000"
+    ]
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "isSideloaded",
+        "operator": "equals",
+        "value": true
+      },
+      {
+        "field": "permissions",
+        "operator": "contains_all",
+        "values": [
+          "android.permission.RECORD_AUDIO",
+          "android.permission.CAMERA",
+          "android.permission.ACCESS_FINE_LOCATION",
+          "android.permission.READ_CALL_LOG"
+        ]
+      }
+    ]
+  },
+  "remediation": "Isolate device from network, back up essential data, and perform a factory firmware reflash."
+}

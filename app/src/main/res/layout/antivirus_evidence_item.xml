@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#1F000000"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Top Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/evidence_icon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_shield"
+                app:tint="?android:attr/colorPrimary" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/evidence_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:text="142.250.190.46:443 (TCP)" />
+
+                <TextView
+                    android:id="@+id/evidence_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:attr/textColorSecondary"
+                    android:textSize="11sp"
+                    tools:text="Google Chrome (com.android.chrome)" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/evidence_severity_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_badge_service"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="CLEAN"
+                android:textColor="#FFFFFF"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Forensic Path / Location Container -->
+        <LinearLayout
+            android:id="@+id/evidence_path_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="#0A000000"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_folder"
+                app:tint="?android:attr/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/evidence_path"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="10.5sp"
+                tools:text="/storage/emulated/0/Download/sample_malware.apk" />
+        </LinearLayout>
+
+        <!-- Forensic SHA-256 Hash Container -->
+        <LinearLayout
+            android:id="@+id/evidence_hash_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#0A000000"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_fingerprint"
+                app:tint="?android:attr/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/evidence_hash"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="10sp"
+                tools:text="SHA-256: 3a4f8b92e105..." />
+        </LinearLayout>
+
+        <!-- MITRE ATT&CK Mobile TTPs Container -->
+        <LinearLayout
+            android:id="@+id/evidence_mitre_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="#109333EA"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_bug"
+                app:tint="#9333EA" />
+
+            <TextView
+                android:id="@+id/evidence_mitre_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="#9333EA"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                tools:text="MITRE ATT&amp;CK: [T1437 Accessibility] [T1411 Overlay]" />
+        </LinearLayout>
+
+        <!-- Forensics Details -->
+        <TextView
+            android:id="@+id/evidence_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp"
+            tools:text="Standard outbound traffic verified" />
+
+        <!-- Action Buttons Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action_vt"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:text="VirusTotal"
+                android:textSize="10.5sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action_otx"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:text="OTX"
+                android:textSize="10.5sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action_manage"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:text="Access Control"
+                android:textSize="10.5sp"
+                app:icon="@drawable/ic_lock"
+                app:iconSize="12dp" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

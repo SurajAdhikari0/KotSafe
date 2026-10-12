@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        These IDs are used as stable tags for UI chips (FilterDescriptor) and
+        other non-menu views that need a resource-based integer ID.
+        NOTE: 'firewall' was previously a nav drawer menu item; it is now a
+        standalone ID since the Firewall screen has its own bottom navigation.
+    -->
+    <item name="firewall" type="id" />
+</resources>

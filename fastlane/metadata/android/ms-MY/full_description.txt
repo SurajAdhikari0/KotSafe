@@ -1,0 +1,21 @@
+<i>KotSafe</i> ialah aplikasi sumber terbuka mesra privasi yang boleh menjejak, menganalisis dan menyekat sambungan yang dibuat oleh aplikasi lain dalam peranti.
+Aplikasi ini juga boleh mengeksport dump PCAP bagi trafik, memeriksa permintaan HTTP, menyahsulit trafik TLS dan banyak lagi.
+
+KotSafe mensimulasikan VPN untuk menangkap trafik rangkaian tanpa root. Ia tidak menggunakan pelayan VPN jauh; sebaliknya data diproses secara setempat pada peranti.
+
+<b>Ciri-ciri utama:</b>
+
+* Log dan analisis sambungan yang dibuat oleh aplikasi pengguna dan sistem
+* Dapatkan ringkasan jumlah data yang dihantar dan diterima oleh setiap aplikasi
+* Penggunaan bateri yang rendah, untuk tangkapan berterusan sepanjang hari
+* Ekstrak hos dan alamat IP daripada DNS, TLS dan HTTP
+* Rakam trafik ke fail PCAP dengan metadata aplikasi tambahan
+* Hantar trafik menerusi PCAP-over-IP untuk analisis masa nyata (cth. pada Wireshark)
+* Nyahsulit trafik HTTPS/TLS, ekstrak URL dan simpan SSLKEYLOGFILE
+* Periksa permintaan/respons HTTP dan eksport ke HAR
+* Kenal pasti negara dan ASN pelayan jauh menerusi carian pangkalan data luar talian
+* Pada peranti yang diroot, tangkap trafik semasa aplikasi VPN lain sedang berjalan
+
+Jika anda bercadang menggunakan KotSafe untuk melakukan analisis paket, rujuk <a href='https://kotsafe.github.io/KotSafe/quick_start#14-packet-analysis'>bahagian khusus</a> dalam manual.
+
+Sertai komuniti antarabangsa KotSafe <a href="https://t.me/KotSafe">di Telegram</a> atau <a href="https://matrix.to/#/#kotsafe:matrix.org">di Matrix</a>.

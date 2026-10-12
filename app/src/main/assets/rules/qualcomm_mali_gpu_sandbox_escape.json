@@ -1,0 +1,48 @@
+{
+  "id": "RULE-FILE-005",
+  "name": "Qualcomm Adreno & ARM Mali GPU Driver Exploit / Sandbox Escape (CVE-2026-21385 / CVE-2025-5420)",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1068",
+    "T1055"
+  ],
+  "tactics": [
+    "Privilege Escalation",
+    "Defense Evasion"
+  ],
+  "description": "Flags native ELF binaries and embedded shared libraries (.so) attempting memory corruption and integer overflows on kernel graphics device interfaces (/dev/kgsl-3d0, /dev/mali0) to break out of unprivileged app and browser renderer sandboxes.",
+  "target": "file",
+  "iocs": {
+    "sha256": [
+      "7c9f8a3d5e2b1c4a6f8e0d2b4c6a8f1e3d5b7c9a1f2e4d6b8a0c2e4f6a8b1c3d"
+    ]
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "contentStrings",
+        "operator": "contains_any",
+        "values": [
+          "/dev/kgsl-3d0",
+          "/dev/mali0",
+          "IOCTL_KGSL_GPU_COMMAND",
+          "mali_kbase_ioctl",
+          "KGSL_MEMFLAGS_USE_CPU_MAP"
+        ]
+      },
+      {
+        "field": "contentStrings",
+        "operator": "contains_any",
+        "values": [
+          "commit_creds",
+          "prepare_kernel_cred",
+          "selinux_enforcing",
+          "init_task"
+        ]
+      }
+    ]
+  },
+  "remediation": "Quarantine the offending file immediately. Apply manufacturer firmware update containing Google March 2026 or later security patch level."
+}

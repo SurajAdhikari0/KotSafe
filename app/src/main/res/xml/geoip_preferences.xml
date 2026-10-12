@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 1. Database Status & Information -->
+    <PreferenceCategory
+        app:key="geo_status_category"
+        app:title="@string/geo_status_category"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            app:key="country_status"
+            app:title="@string/geo_status_country"
+            app:icon="@drawable/ic_location_dot"
+            app:iconSpaceReserved="true"
+            android:summary="@string/geo_db_not_installed" />
+
+        <Preference
+            app:key="asn_status"
+            app:title="@string/geo_status_asn"
+            app:icon="@drawable/ic_lan"
+            app:iconSpaceReserved="true"
+            android:summary="@string/geo_db_not_installed" />
+    </PreferenceCategory>
+
+    <!-- 2. Diagnostic & Testing Tools -->
+    <PreferenceCategory
+        app:key="geo_tools_category"
+        app:title="@string/geo_tools_category"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            app:key="test_ip_lookup"
+            app:title="@string/test_ip_lookup_title"
+            app:summary="@string/test_ip_lookup_summary"
+            app:icon="@drawable/ic_search"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <!-- 3. Database Management -->
+    <PreferenceCategory
+        app:key="geo_management_category"
+        app:title="@string/geo_management_category"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            app:key="download"
+            app:title="@string/download"
+            android:summary="@string/geo_db_download"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="import_country_db"
+            app:title="@string/import_country_mmdb_title"
+            app:summary="@string/import_country_mmdb_summary"
+            app:icon="@drawable/ic_file_import"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="import_asn_db"
+            app:title="@string/import_asn_mmdb_title"
+            app:summary="@string/import_asn_mmdb_summary"
+            app:icon="@drawable/ic_file_import"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="custom_mirror"
+            app:title="@string/custom_mirror_title"
+            app:summary="@string/custom_mirror_summary"
+            app:icon="@drawable/ic_settings"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            app:key="delete"
+            app:title="@string/delete"
+            android:summary="@string/geo_db_delete"
+            app:icon="@drawable/ic_cancel"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <!-- 4. Automation -->
+    <PreferenceCategory
+        app:key="geo_automation_category"
+        app:title="Automation"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="pref_auto_update_geoip"
+            app:title="@string/auto_update_geoip_title"
+            app:summary="@string/auto_update_geoip_summary"
+            app:icon="@drawable/ic_history"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

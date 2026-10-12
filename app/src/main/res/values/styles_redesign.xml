@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="KS" />
+    <style name="KS.Text" parent="KS">
+        <item name="android:textColor">@color/ks_ink</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <!-- Small all-caps badge labels like "● IDLE" — bold is correct here (weight 700) -->
+    <style name="KS.Label" parent="KS.Text">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ks_grey</item>
+        <item name="android:letterSpacing">0.10</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <!-- Secondary captions — regular weight, matches design's font-weight:500 -->
+    <style name="KS.Caption" parent="KS.Text">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/ks_grey</item>
+    </style>
+    <!-- Body text — medium weight (600), no bold, matches design reference -->
+    <style name="KS.Body" parent="KS.Text">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+    <!-- Section headings — medium weight (not full bold), matches design font-weight:600 -->
+    <style name="KS.Heading" parent="KS.Text">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+</resources>

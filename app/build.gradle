@@ -1,0 +1,247 @@
+import javax.inject.Inject
+
+apply plugin: 'com.android.application'
+
+base {
+    archivesName = 'KotSafe'
+}
+
+android {
+    ndkVersion = "27.1.12297006"
+
+    defaultConfig {
+        applicationId "com.kotsafe.security"
+        minSdkVersion 23
+        compileSdk 36
+        targetSdk 34
+        versionCode 96
+        versionName "2.0.4"
+
+        // only include full translations
+        // NOTE: keep in sync with locales_config.xml
+        resourceConfigurations += ["en", "ar", "az", "bn", "de", "es", "fr", "hi", "in", "it", "ja", "ko",
+                                   "ms", "pl", "pt", "pt-rBR", "ru", "ta", "tr", "uk", "ur", "vi", "zh-rCN"]
+    }
+
+    flavorDimensions = ["type"]
+
+    productFlavors {
+        /* Note: alphabetical order determines the default flavor, which is standard */
+        standard {
+            dimension "type"
+            buildConfigField "String", "FLAVOR_TIER", "\"standard\""
+        }
+
+        fullPower {
+            dimension "type"
+            buildConfigField "String", "FLAVOR_TIER", "\"fullPower\""
+        }
+
+        corporate {
+            dimension "type"
+            buildConfigField "String", "FLAVOR_TIER", "\"corporate\""
+        }
+
+        withoutUshark {
+            dimension "type"
+            buildConfigField "String", "FLAVOR_TIER", "\"withoutUshark\""
+        }
+    }
+
+    signingConfigs {
+        release {
+            def keystoreFile = project.hasProperty("RELEASE_STORE_FILE") ? file(project.property("RELEASE_STORE_FILE")) :
+                    (System.getenv("KOTSAFE_KEYSTORE_FILE") ? file(System.getenv("KOTSAFE_KEYSTORE_FILE")) : (System.getenv("NETPDROID_KEYSTORE_FILE") ? file(System.getenv("NETPDROID_KEYSTORE_FILE")) : file("release.keystore")))
+            def keystorePassword = project.hasProperty("RELEASE_STORE_PASSWORD") ? project.property("RELEASE_STORE_PASSWORD") :
+                    (System.getenv("KOTSAFE_KEYSTORE_PASSWORD") ?: (System.getenv("NETPDROID_KEYSTORE_PASSWORD") ?: (keystoreFile.exists() ? "netpdroid" : "")))
+            def keyAliasVal = project.hasProperty("RELEASE_KEY_ALIAS") ? project.property("RELEASE_KEY_ALIAS") :
+                    (System.getenv("KOTSAFE_KEY_ALIAS") ?: (System.getenv("NETPDROID_KEY_ALIAS") ?: (keystoreFile.exists() ? "netpdroid" : "")))
+            def keyPass = project.hasProperty("RELEASE_KEY_PASSWORD") ? project.property("RELEASE_KEY_PASSWORD") :
+                    (System.getenv("KOTSAFE_KEY_PASSWORD") ?: (System.getenv("NETPDROID_KEY_PASSWORD") ?: (keystoreFile.exists() ? "netpdroid" : "")))
+
+            if (keystoreFile.exists() && keystorePassword) {
+                storeFile = keystoreFile
+                storePassword = keystorePassword
+                keyAlias = keyAliasVal
+                keyPassword = keyPass
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig = signingConfigs.release
+        }
+        debug {
+            signingConfig = signingConfigs.release
+            versionNameSuffix = '-beta'
+            pseudoLocalesEnabled = true
+
+            if(project.hasProperty("doNotStrip")) {
+                // NOTE: packagingOptions will also affect the "release" build, so the "doNotStrip"
+                // guard is required
+                packagingOptions {
+                    //doNotStrip '**.so'
+                    doNotStrip '**/libkotengine.so'
+                }
+            }
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    aaptOptions {
+        noCompress "tflite"
+    }
+
+    packagingOptions {
+        jniLibs {
+            // NOTE: keep native libs extracted on disk (needed by KotEngine root helpers)
+            useLegacyPackaging = true
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/jni/CMakeLists.txt')
+            version = "3.22.1"
+        }
+    }
+
+    compileOptions {
+        encoding = "UTF-8"
+        coreLibraryDesugaringEnabled = true // support devices running older Java versions
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs += ["-nowarn", "-Xlint:none"]
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += '../submodules/MaxMind-DB-Reader-java/src/main/java'
+
+        fullPower {
+            manifest.srcFile 'src/fullPower/AndroidManifest.xml'
+        }
+
+        corporate {
+            manifest.srcFile 'src/fullPower/AndroidManifest.xml'
+        }
+    }
+
+    testOptions {
+        // needed by robolectric
+        unitTests.includeAndroidResources = true
+        unitTests.all {
+            systemProperty "java.library.path", "${buildDir}/hostJni"
+        }
+    }
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+        disable 'MissingTranslation'
+    }
+    namespace = 'com.kotsafe.security'
+}
+
+// Build zstd JNI for the host platform (needed by unit tests)
+abstract class BuildHostZstdJniTask extends DefaultTask {
+    @Inject abstract ExecOperations getExecOps()
+
+    @InputDirectory File jniSrcDir
+    @InputDirectory File zstdLibDir
+    @OutputDirectory File outputDir
+    @Internal File cmakeBuildDir
+
+    @TaskAction
+    void build() {
+        execOps.exec {
+            commandLine 'cmake', '-S', jniSrcDir, '-B', cmakeBuildDir,
+                "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${outputDir}"
+        }
+        execOps.exec {
+            commandLine 'cmake', '--build', cmakeBuildDir
+        }
+    }
+}
+
+tasks.register('buildHostZstdJni', BuildHostZstdJniTask) {
+    jniSrcDir = file("src/main/jni/zstd")
+    zstdLibDir = file("${rootDir}/submodules/zstd/lib")
+    cmakeBuildDir = file("${buildDir}/hostJni/cmake")
+    outputDir = file("${buildDir}/hostJni")
+}
+
+tasks.configureEach { task ->
+    if (task.name.startsWith("test") && task.name.endsWith("UnitTest")) {
+        task.dependsOn buildHostZstdJni
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+        force 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+    }
+}
+
+dependencies {
+// Tests
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.7.0'
+    testImplementation "org.robolectric:robolectric:4.16.1"
+    testImplementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+    testImplementation 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+
+// AndroidX
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    implementation 'androidx.fragment:fragment:1.8.9'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation "androidx.navigation:navigation-fragment:2.9.8"
+    implementation "androidx.navigation:navigation-ui:2.9.8"
+    implementation 'androidx.work:work-runtime:2.9.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+
+// Google
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'com.google.code.gson:gson:2.14.0'
+    implementation 'org.brotli:dec:0.1.2'
+
+// Third-party
+    implementation 'cat.ereza:customactivityoncrash:2.4.0'
+    implementation 'com.github.KaKaVip:Android-Flag-Kit:v0.1'
+    implementation 'com.github.AppIntro:AppIntro:6.2.0'
+    implementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.78.1'
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+
+// P2P Live Signaling & Cloud Backends
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.guava:guava:33.2.1-android'
+}

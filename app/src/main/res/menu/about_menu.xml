@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/build_info"
+        android:title="@string/build_info"
+        android:orderInCategory="5"
+        android:icon="@drawable/ic_info"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/on_boarding"
+        android:title="@string/welcome_to_kotsafe"
+        android:orderInCategory="10"
+        app:showAsAction="never" />
+</menu>

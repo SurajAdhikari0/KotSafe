@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Midnight navy gradient — professional security app style -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="0"
+        android:startColor="#0A1628"
+        android:centerColor="#0B1D38"
+        android:endColor="#0F2347" />
+</shape>

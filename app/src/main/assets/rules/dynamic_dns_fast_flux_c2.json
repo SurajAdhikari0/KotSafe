@@ -1,0 +1,45 @@
+{
+  "id": "RULE-NET-001",
+  "name": "Dynamic DNS & Fast-Flux C2 Infrastructure Beaconing",
+  "severity": "HIGH",
+  "triggerSchedule": "REALTIME_NET",
+  "mitreTechniques": [
+    "T1568.002",
+    "T1071"
+  ],
+  "tactics": [
+    "Command and Control"
+  ],
+  "description": "Detects outbound network flows to known dynamic DNS providers commonly used by adversaries for fast-flux command & control infrastructure resilience.",
+  "target": "network",
+  "iocs": {
+    "domains": [
+      "clickfunax.top",
+      "duckdns.org",
+      "hopto.org",
+      "no-ip.biz",
+      "zapto.org",
+      "servehttp.com"
+    ],
+    "ips": [
+      "185.220.101.5",
+      "194.26.29.112"
+    ]
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "domain",
+        "operator": "regex",
+        "value": ".*\\.(top|xyz|click|buzz|duckdns\\.org|clickfunax\\.top|hopto\\.org|no-ip\\.biz)$"
+      },
+      {
+        "field": "dgaEntropy",
+        "operator": "greater_than",
+        "value": 3.85
+      }
+    ]
+  },
+  "remediation": "Block the domain/IP in KotSafe Firewall and audit the originating application socket."
+}

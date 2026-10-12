@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:key="personal_gateway_status_category"
+        app:title="@string/gateway_status_category"
+        app:iconSpaceReserved="true">
+        <Preference
+            android:key="personal_gateway_mode_banner"
+            app:title="Operating Mode"
+            app:summary="Standby"
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_status"
+            app:title="@string/gateway_status_title"
+            app:summary="@string/gateway_status_disconnected"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="personal_gateway_exit_category"
+        app:title="@string/gateway_exit_category"
+        app:iconSpaceReserved="true">
+        <SwitchPreference
+            app:key="personal_gateway_exit_enabled"
+            app:title="@string/gateway_exit_enabled_title"
+            app:summary="@string/gateway_exit_enabled_summary"
+            app:defaultValue="false" />
+        <SwitchPreference
+            app:key="personal_gateway_battery_guard"
+            app:title="Battery Saver Guard"
+            app:summary="Conserve host battery when discharging below 20%"
+            app:defaultValue="true" />
+        <Preference
+            android:key="personal_gateway_show_pairing_qr"
+            app:title="@string/gateway_show_pairing_title"
+            app:summary="@string/gateway_show_pairing_summary" />
+        <Preference
+            android:key="personal_gateway_exit_revoke"
+            app:title="@string/gateway_exit_revoke_title"
+            app:summary="@string/gateway_exit_revoke_summary" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="personal_gateway_client_category"
+        app:title="@string/gateway_client_category"
+        app:iconSpaceReserved="true">
+        <SwitchPreference
+            app:key="personal_gateway_client_enabled"
+            app:title="@string/gateway_client_enabled_title"
+            app:summary="@string/gateway_client_enabled_summary"
+            app:defaultValue="false" />
+        <Preference
+            android:key="personal_gateway_scan_pairing_qr"
+            app:title="@string/gateway_scan_pairing_title"
+            app:summary="@string/gateway_scan_pairing_summary" />
+        <Preference
+            android:key="personal_gateway_manage_profiles"
+            app:title="Saved Exit Gateways"
+            app:summary="Manage and switch between paired exit devices" />
+        <ListPreference
+            app:key="personal_gateway_transport_mode"
+            app:title="@string/gateway_transport_title"
+            app:summary="%s"
+            app:entries="@array/gateway_transport_entries"
+            app:entryValues="@array/gateway_transport_values"
+            app:defaultValue="automatic" />
+        <ListPreference
+            app:key="personal_gateway_app_routing_mode"
+            app:title="@string/gateway_app_routing_title"
+            app:summary="%s"
+            app:entries="@array/gateway_app_routing_entries"
+            app:entryValues="@array/gateway_app_routing_values"
+            app:defaultValue="all" />
+        <Preference
+            android:key="personal_gateway_select_apps"
+            app:title="@string/gateway_select_apps_title"
+            app:summary="@string/gateway_select_apps_summary" />
+        <SwitchPreference
+            app:key="personal_gateway_kill_switch"
+            app:title="@string/gateway_kill_switch_title"
+            app:summary="@string/gateway_kill_switch_summary"
+            app:defaultValue="true" />
+        <Preference
+            android:key="personal_gateway_disconnect"
+            app:title="@string/gateway_disconnect_title"
+            app:summary="@string/gateway_disconnect_summary" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="personal_gateway_telemetry_category"
+        app:title="Exit Node Live Telemetry"
+        app:iconSpaceReserved="true">
+        <Preference
+            android:key="personal_gateway_telemetry_health"
+            app:title="Exit Node Health"
+            app:summary="Waiting for connection..."
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_telemetry_battery"
+            app:title="Exit Node Battery"
+            app:summary="Waiting for telemetry..."
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_telemetry_network"
+            app:title="Exit Node Network"
+            app:summary="Waiting for telemetry..."
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_telemetry_bandwidth"
+            app:title="Live Speed &amp; Throughput"
+            app:summary="Idle • 0 B/s"
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_telemetry_transport"
+            app:title="Transport &amp; Link Quality"
+            app:summary="—"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="personal_gateway_relay_category"
+        app:title="@string/gateway_relay_category"
+        app:iconSpaceReserved="true">
+        <ListPreference
+            app:key="personal_gateway_relay_mode"
+            app:title="@string/gateway_relay_mode_title"
+            app:summary="%s"
+            app:entries="@array/gateway_relay_mode_entries"
+            app:entryValues="@array/gateway_relay_mode_values"
+            app:defaultValue="cloudflare_tunnel" />
+        <EditTextPreference
+            app:key="personal_gateway_custom_relay_url"
+            app:title="@string/gateway_custom_relay_url_title"
+            app:summary="@string/gateway_custom_relay_url_summary"
+            app:dialogTitle="@string/gateway_custom_relay_url_title" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,160 @@
+{
+  "version": 3,
+  "updated_at": "2026-09-25T13:15:00Z",
+  "rules_count": 17,
+  "rules": [
+    {
+      "id": "RULE-ANDR-001",
+      "name": "Sideloaded APK with Accessibility & Overlay Abuse (Banking Trojan Pattern)",
+      "file": "banking_trojan_accessibility_overlay.json",
+      "path": "rules/banking_trojan_accessibility_overlay.json",
+      "severity": "CRITICAL",
+      "target": "app",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-ANDR-002",
+      "name": "Covert Surveillance & SMS OTP Interception Spyware",
+      "file": "covert_sms_otp_spyware.json",
+      "path": "rules/covert_sms_otp_spyware.json",
+      "severity": "HIGH",
+      "target": "app",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-ANDR-003",
+      "name": "Dynamic Dropper / Obfuscated DexClassLoader Pipeline",
+      "file": "dynamic_dropper_dexclassloader.json",
+      "path": "rules/dynamic_dropper_dexclassloader.json",
+      "severity": "HIGH",
+      "target": "app",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-ANDR-004",
+      "name": "Commercial Spyware & Cyber Espionage Stalkerware (Pegasus / Predator Indicators)",
+      "file": "commercial_spyware_pegasus.json",
+      "path": "rules/commercial_spyware_pegasus.json",
+      "severity": "CRITICAL",
+      "target": "app",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-ANDR-005",
+      "name": "Rafel RAT & SpyNote Advanced Multi-Vector Surveillance Implant",
+      "file": "rafel_rat_c2_surveillance.json",
+      "path": "rules/rafel_rat_c2_surveillance.json",
+      "severity": "CRITICAL",
+      "target": "app",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-NET-001",
+      "name": "Dynamic DNS & Fast-Flux C2 Infrastructure Beaconing",
+      "file": "dynamic_dns_fast_flux_c2.json",
+      "path": "rules/dynamic_dns_fast_flux_c2.json",
+      "severity": "HIGH",
+      "target": "network",
+      "trigger": "REALTIME_NET"
+    },
+    {
+      "id": "RULE-NET-002",
+      "name": "Anomalous Meterpreter / Remote Access C2 Port Connection",
+      "file": "meterpreter_reverse_shell_port.json",
+      "path": "rules/meterpreter_reverse_shell_port.json",
+      "severity": "CRITICAL",
+      "target": "network",
+      "trigger": "REALTIME_NET"
+    },
+    {
+      "id": "RULE-NET-003",
+      "name": "Telegram Bot API C2 Command & Exfiltration Tunnel",
+      "file": "telegram_bot_c2_exfiltration.json",
+      "path": "rules/telegram_bot_c2_exfiltration.json",
+      "severity": "HIGH",
+      "target": "network",
+      "trigger": "REALTIME_NET"
+    },
+    {
+      "id": "RULE-NET-004",
+      "name": "Cryptomining Pool Stratum Protocol Traffic",
+      "file": "cryptomining_stratum_protocol.json",
+      "path": "rules/cryptomining_stratum_protocol.json",
+      "severity": "HIGH",
+      "target": "network",
+      "trigger": "REALTIME_NET"
+    },
+    {
+      "id": "RULE-NET-005",
+      "name": "Cobalt Strike / Metasploit Malleable C2 Beaconing",
+      "file": "cobalt_strike_malleable_c2.json",
+      "path": "rules/cobalt_strike_malleable_c2.json",
+      "severity": "CRITICAL",
+      "target": "network",
+      "trigger": "REALTIME_NET"
+    },
+    {
+      "id": "RULE-NET-006",
+      "name": "Chrome V8 Engine Out-of-Bounds & Type Confusion Exploit Delivery (CVE-2026-87491 / CVE-2026-85046)",
+      "file": "chrome_v8_jit_exploit_delivery.json",
+      "path": "rules/chrome_v8_jit_exploit_delivery.json",
+      "severity": "CRITICAL",
+      "target": "network",
+      "trigger": "REALTIME_NET"
+    },
+    {
+      "id": "RULE-FILE-001",
+      "name": "Privilege Escalation & Rootkit Su Daemon Stager",
+      "file": "rootkit_su_daemons.json",
+      "path": "rules/rootkit_su_daemons.json",
+      "severity": "CRITICAL",
+      "target": "file",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-FILE-002",
+      "name": "Mobile Ransomware Extortion Demand & Locker Payload",
+      "file": "mobile_ransomware_extortion.json",
+      "path": "rules/mobile_ransomware_extortion.json",
+      "severity": "CRITICAL",
+      "target": "file",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-FILE-003",
+      "name": "Meterpreter Reverse Shell or Screen Surveillance Payload",
+      "file": "meterpreter_reverse_tcp_payload.json",
+      "path": "rules/meterpreter_reverse_tcp_payload.json",
+      "severity": "CRITICAL",
+      "target": "file",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-FILE-004",
+      "name": "Embedded ELF Exploit Binary / DirtyPipe Kernel Privilege Escalation",
+      "file": "dirtypipe_kernel_privilege_escalation.json",
+      "path": "rules/dirtypipe_kernel_privilege_escalation.json",
+      "severity": "CRITICAL",
+      "target": "file",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-FILE-005",
+      "name": "Qualcomm Adreno & ARM Mali GPU Driver Exploit / Sandbox Escape (CVE-2026-21385 / CVE-2025-5420)",
+      "file": "qualcomm_mali_gpu_sandbox_escape.json",
+      "path": "rules/qualcomm_mali_gpu_sandbox_escape.json",
+      "severity": "CRITICAL",
+      "target": "file",
+      "trigger": "ON_SCAN"
+    },
+    {
+      "id": "RULE-FILE-006",
+      "name": "Chrome Sandbox Broker & Android Binder IPC Memory Corruption Exploit",
+      "file": "chrome_sandbox_broker_escape.json",
+      "path": "rules/chrome_sandbox_broker_escape.json",
+      "severity": "CRITICAL",
+      "target": "file",
+      "trigger": "ON_SCAN"
+    }
+  ]
+}

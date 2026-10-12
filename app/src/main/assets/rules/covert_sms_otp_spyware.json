@@ -1,0 +1,40 @@
+{
+  "id": "RULE-ANDR-002",
+  "name": "Covert Surveillance & SMS OTP Interception Spyware",
+  "severity": "HIGH",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1412",
+    "T1429",
+    "T1430"
+  ],
+  "tactics": [
+    "Collection",
+    "Discovery"
+  ],
+  "description": "Detects sideloaded applications with high-privilege surveillance sensors combining background SMS interception with microphone recording and fine GPS geolocation.",
+  "target": "app",
+  "iocs": {
+    "sha256": []
+  },
+  "logic": {
+    "match": "all",
+    "conditions": [
+      {
+        "field": "isSideloaded",
+        "operator": "equals",
+        "value": true
+      },
+      {
+        "field": "permissions",
+        "operator": "contains_all",
+        "values": [
+          "android.permission.RECEIVE_SMS",
+          "android.permission.RECORD_AUDIO",
+          "android.permission.ACCESS_FINE_LOCATION"
+        ]
+      }
+    ]
+  },
+  "remediation": "Review application permissions in Android App Settings and restrict background sensor access."
+}

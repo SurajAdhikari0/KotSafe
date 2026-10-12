@@ -1,0 +1,35 @@
+{
+  "id": "RULE-FILE-001",
+  "name": "Privilege Escalation & Rootkit Su Daemon Stager",
+  "severity": "CRITICAL",
+  "triggerSchedule": "ON_SCAN",
+  "mitreTechniques": [
+    "T1404",
+    "T1068"
+  ],
+  "tactics": [
+    "Privilege Escalation"
+  ],
+  "description": "Discovers storage artifacts or binary payloads embedding unauthorized superuser daemons or kernel exploit indicators (/system/bin/su, dirtycow, magisk tampering).",
+  "target": "file",
+  "iocs": {
+    "sha256": []
+  },
+  "logic": {
+    "match": "any",
+    "conditions": [
+      {
+        "field": "content_strings",
+        "operator": "contains_any",
+        "values": [
+          "/system/bin/su",
+          "/system/xbin/daemonsu",
+          "dirtycow",
+          "ro.build.selinux",
+          "/sbin/su"
+        ]
+      }
+    ]
+  },
+  "remediation": "Delete or quarantine the unauthorized root binary to prevent local privilege escalation."
+}

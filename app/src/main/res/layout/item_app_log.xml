@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="3dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/cardBorder"
+    app:cardBackgroundColor="?android:attr/colorBackgroundFloating">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!-- Top Row: Level Badge, Tag, Timestamp, Copy Action -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Level Badge -->
+            <TextView
+                android:id="@+id/tv_log_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="7dp"
+                android:paddingVertical="2dp"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_badge_neutral"
+                tools:text="INFO"
+                tools:backgroundTint="#0EA5E9" />
+
+            <!-- Tag Chip (optional) -->
+            <TextView
+                android:id="@+id/tv_log_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="1dp"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace"
+                android:textColor="@color/metricTextPrimary"
+                android:background="@drawable/bg_badge_neutral"
+                tools:text="CaptureService" />
+
+            <!-- Timestamp -->
+            <TextView
+                android:id="@+id/tv_log_timestamp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:textColor="@color/metricTextSecondary"
+                android:gravity="end"
+                tools:text="23/Sep/2026 20:26:45" />
+
+            <!-- Single Line Copy Button -->
+            <ImageView
+                android:id="@+id/btn_copy_line"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="8dp"
+                android:padding="2dp"
+                android:src="@drawable/ic_content_copy_small"
+                app:tint="@color/metricTextSecondary"
+                android:contentDescription="Copy line"
+                android:background="?android:attr/selectableItemBackgroundBorderless" />
+        </LinearLayout>
+
+        <!-- Message Body -->
+        <TextView
+            android:id="@+id/tv_log_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="monospace"
+            android:textSize="12sp"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/metricTextPrimary"
+            android:textIsSelectable="false"
+            tools:text="VpnService started, protecting active network connection." />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

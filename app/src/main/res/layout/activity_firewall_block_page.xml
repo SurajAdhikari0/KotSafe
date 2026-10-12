@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of KotSafe.
+  ~ GPL-3.0 License — see <http://www.gnu.org/licenses/>
+  -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="36dp">
+
+            <!-- Top Header with App Name Branding -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="20dp">
+
+                <TextView
+                    android:id="@+id/tv_app_brand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KOTSAFE"
+                    android:textColor="#004B87"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.04" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/btn_action_center_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Action Center"
+                    android:textColor="#0073D8"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+
+            <!-- Main Content Area: Shield Icon + Text Block -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="12dp">
+
+                <!-- Left / Top Icon: Salmon Shield with White Stop Hand -->
+                <ImageView
+                    android:id="@+id/iv_firewall_shield"
+                    android:layout_width="120dp"
+                    android:layout_height="140dp"
+                    android:layout_marginBottom="16dp"
+                    android:src="@drawable/ic_sophos_shield_hand"
+                    android:contentDescription="Blocked Shield" />
+
+                <!-- "Stop!" in Coral Red -->
+                <TextView
+                    android:id="@+id/tv_block_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Stop!"
+                    android:textColor="#E5675C"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <!-- "This website is blocked" in Charcoal -->
+                <TextView
+                    android:id="@+id/tv_block_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="This website is blocked"
+                    android:textColor="#333333"
+                    android:textSize="24sp" />
+
+                <!-- Explanatory text -->
+                <TextView
+                    android:id="@+id/tv_block_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="The administrator of this network has restricted access to sites categorized as Security Threat / Restricted Sites."
+                    android:textColor="#555555"
+                    android:textSize="14.5sp"
+                    android:lineSpacingExtra="3dp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="If you think this is incorrect, you may suggest a different category."
+                    android:textColor="#555555"
+                    android:textSize="14.5sp" />
+
+                <!-- Action Buttons Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="24dp"
+                    android:gravity="center_vertical">
+
+                    <android.widget.Button
+                        android:id="@+id/btn_back"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:background="@drawable/bg_sophos_button"
+                        android:text="Return to previous page"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13.5sp"
+                        android:textAllCaps="false"
+                        android:paddingHorizontal="18dp" />
+
+                    <android.widget.Button
+                        android:id="@+id/btn_unblock_site"
+                        android:layout_width="wrap_content"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_sophos_button"
+                        android:text="Unblock this site"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13.5sp"
+                        android:textAllCaps="false"
+                        android:paddingHorizontal="18dp" />
+                </LinearLayout>
+
+
+
+                <!-- Expandable: "> About this request" -->
+                <LinearLayout
+                    android:id="@+id/layout_toggle_about"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="22dp"
+                    android:paddingVertical="6dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:id="@+id/tv_about_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="›"
+                        android:textColor="#777777"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="About this request"
+                        android:textColor="#777777"
+                        android:textSize="13.5sp" />
+                </LinearLayout>
+
+                <!-- Details Card (expanded/collapsed) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_about_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:cardBackgroundColor="#FBFBFB"
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#E2E8F0"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- URL -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="110dp"
+                                android:layout_height="wrap_content"
+                                android:text="URL:"
+                                android:textColor="#718096"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_target_value"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="example.com"
+                                android:textColor="#2D3748"
+                                android:textSize="13sp" />
+
+                            <ImageView
+                                android:id="@+id/btn_copy_target"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_copy"
+                                app:tint="#718096"
+                                android:contentDescription="Copy"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="2dp"/>
+                        </LinearLayout>
+
+                        <!-- Category -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:layout_width="110dp"
+                                android:layout_height="wrap_content"
+                                android:text="Category:"
+                                android:textColor="#718096"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_category_value"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Security Threat / Restricted Sites"
+                                android:textColor="#2D3748"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Client App -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:layout_width="110dp"
+                                android:layout_height="wrap_content"
+                                android:text="Client App:"
+                                android:textColor="#718096"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:id="@+id/iv_app_icon"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginEnd="6dp"
+                                android:src="@drawable/ic_language"
+                                android:contentDescription="@null"/>
+
+                            <TextView
+                                android:id="@+id/tv_app_name"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Google Chrome"
+                                android:textColor="#2D3748"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Policy -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:layout_width="110dp"
+                                android:layout_height="wrap_content"
+                                android:text="Policy:"
+                                android:textColor="#718096"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_policy_reason"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="KotSafe Next-Gen Firewall Rule"
+                                android:textColor="#2D3748"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <!-- Action -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:layout_width="110dp"
+                                android:layout_height="wrap_content"
+                                android:text="Action:"
+                                android:textColor="#718096"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="BLOCKED (Connection Dropped)"
+                                android:textColor="#E53E3E"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Timestamp -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp">
+
+                            <TextView
+                                android:layout_width="110dp"
+                                android:layout_height="wrap_content"
+                                android:text="Timestamp:"
+                                android:textColor="#718096"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_timestamp"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Just now"
+                                android:textColor="#718096"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

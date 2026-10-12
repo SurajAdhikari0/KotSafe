@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:id="@+id/dialog_threat_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_shield"
+            app:tint="#E91E63"
+            android:layout_marginEnd="12dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/dialog_threat_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Threat Remediation Action Center"
+                android:textStyle="bold"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/dialog_threat_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IOC / Artifact Details"
+                android:textSize="12sp"
+                android:alpha="0.8" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialog_threat_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MALICIOUS"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#E91E63"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:background="@drawable/bg_badge_threat" />
+    </LinearLayout>
+
+    <!-- Forensic Metadata Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#22808080"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <!-- File / APK Path Row -->
+            <LinearLayout
+                android:id="@+id/dialog_path_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="FILE / ARTIFACT LOCATION"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/btn_copy_path"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_copy"
+                        app:tint="?android:attr/colorPrimary" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_dialog_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="monospace"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    android:textSize="11.5sp"
+                    tools:text="/storage/emulated/0/Download/payload.apk" />
+            </LinearLayout>
+
+            <!-- SHA-256 Hash Row -->
+            <LinearLayout
+                android:id="@+id/dialog_hash_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="CRYPTOGRAPHIC DIGEST (SHA-256)"
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/btn_copy_hash"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="2dp"
+                        android:src="@drawable/ic_copy"
+                        app:tint="?android:attr/colorPrimary" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_dialog_hash"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="monospace"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    android:textSize="11sp"
+                    tools:text="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" />
+            </LinearLayout>
+
+            <!-- Threat Details and Behavioral Analysis -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BEHAVIORAL ANALYSIS &amp; DETECTIONS"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/dialog_threat_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Threat Details and Behavioral Analysis"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textIsSelectable="true"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2dp" />
+
+            <!-- MITRE ATT&CK Mobile Correlation -->
+            <LinearLayout
+                android:id="@+id/dialog_mitre_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:background="#129333EA"
+                android:padding="8dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🎯 MITRE ATT&amp;CK® MATRIX (TTPs)"
+                        android:textColor="#9333EA"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btn_dialog_mitre_link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View Matrix ↗"
+                        android:textColor="#9333EA"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_dialog_mitre_breakdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:textIsSelectable="true"
+                    android:textSize="11.5sp"
+                    android:lineSpacingExtra="2dp"
+                    tools:text="• [T1437] Persistence: Abuse Accessibility Features\n  ↳ Banking Trojan accessibility overlay hijack detected" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recommended Remediation Actions"
+        android:textStyle="bold"
+        android:textSize="13sp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Remediation Buttons Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- File Quarantine Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action_quarantine"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔒 Quarantine to Sandboxed Vault"
+            app:backgroundTint="#FF9800"
+            android:layout_marginBottom="6dp" />
+
+        <!-- File Delete Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action_shred_delete"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🗑️ Permanently Shred &amp; Delete"
+            app:backgroundTint="#D32F2F"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Firewall Block Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action_firewall_block"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🛡️ Block in KotSafe Firewall"
+            app:backgroundTint="#E91E63"
+            android:layout_marginBottom="6dp" />
+
+        <!-- App Uninstall Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action_uninstall_app"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📦 Uninstall Malicious Application"
+            app:backgroundTint="#D32F2F"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Allow on Device (Defender Whitelist) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action_allow_whitelist"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="✔️ Allow on Device (Trust &amp; Whitelist)"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Threat Intel Lookup -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action_virustotal"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="VirusTotal"
+                android:textSize="12sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action_otx"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="AlienVault OTX"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

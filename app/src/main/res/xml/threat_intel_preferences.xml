@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:title="AlienVault OTX Integration"
+        app:iconSpaceReserved="false">
+
+        <EditTextPreference
+            app:key="otx_api_key"
+            app:title="OTX API Key"
+            app:summary="Configure your personal AlienVault OTX Direct Connect API Key"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="otx_test_connection"
+            app:title="Test OTX Connection"
+            app:summary="Verify AlienVault OTX API authentication"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="otx_docs"
+            app:title="Get Free AlienVault OTX API Key"
+            app:summary="Visit otx.alienvault.com/api to create a free account and copy your key"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://otx.alienvault.com/api" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="VirusTotal Integration"
+        app:iconSpaceReserved="false">
+
+        <EditTextPreference
+            app:key="virustotal_api_key"
+            app:title="VirusTotal API Key"
+            app:summary="Configure your personal VirusTotal API v3 Key"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="virustotal_test_connection"
+            app:title="Test VirusTotal Connection"
+            app:summary="Verify VirusTotal API authentication and quota"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="virustotal_docs"
+            app:title="Get Free VirusTotal API Key"
+            app:summary="Visit virustotal.com/gui/my-apikey to get your personal API key"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://www.virustotal.com/gui/my-apikey" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="URLhaus Integration (Abuse.ch)"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="urlhaus_enabled"
+            app:title="Enable URLhaus Provider"
+            app:summary="Real-time queries for active malware distribution URLs and payloads"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="urlhaus_api_key"
+            app:title="@string/urlhaus_api_key"
+            app:summary="@string/urlhaus_api_key_summary"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="urlhaus_test_connection"
+            app:title="@string/urlhaus_test_connection"
+            app:summary="@string/urlhaus_test_summary"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="urlhaus_docs"
+            app:title="@string/urlhaus_docs"
+            app:summary="@string/urlhaus_docs_summary"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://urlhaus.abuse.ch/api/" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="ThreatFox Integration (Abuse.ch)"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="threatfox_enabled"
+            app:title="Enable ThreatFox Provider"
+            app:summary="Real-time botnet C2, payload, and IOC queries"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="threatfox_api_key"
+            app:title="@string/threatfox_api_key"
+            app:summary="@string/threatfox_api_key_summary"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="threatfox_test_connection"
+            app:title="@string/threatfox_test_connection"
+            app:summary="@string/threatfox_test_summary"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="threatfox_docs"
+            app:title="@string/threatfox_docs"
+            app:summary="@string/threatfox_docs_summary"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://threatfox.abuse.ch/api/" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/threat_feed_sync_category"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="auto_threat_feed_sync"
+            app:title="@string/auto_threat_feed_sync_title"
+            app:summary="@string/auto_threat_feed_sync_summary"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="threat_feed_sync_now"
+            app:title="@string/sync_threat_feeds_now"
+            app:summary="@string/sync_threat_feeds_now_summary"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Automated Intelligence &amp; Background Audits"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="pref_auto_daily_deep_scan"
+            app:title="Automatic Daily Deep Scan"
+            app:summary="Run automated deep vulnerability &amp; antivirus audit in the background every 24 hours"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            app:key="auto_threat_query_during_scan"
+            app:title="Query APIs During Antivirus Scan"
+            app:summary="Automatically check contacted IPs, URLs, and file hashes against enabled threat intelligence providers during Antivirus Scan"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="MalwareBazaar Integration (Abuse.ch)"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="malwarebazaar_enabled"
+            app:title="Enable MalwareBazaar Provider"
+            app:summary="Direct SHA-256 cloud threat queries (No API key required)"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="malwarebazaar_api_key"
+            app:title="MalwareBazaar Auth Key (Optional)"
+            app:summary="Optional Auth-Key for elevated query rate-limits"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="malwarebazaar_test_connection"
+            app:title="Test MalwareBazaar Connection"
+            app:summary="Verify Abuse.ch MalwareBazaar hash API accessibility"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="malwarebazaar_docs"
+            app:title="Visit MalwareBazaar"
+            app:summary="bazaar.abuse.ch - Public malware sample database"
+            app:iconSpaceReserved="false">
+            <intent android:action="android.intent.action.VIEW"
+                android:data="https://bazaar.abuse.ch/api/" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Enterprise SIEM &amp; Syslog Forwarder"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="pref_siem_telemetry_enabled"
+            app:title="Stream Telemetry to Remote SIEM"
+            app:summary="Export incidents, process tampering, and network anomalies to external SIEM"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="pref_siem_endpoint_url"
+            app:title="SIEM Ingestion Endpoint URL"
+            app:summary="HTTPS Webhook, Splunk HEC, or Elastic Ingest URL"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            app:key="pref_siem_auth_token"
+            app:title="Ingestion Auth Token"
+            app:summary="Optional Bearer token or HEC token for authentication"
+            app:useSimpleSummaryProvider="false"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            app:key="pref_siem_format"
+            app:title="Telemetry Log Format"
+            app:entries="@array/siem_format_labels"
+            app:entryValues="@array/siem_format_values"
+            app:defaultValue="ECS"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            app:key="pref_siem_anonymize_ip"
+            app:title="Anonymize Network IP Addresses"
+            app:summary="Mask last octet of IP addresses in telemetry to protect user privacy"
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="siem_test_connection"
+            app:title="Test SIEM Ingestion Endpoint"
+            app:summary="Send diagnostic ping to verify endpoint connectivity and authentication"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Enterprise Fleet &amp; Live Location Telemetry"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="pref_enterprise_location_sharing_enabled"
+            app:title="Enable Enterprise Location Telemetry"
+            app:summary="Disabled by default. For corporate MDM asset tracking and physical threat correlation"
+            app:defaultValue="false"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreference
+            app:key="pref_attach_location_to_siem_alerts"
+            app:title="Attach Coordinates to SIEM Incidents"
+            app:summary="Includes GPS / Network latitude &amp; longitude in security incident logs for SOC triage"
+            app:defaultValue="false"
+            app:dependency="pref_enterprise_location_sharing_enabled"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_action_share_live_location"
+            app:title="Share Current Live Location"
+            app:summary="Instantly dispatch device GPS coordinates and maps link via share sheet"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

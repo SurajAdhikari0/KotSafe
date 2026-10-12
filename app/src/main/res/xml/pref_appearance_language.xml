@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_theme_language"
+        app:title="Appearance &amp; Language"
+        app:icon="@drawable/ic_cat_appearance"
+        app:iconSpaceReserved="true">
+
+        <DropDownPreference
+            app:key="theme_mode"
+            app:title="@string/theme_mode"
+            android:entries="@array/theme_mode_labels"
+            android:entryValues="@array/theme_mode"
+            app:icon="@drawable/ic_pref_theme"
+            app:iconSpaceReserved="true"
+            app:defaultValue="system"
+            app:useSimpleSummaryProvider="true" />
+
+        <Preference
+            app:key="app_language"
+            android:key="app_language"
+            app:title="@string/app_language"
+            app:summary="Choose application language with country flags"
+            app:icon="@drawable/ic_pref_language"
+            app:iconSpaceReserved="true"/>
+
+        <Preference
+            app:key="app_language_external"
+            app:title="@string/app_language"
+            app:isPreferenceVisible="false"
+            app:useSimpleSummaryProvider="true"
+            app:icon="@drawable/ic_pref_language"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

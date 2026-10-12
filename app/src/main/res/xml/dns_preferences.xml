@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:title="@string/dns_status_active"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="pref_dns_active_status"
+            app:title="@string/dns_server"
+            app:iconSpaceReserved="false"
+            app:icon="@drawable/ic_dns"
+            app:summary="@string/dns_mode_system" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="DNS Resolver Selection"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="system_dns"
+            android:title="@string/use_system_dns"
+            app:iconSpaceReserved="false"
+            app:summary="@string/use_system_dns_summary"
+            android:defaultValue="true" />
+
+        <Preference
+            app:key="pref_dns_presets"
+            app:title="@string/dns_preset_picker"
+            app:summary="@string/dns_preset_picker_summary"
+            app:iconSpaceReserved="false"
+            app:icon="@drawable/ic_pref_dns" />
+
+        <Preference
+            app:key="pref_dns_speed_test"
+            app:title="@string/dns_speed_test"
+            app:summary="@string/dns_speed_test_summary"
+            app:iconSpaceReserved="false"
+            app:icon="@drawable/ic_refresh" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Custom DNS Addresses"
+        app:iconSpaceReserved="false">
+
+        <EditTextPreference
+            app:key="dns_v4"
+            app:title="@string/ipv4_dns_server"
+            app:iconSpaceReserved="false"
+            app:defaultValue="1.1.1.1"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="dns_v6"
+            app:title="@string/ipv6_dns_server"
+            app:iconSpaceReserved="false"
+            app:defaultValue="2606:4700:4700::1111"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Encrypted DNS (RFC 8484 DoH)"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="pref_adblock_doh_enabled"
+            app:title="@string/pref_adblock_doh_title"
+            app:summary="@string/pref_adblock_doh_summary"
+            app:iconSpaceReserved="false"
+            app:defaultValue="false" />
+
+        <ListPreference
+            app:key="pref_adblock_doh_provider"
+            app:title="@string/pref_adblock_doh_provider_title"
+            app:entries="@array/doh_provider_names"
+            app:entryValues="@array/doh_provider_keys"
+            app:defaultValue="cloudflare"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"
+            app:dependency="pref_adblock_doh_enabled" />
+
+        <Preference
+            app:key="pref_dnscrypt_guide"
+            app:title="@string/dnscrypt_how_to"
+            app:summary="Step-by-step setup guide and security hardening"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

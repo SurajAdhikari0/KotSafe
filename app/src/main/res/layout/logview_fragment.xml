@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?android:attr/colorBackground">
+
+    <!-- Status / Verification Banner (Dynamic: App, Root, or MITM Addon) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_status_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/cardBorder"
+        app:cardBackgroundColor="?android:attr/colorBackgroundFloating">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/iv_status_icon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_pref_logs"
+                    app:tint="@color/colorPrimary"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_status_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="13sp"
+                        android:textColor="@color/metricTextPrimary"
+                        tools:text="App Log (kotsafe.log)" />
+
+                    <TextView
+                        android:id="@+id/tv_status_desc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:textSize="11sp"
+                        android:textColor="@color/metricTextSecondary"
+                        tools:text="Active log engine • 142 KB" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_status_action"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:minHeight="0dp"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="0dp"
+                    android:textSize="11sp"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="Setup Addon" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Controls Row: Parser Mode Selector (Parsed vs Raw) & Fast Actions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Mode Toggle Chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/mode_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mode_parsed"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Parsed"
+                android:checked="true"
+                android:textSize="11sp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mode_raw"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Raw Console"
+                android:textSize="11sp" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Stats Counter -->
+        <TextView
+            android:id="@+id/tv_log_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textSize="11sp"
+            android:textColor="@color/metricTextSecondary"
+            android:gravity="end"
+            tools:text="148 entries" />
+
+        <!-- Refresh Button -->
+        <ImageView
+            android:id="@+id/btn_action_refresh"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_refresh"
+            app:tint="@color/metricTextSecondary"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Refresh logs" />
+
+        <!-- Clear Button -->
+        <ImageView
+            android:id="@+id/btn_action_clear"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="4dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_cancel"
+            app:tint="@color/metricTextSecondary"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Clear log file" />
+
+        <!-- Copy All Button -->
+        <ImageView
+            android:id="@+id/btn_action_copy_all"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="4dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_content_copy_small"
+            app:tint="@color/metricTextSecondary"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Copy all visible logs" />
+    </LinearLayout>
+
+    <!-- Filter & Search Controls (Visible in Parsed Mode) -->
+    <LinearLayout
+        android:id="@+id/layout_filters_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="4dp">
+
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_badge_neutral"
+            android:paddingHorizontal="10dp"
+            android:layout_marginBottom="4dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_search"
+                app:tint="@color/metricTextSecondary"
+                android:contentDescription="@null" />
+
+            <EditText
+                android:id="@+id/search_log_input"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:hint="Search tag, keyword, or timestamp..."
+                android:textSize="12sp"
+                android:textColor="@color/metricTextPrimary"
+                android:textColorHint="@color/metricTextSecondary"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1" />
+
+            <ImageView
+                android:id="@+id/btn_clear_search_input"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_cancel"
+                android:visibility="gone"
+                app:tint="@color/metricTextSecondary"
+                android:contentDescription="Clear search" />
+        </LinearLayout>
+
+        <!-- Log Level Filter Chips -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/level_filter_chip_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_lvl_all"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All"
+                    android:checked="true"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_lvl_error"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Errors (🔴)"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_lvl_warn"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Warnings (🟡)"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_lvl_info"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Info (🔵)"
+                    android:textSize="11sp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_lvl_debug"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Debug (🟣)"
+                    android:textSize="11sp" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <!-- Main Content Frame: Parsed RecyclerView, Raw Monospace ScrollView, Empty State -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Parsed Mode: RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_log_entries"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            android:scrollbars="vertical"
+            tools:visibility="visible" />
+
+        <!-- Raw Mode: Monospace ScrollView -->
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="gone">
+
+            <TextView
+                android:id="@+id/log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:fontFamily="monospace"
+                android:textSize="12sp"
+                android:lineSpacingExtra="3dp"
+                android:textColor="@color/metricTextPrimary"
+                android:textIsSelectable="true"
+                tools:text="[I] 23/Sep/2026 20:26:45 - [CaptureService] Capture initialized" />
+        </ScrollView>
+
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/layout_empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/iv_empty_icon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/ic_text_snippet"
+                app:tint="@color/metricTextSecondary"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/tv_empty_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="15sp"
+                android:textColor="@color/metricTextPrimary"
+                android:text="No Log Entries Available" />
+
+            <TextView
+                android:id="@+id/tv_empty_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/metricTextSecondary"
+                android:text="No logs recorded yet or no events match current filters." />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

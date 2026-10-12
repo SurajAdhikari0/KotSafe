@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:key="cat_analytics_diagnostics"
+        app:title="Analytics &amp; Audit Logs"
+        app:icon="@drawable/ic_cat_analytics"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="pref_traffic_stats"
+            app:title="Traffic Statistics"
+            app:summary="View real-time protocol breakdowns, bandwidth graphs and traffic metrics"
+            app:icon="@drawable/ic_pref_stats"
+            app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="pref_enable_traffic_graphs"
+            app:title="@string/pref_enable_traffic_graphs_title"
+            app:summary="@string/pref_enable_traffic_graphs_summary"
+            app:icon="@drawable/ic_pref_traffic_graphs"
+            app:iconSpaceReserved="true"
+            app:defaultValue="true" />
+
+        <Preference
+            android:key="pref_app_log"
+            app:title="System &amp; Security Logs"
+            app:summary="Inspect system activity, security audit trail and debug logs"
+            app:icon="@drawable/ic_pref_logs"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="storage_management"
+            app:title="@string/storage_management"
+            app:summary="@string/storage_management_desc"
+            app:icon="@drawable/ic_pref_storage"
+            app:iconSpaceReserved="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,115 @@
+================================================================================
+KOTSAFE — FULL ADVANCED UNRESTRICTED (NON-PLAY STORE) EDITION
+ARCHITECTURAL SPECIFICATION & AI BUILD DIRECTIVE
+================================================================================
+Version: 2.0+ Enterprise / Full Security Edition
+Target: Power Users, Security Researchers, Enterprise Deployment, F-Droid / GitHub Direct
+Do NOT Restrict: This version is intentionally designed WITHOUT Google Play Store limitations.
+
+--------------------------------------------------------------------------------
+1. MISSION & SCOPE: WHY THIS IS THE FULL-PERMISSION VERSION
+--------------------------------------------------------------------------------
+Traditional Play Store network monitors and VPN apps are severely neutered by Google
+Play policies. Google Play strictly limits or outright forbids:
+  * System-wide cleartext inspection and transparent TLS decryption.
+  * Continuous background foreground-service operation without battery killing.
+  * Custom local CA root trust certificate generation and silent root injection.
+  * Direct P2P Exit Node proxying (routing arbitrary remote device traffic).
+  * System app whitelist bypasses, package inspection, and device-admin sensors.
+  * Direct raw socket manipulation, DNS sinkhole diversion, and packet dropping.
+
+This repository hosts the FULL, UNRESTRICTED, and ALL-CAPABILITIES edition.
+Every advanced security, cryptographic, AI intelligence, and network interception
+module is active and connected directly into the native packet processing core.
+
+--------------------------------------------------------------------------------
+2. ARCHITECTURE BREAKDOWN FOR DEVELOPERS AND AI AGENTS
+--------------------------------------------------------------------------------
+
+A. NATIVE PACKET PIPELINE (C / C++ / JNI)
+   Location: app/src/main/jni/ and submodules/ (libpcap, nDPI, zdtun, zstd)
+   * libzdtun.so: Zero-copy Virtual TUN interface driver bridging Linux TUN/TAP to Java.
+   * libcore.so: High-performance packet multiplexer and TCP/UDP reassembly engine.
+   * nDPI: Deep packet inspection engine identifying 300+ Layer 7 protocols in real time.
+   * Flow: Android VpnService fd -> zdtun -> core reassembler -> JNI callbacks into Java.
+
+B. AUTONOMOUS ON-DEVICE AI PROTECTION ENGINE
+   Location: app/src/main/java/com/kotsafe/security/ai/
+   * AiAccessController.java: Guardrail enforcing privacy and offline computation bounds.
+   * KnowledgeBase.java: Offline vector/rule repository of known threat behaviors and IOCs.
+   * OfflineKnowledgeEngine.java: Local heuristic scoring and neural decision model for
+     zero-day malicious traffic, anomalous beaconing, and C2 communication.
+   * AiConfig.java: Tuning parameters for threat detection sensitivity and alerts.
+
+C. ACTIVE INTRUSION PREVENTION SYSTEM (IPS) & MITIGATION
+   Location: app/src/main/java/com/kotsafe/security/ips/
+             app/src/main/java/com/kotsafe/security/decoders/
+             app/src/main/java/com/kotsafe/security/model/
+   * DnsSinkholeResponder.java: Intercepts DNS queries for known malicious, ad, or tracker
+     domains and crafts local sinkhole NXDOMAIN / 0.0.0.0 responses without contacting upstream.
+   * Ja3Fingerprinter.java: Extracts TLS Client Hello cipher suites and extensions to build
+     JA3/JA3S fingerprints, detecting malware even when encrypted.
+   * IpsEngine.java: Active packet firewall capable of real-time TCP RST and packet drops.
+   * TokenBucketRateLimiter.java: DoS and abnormal traffic burst rate limiting per-app.
+   * DomainSuffixTree.java: Ultra-fast O(K) lookup tree for millions of ad/malware domains.
+   * CorrelationEngine.java: Multi-factor incident correlation linking IP, port, app UID,
+     geolocation, and JA3 fingerprint into a single threat timeline.
+
+D. FULL TLS DECRYPTION & PROTOCOL INSPECTORS
+   Location: app/src/main/java/com/kotsafe/security/
+   * Built-in TLS Decryption: Intercepts TLS connections using dynamically generated
+     certificates signed by an in-app Root CA.
+   * Wire Decoders: Full support for HTTP/1.1, HTTP/2, gRPC, Protobuf, WebSockets, and DoH.
+   * CertificateEngine.java: Manages local CA root keypair and cert exports.
+
+E. P2P MESH TUNNEL & PERSONAL EXIT NODE SYSTEM
+   Location: app/src/main/java/com/kotsafe/security/p2p/
+             app/src/main/java/com/kotsafe/security/model/backend/
+             server_oracle_and_vps/
+             standalone_p2p_vpn_module/
+   * P2PExitNodeServer.java: Turns the Android device into an encrypted internet exit node.
+   * P2PTunnelCrypto.java / TunnelCipher.java: AES-256-GCM / ChaCha20-Poly1305 payload cipher.
+   * CustomHttpProvider.java: High-speed relay provider connecting to the Oracle / VPS relay.
+   * BufferedTunnelStream.java: Zero-copy circular buffer managing high-throughput streaming.
+   * BackendProviderFactory.java: Dynamic switching between Direct VPS, TURN, and Cloudflare.
+
+F. SYSTEM, DEVICE & PHYSICAL SECURITY SUBSYSTEM
+   Location: app/src/main/java/com/kotsafe/security/model/
+             app/src/main/java/com/kotsafe/security/security/
+   * AndroidBehaviorEngine.java: Real-time app behavior analysis (background exfiltration).
+   * AntivirusResponseEngine.java: Autonomous mitigation (block network, notify user, isolate).
+   * DeviceSecurityEngine.java: Root detection, SELinux status, tamper detection.
+   * PhysicalSecurityEngine.java: Sensor-based anti-theft and unauthorized physical access monitoring.
+   * PermissionRiskEngine.java: Static/dynamic permission audit for every installed package.
+
+--------------------------------------------------------------------------------
+3. INSTRUCTIONS FOR AI CODING AGENTS AND FUTURE DEVELOPERS
+--------------------------------------------------------------------------------
+When prompted to build, extend, refactor, or debug this project, ANY AI MUST FOLLOW THESE RULES:
+
+1. PRESERVE UNRESTRICTED PERMISSIONS:
+   * Do NOT remove permissions such as ACCESS_SUPERUSER, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+     SYSTEM_ALERT_WINDOW, READ_LOGS, or FOREGROUND_SERVICE from AndroidManifest.xml.
+   * Do NOT attempt to rewrite the code to comply with Google Play Developer Policies.
+     This project is distributed via GitHub Releases, F-Droid, and direct APK installation.
+
+2. MAINTAIN THREAD SAFETY & MEMORY LIMITS:
+   * Packet capture runs at multi-megabit speeds. Never allocate large objects inside packet
+     loops (such as CaptureService.handlePacket or zdtun callbacks).
+   * Use the thread-safe FIFO write queues in P2PExitNodeServer and BufferedTunnelStream.
+   * In Android, keep memory consumption under 256MB to avoid LowMemoryKiller (LMK) eviction.
+
+3. DUAL-MODE COMPATIBILITY:
+   * The app is designed to work in two modes:
+     a) Local Gateway / Firewall: Intercepting and securing the host device.
+     b) P2P Exit Node / Mesh Client: Proxying and tunneling traffic across remote peers.
+   * Ensure changes to CaptureService do not break the P2P relay loop or cause VPN routing loops.
+
+4. SERVER AGNOSTICISM:
+   * The backend server code in server_oracle_and_vps/ is 100% cloud-agnostic.
+   * It runs identically on Oracle Cloud, AWS, DigitalOcean, Hetzner, or a Raspberry Pi.
+   * The app communicates via standard HTTPS/WSS and JSON-RPC / binary protocol contracts.
+
+================================================================================
+END OF SPECIFICATION
+================================================================================

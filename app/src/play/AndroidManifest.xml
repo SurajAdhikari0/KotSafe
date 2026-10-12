@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Play Store Release Distribution Manifest Merger:
+         Strips broad file access (MANAGE_EXTERNAL_STORAGE) to adhere strictly to
+         Google Play Console policy scanner rules and prevent automated store rejection. -->
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:node="remove" />
+
+    <!-- Retains declared broad antivirus special-use read permission WITHOUT
+         maxSdkVersion="32" ceiling so openInputStream() succeeds on Android 13+ downloads. -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
+</manifest>

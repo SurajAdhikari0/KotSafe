@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <!-- KotSafe Redesign Top Brand Bar (Matches Day & Night Tactical Design) -->
+    <LinearLayout
+        android:id="@+id/top_brand_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="6dp"
+        android:background="@color/ks_ground">
+
+        <ImageView
+            android:id="@+id/toolbar_logo"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/kotsafe_logo"
+            android:contentDescription="@string/ks_cd_logo" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ks_app_name"
+                android:textSize="24sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/ks_ink"
+                android:includeFontPadding="false" />
+
+            <TextView
+                android:id="@+id/toolbar_status_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● IDLE"
+                android:textColor="@color/ks_accent"
+                android:layout_marginTop="2dp"
+                style="@style/KS.Label" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btn_account"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_user"
+            android:background="@drawable/ks_bg_btn_circle"
+            android:padding="11dp"
+            android:tint="@color/ks_ink"
+            android:contentDescription="@string/ks_cd_btn_account" />
+
+        <ImageButton
+            android:id="@+id/btn_stop"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_stop"
+            android:background="@drawable/ks_bg_btn_circle"
+            android:padding="11dp"
+            android:tint="@color/ks_danger"
+            android:contentDescription="@string/ks_cd_btn_stop"
+            android:visibility="gone"
+            android:layout_marginStart="8dp" />
+
+        <ImageButton
+            android:id="@+id/btn_more"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_more"
+            android:background="@drawable/ks_bg_btn_circle"
+            android:padding="11dp"
+            android:tint="@color/ks_ink"
+            android:contentDescription="@string/ks_cd_btn_more"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- KotSafe Redesign Segmented Pill Tab Bar -->
+    <LinearLayout
+        android:id="@+id/top_tabs_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="8dp"
+        android:background="@color/ks_ground">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            android:background="@drawable/ks_bg_tab_strip">
+
+            <TextView
+                android:id="@+id/tab_status"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/ks_tab_status"
+                android:textColor="@color/ks_tab_text"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:background="@drawable/ks_bg_tab"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tab_traffic"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/ks_tab_traffic"
+                android:textColor="@color/ks_tab_text"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:background="@drawable/ks_bg_tab"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/tab_switch_button"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_layers"
+            android:background="@drawable/ks_bg_btn_circle"
+            android:padding="11dp"
+            android:tint="@color/ks_accent"
+            android:contentDescription="@string/ks_cd_btn_switch_view"
+            android:layout_marginStart="10dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+    <!-- Hidden compatibility views for legacy framework bindings -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tablayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
+
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Cyber-Security Floating Bottom Navigation Dock -->
+    <FrameLayout
+        android:id="@+id/bottom_nav_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:strokeColor="@color/bottomNavBorder"
+            app:strokeWidth="1.2dp"
+            app:cardBackgroundColor="@color/bottomNavBg">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="62dp"
+                android:background="@android:color/transparent"
+                app:elevation="0dp"
+                app:itemActiveIndicatorStyle="@style/CustomBottomNavActiveIndicator"
+                app:itemIconSize="22dp"
+                app:itemIconTint="@color/bottom_nav_item_color"
+                app:itemTextColor="@color/bottom_nav_item_color"
+                app:itemTextAppearanceActive="@style/BottomNavTextActive"
+                app:itemTextAppearanceInactive="@style/BottomNavTextInactive"
+                app:itemRippleColor="@color/bottomNavIndicator"
+                app:labelVisibilityMode="labeled"
+                app:menu="@menu/bottom_nav_menu" />
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
+</LinearLayout>

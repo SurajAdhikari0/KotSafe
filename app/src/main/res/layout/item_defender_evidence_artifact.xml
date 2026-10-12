@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_investigation_card"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp">
+
+    <!-- Top Header: Icon + Title + Status Badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="6dp">
+
+        <TextView
+            android:id="@+id/tv_evidence_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌐"
+            android:textSize="14sp"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/tv_evidence_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="NETWORK EVIDENCE"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#F8FAFC"
+            android:letterSpacing="0.05"
+            tools:text="NETWORK EVIDENCE" />
+
+        <TextView
+            android:id="@+id/tv_evidence_status_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BLOCKED"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/badge_pill_bg"
+            app:backgroundTint="#F85149"
+            android:paddingHorizontal="6dp"
+            android:paddingVertical="2dp"
+            tools:ignore="SmallSp" />
+    </LinearLayout>
+
+    <!-- Evidence Content Box -->
+    <LinearLayout
+        android:id="@+id/ll_evidence_content_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#0A0F1D"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_evidence_line1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="#CBD5E1"
+            android:fontFamily="monospace"
+            tools:text="• Remote: android-safebrowsing.google.com:443" />
+
+        <TextView
+            android:id="@+id/tv_evidence_line2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textColor="#94A3B8"
+            android:fontFamily="monospace"
+            tools:text="• Protocol: TCP / DNS Tunneling Heuristic" />
+
+        <TextView
+            android:id="@+id/tv_evidence_line3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textColor="#38BDF8"
+            android:fontFamily="monospace"
+            tools:text="• Metric: Shannon Entropy 3.62 (DGA Anomaly)" />
+
+        <TextView
+            android:id="@+id/tv_evidence_line4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="11sp"
+            android:textColor="#3FB950"
+            android:fontFamily="monospace"
+            tools:text="• Action: 0 Bytes Exfiltrated (Dropped by Kernel)" />
+    </LinearLayout>
+</LinearLayout>

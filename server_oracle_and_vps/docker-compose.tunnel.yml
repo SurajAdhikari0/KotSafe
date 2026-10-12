@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  signaling-server:
+    build: ./signaling-server
+    container_name: kotsafe-signaling
+    restart: unless-stopped
+    environment:
+      - PORT=8081
+      - SHARED_SECRET=${SHARED_SECRET}
+      - PAIRING_TTL_SECONDS=${PAIRING_TTL_SECONDS:-86400}
+    expose:
+      - "8081"
+
+  # Cloudflare Tunnel container (zero port-forwarding, automatic HTTPS/WSS)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: kotsafe-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - signaling-server

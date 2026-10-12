@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 🔍 SEARCH BAR (Instant Search Across All Settings) -->
+    <Preference
+        android:key="pref_search_settings"
+        app:title="Search Settings &amp; Features"
+        app:summary="Quickly find firewall rules, AI defense, DNS, proxies &amp; options"
+        app:icon="@drawable/ic_pref_search"
+        app:iconSpaceReserved="true" />
+
+    <!-- KotSafe Shield -->
+    <Preference
+        android:key="kotsafe_shield_settings"
+        app:key="kotsafe_shield_settings"
+        app:title="KotSafe Shield"
+        app:summary="Auto-Pilot safety, background real-time defense &amp; auto-protection"
+        app:icon="@drawable/ic_shield"
+        app:iconSpaceReserved="true" />
+
+    <!-- Advanced & Developer Mode -->
+    <Preference
+        android:key="advanced_developer_settings"
+        app:key="advanced_developer_settings"
+        app:title="Advanced &amp; Developer Mode"
+        app:summary="Deep packet capture, TLS decryption, Wireshark &amp; developer tools"
+        app:icon="@drawable/ic_pref_wizard"
+        app:iconSpaceReserved="true" />
+
+    <!-- AI & Autonomous Cyber Defense -->
+    <Preference
+        android:key="ai_autonomous_settings"
+        app:key="ai_autonomous_settings"
+        app:title="AI &amp; Autonomous"
+        app:summary="AI security engine, Threat Intel APIs, AV scan &amp; quarantine vault"
+        app:icon="@drawable/ic_cat_ai"
+        app:iconSpaceReserved="true" />
+
+    <!-- Firewall & Access Control -->
+    <Preference
+        android:key="firewall_access_settings"
+        app:key="firewall_access_settings"
+        app:title="Firewall &amp; Access Control"
+        app:summary="App firewall rules, domain ACLs, anti-theft &amp; Wi-Fi defense"
+        app:icon="@drawable/ic_cat_firewall"
+        app:iconSpaceReserved="true" />
+
+    <!-- Capture Engine & Interfaces -->
+    <Preference
+        android:key="capture_engine_settings"
+        app:key="capture_engine_settings"
+        app:title="Capture Engine and Interface"
+        app:summary="Next-Gen KotEngine, root capture, DNS servers, tracker shield &amp; boot triggers"
+        app:icon="@drawable/ic_cat_capture"
+        app:iconSpaceReserved="true" />
+
+    <!-- Streaming Proxy & Mesh -->
+    <Preference
+        android:key="streaming_proxy_settings"
+        app:key="streaming_proxy_settings"
+        app:title="Streaming Proxy"
+        app:summary="Personal gateway, P2P exit nodes, SOCKS5 &amp; live PCAP exporter"
+        app:icon="@drawable/ic_cat_streaming"
+        app:iconSpaceReserved="true" />
+
+    <!-- Backup & Restore -->
+    <Preference
+        android:key="backup_restore_settings"
+        app:key="backup_restore_settings"
+        app:title="Backup &amp; Restore"
+        app:summary="Export &amp; import configurations, PCAPNG format, prefix &amp; logs"
+        app:icon="@drawable/ic_cat_backup"
+        app:iconSpaceReserved="true" />
+
+    <!-- Analytics -->
+    <Preference
+        android:key="analytics_logs_settings"
+        app:key="analytics_logs_settings"
+        app:title="Analytics"
+        app:summary="Live telemetry statistics, bandwidth wave graphs, logs &amp; storage"
+        app:icon="@drawable/ic_cat_analytics"
+        app:iconSpaceReserved="true" />
+
+    <!-- Appearance and Language -->
+    <Preference
+        android:key="appearance_language_settings"
+        app:key="appearance_language_settings"
+        app:title="Appearance and Language"
+        app:summary="Dark/Light theme modes, language localization &amp; UI settings"
+        app:icon="@drawable/ic_cat_appearance"
+        app:iconSpaceReserved="true" />
+
+</PreferenceScreen>

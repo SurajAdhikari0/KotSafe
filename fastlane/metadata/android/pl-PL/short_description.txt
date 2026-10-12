@@ -1,0 +1,1 @@
+Monitor sieci, zapora i zrzut PCAP dla Androida, bez roota

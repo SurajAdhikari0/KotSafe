@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2026 KotSafe Cyber Security Project
+  -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        app:title="Privacy &amp; Tracker Protection"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="pref_adblock_enabled"
+            app:title="@string/pref_adblock_master_title"
+            app:summary="@string/pref_adblock_master_summary"
+            app:iconSpaceReserved="false"
+            app:defaultValue="false" />
+
+        <SwitchPreference
+            app:key="pref_adblock_auto_update"
+            app:title="@string/pref_adblock_auto_update_title"
+            app:summary="@string/pref_adblock_auto_update_summary"
+            app:iconSpaceReserved="false"
+            app:dependency="pref_adblock_enabled"
+            app:defaultValue="true" />
+
+        <Preference
+            app:key="pref_adblock_update_now"
+            app:title="@string/pref_adblock_update_now_title"
+            app:summary="@string/pref_adblock_update_now_summary"
+            app:iconSpaceReserved="false"
+            app:dependency="pref_adblock_enabled" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Blocklist Subscriptions"
+        app:iconSpaceReserved="false">
+
+        <MultiSelectListPreference
+            app:key="pref_adblock_active_feeds"
+            app:title="@string/pref_adblock_subscriptions_title"
+            app:summary="@string/pref_adblock_subscriptions_summary"
+            app:entries="@array/adblock_feed_names"
+            app:entryValues="@array/adblock_feed_ids"
+            app:defaultValue="@array/adblock_default_feed_ids"
+            app:iconSpaceReserved="false"
+            app:dependency="pref_adblock_enabled" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Encrypted DNS (RFC 8484)"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="pref_adblock_doh_enabled"
+            app:title="@string/pref_adblock_doh_title"
+            app:summary="@string/pref_adblock_doh_summary"
+            app:iconSpaceReserved="false"
+            app:defaultValue="false" />
+
+        <ListPreference
+            app:key="pref_adblock_doh_provider"
+            app:title="@string/pref_adblock_doh_provider_title"
+            app:entries="@array/doh_provider_names"
+            app:entryValues="@array/doh_provider_keys"
+            app:defaultValue="cloudflare"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false"
+            app:dependency="pref_adblock_doh_enabled" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="Custom Rules"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            app:key="pref_adblock_manage_whitelist"
+            app:title="@string/pref_adblock_whitelist_title"
+            app:summary="@string/pref_adblock_whitelist_summary"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="pref_adblock_manage_blacklist"
+            app:title="@string/pref_adblock_blacklist_title"
+            app:summary="@string/pref_adblock_blacklist_summary"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,0 +1,3 @@
+http://130.210.16.110, http://:80 {
+    reverse_proxy signaling-server:8081
+}
