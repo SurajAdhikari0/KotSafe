@@ -14,7 +14,53 @@
   <a href="#-turnkey-server-deployment"><img src="https://img.shields.io/badge/Mesh%20Relay-Oracle%20Cloud%20%2F%20VPS%20Ready-blue.svg" alt="VPS Ready" /></a>
   <a href="#-privacy--zero-telemetry-guarantee"><img src="https://img.shields.io/badge/Privacy-100%25%20On--Device-success.svg" alt="100% On-Device" /></a>
   <a href="#-offline-ai-assistant"><img src="https://img.shields.io/badge/AI-Offline%20Neural%20Core-purple.svg" alt="Offline AI" /></a>
+  <a href="https://github.com/SurajAdhikari0/KotSafe/releases/latest"><img src="https://img.shields.io/github/v/release/SurajAdhikari0/KotSafe?label=Download%20APK&color=green&logo=android" alt="Download APK" /></a>
 </p>
+
+---
+
+## 📥 Direct APK Downloads
+
+You can download official signed KotSafe APK binaries directly from GitHub Releases:
+
+<p align="center">
+  <a href="https://github.com/SurajAdhikari0/KotSafe/releases/latest/download/KotSafe-fullPower-release.apk">
+    <img src="https://img.shields.io/badge/Download-KotSafe%20Full--Power%20(Recommended)-red?style=for-the-badge&logo=android&logoColor=white" alt="Download KotSafe Full-Power" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/SurajAdhikari0/KotSafe/releases/latest/download/KotSafe-standard-release.apk">
+    <img src="https://img.shields.io/badge/Download-KotSafe%20Standard-blue?style=for-the-badge&logo=android&logoColor=white" alt="Download KotSafe Standard" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/SurajAdhikari0/KotSafe/releases/latest"><b>👉 Browse All Releases, Debug Builds & Release Notes on GitHub</b></a>
+</p>
+
+### ⚖️ Edition Comparison & Differentiation
+
+Choose the edition that best matches your security posture and device requirements:
+
+| Security Capability | ⚡ Standard Edition (`standard`) | 🛡️ Full-Power Edition (`fullPower`) |
+| :--- | :---: | :---: |
+| **Intelligent No-Root Packet Firewall & NAC** | ✅ Full | ✅ Full |
+| **Offline Neural AI Assistant (Qwen / SmolLM)** | ✅ Full | ✅ Full |
+| **P2P Encrypted Mesh Tunneling & Exit Nodes** | ✅ Full | ✅ Full |
+| **SOCKS5 & Transparent Smart Proxy Router** | ✅ Full | ✅ Full |
+| **DoH / DNSCrypt Sinkhole Engine** | ✅ Full | ✅ Full |
+| **TLS 1.3 / HTTPS Wire Decryption & PCAP Dump** | ✅ Full | ✅ Full |
+| **Pre-Install APK Inspector & Sideload Sandbox** | ❌ *(Omitted)* | ✅ **Active** (`REQUEST_INSTALL_PACKAGES`) |
+| **Browser Address Bar Real-Time Phishing Guard** | ❌ *(Omitted)* | ✅ **Active** (`BrowserAccessibilityService`) |
+| **Notification & SMS Smishing/Link Protector** | ❌ *(Omitted)* | ✅ **Active** (`PhishingNotificationListener`) |
+| **Anti-Snooping Screen Overlay (`FLAG_SECURE`)** | ❌ *(Omitted)* | ✅ **Active** (`ScreenshotBlockOverlayService`) |
+| **Enterprise Work Profile Isolation** | ❌ *(Omitted)* | ✅ **Active** (`INTERACT_ACROSS_USERS`) |
+| **Deep Storage Threat & Forensics Scanner** | ❌ *(Scoped)* | ✅ **Active** (`MANAGE_EXTERNAL_STORAGE`) |
+| **Recommended Target** | General users, baseline permission devices | Power users, security researchers, enterprise defense |
+
+> [!TIP]
+> **Which edition should I choose?**
+> * **Download Full-Power (Recommended)** if you want complete, uncompromised endpoint protection without Play Store restrictions — including real-time browser URL phishing blocking, SMS malicious link detection, APK installer scanning before installation, and screenshot snooping protection.
+> * **Download Standard** if you only require the core packet firewall, VPN tunneling, DNS filtering, and offline AI assistant using standard, minimal Android permissions.
 
 ---
 
@@ -145,11 +191,13 @@ KotSafe/
 git clone --recursive https://github.com/SurajAdhikari0/KotSafe.git
 cd KotSafe
 
-# Compile debug APK:
+# Compile Standard Edition APK:
 ./gradlew assembleStandardDebug
+# Output: app/build/outputs/apk/standard/debug/KotSafe-standard-debug.apk
 
-# Output artifact:
-# app/build/outputs/apk/standard/debug/KotSafe-standard-debug.apk
+# Compile Full-Power Edition APK:
+./gradlew assembleFullPowerDebug
+# Output: app/build/outputs/apk/fullPower/debug/KotSafe-fullPower-debug.apk
 ```
 
 ---
