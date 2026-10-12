@@ -169,9 +169,9 @@ cd KotSafe
 
 ---
 
-## 📜 License & Legal Attribution
+## 📜 License
 
 KotSafe is free software distributed under the **GNU General Public License v3.0**. See the complete [LICENSE](LICENSE) file for terms and conditions.
 
-* KotSafe incorporates clean-room network packet capture capabilities building upon PCAPdroid (GPL-3.0 by Emanuele Faranda), significantly extended with sovereign P2P mesh networking, zero-trust kernel firewall, on-device offline AI heuristics, and MITRE threat defense by Suraj Adhikari.
+Copyright (c) 2026 Suraj Adhikari. All rights reserved.
 
