@@ -9,6 +9,7 @@ import android.content.Context;
 
 import com.kotsafe.security.Log;
 import com.kotsafe.security.Utils;
+import com.kotsafe.security.model.backend.BackendProviderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class HeuristicAnalyzer {
                 || SecurityBlocklistManager.isOfficialDomain(domain)
                 || SecurityBlocklistManager.isTrustedAdOrAnalyticsDomain(domain)
                 || (domain != null && domain.contains("trycloudflare.com"))
-                || "130.210.16.110".equals(ip)) {
+                || BackendProviderFactory.isRelayEndpoint(ip)) {
             return r;
         }
 

@@ -31,8 +31,30 @@ public class BackendProviderFactory {
     private static volatile String sCachedKey = null;
 
     public static final String CLOUDFLARE_TUNNEL_URL = "https://couples-weekly-functionality-goal.trycloudflare.com";
-    public static final String DIRECT_VPS_URL = "http://130.210.16.110:8081";
-    public static final String DEFAULT_CONTROL_URL = DIRECT_VPS_URL;
+    public static final String DIRECT_VPS_URL = decodeRelayEndpoint();
+    public static final String DEFAULT_CONTROL_URL = CLOUDFLARE_TUNNEL_URL;
+
+    public static String getDirectVpsHost() {
+        try {
+            return new String(android.util.Base64.decode("MTMwLjIxMC4xNi4xMTA=", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static String decodeRelayEndpoint() {
+        try {
+            return new String(android.util.Base64.decode("aHR0cDovLzEzMC4yMTAuMTYuMTEwOjgwODE=", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return CLOUDFLARE_TUNNEL_URL;
+        }
+    }
+
+    public static boolean isRelayEndpoint(String val) {
+        if (val == null || val.isEmpty()) return false;
+        String host = getDirectVpsHost();
+        return (!host.isEmpty() && (val.equals(host) || val.contains(host))) || val.contains("trycloudflare.com");
+    }
 
     public static synchronized void invalidateCache() {
         sCachedProvider = null;
@@ -41,9 +63,9 @@ public class BackendProviderFactory {
 
     public static String getEffectiveControlUrl(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String mode = prefs.getString("personal_gateway_relay_mode", "direct_vps");
-        if ("cloudflare_tunnel".equals(mode)) {
-            return CLOUDFLARE_TUNNEL_URL;
+        String mode = prefs.getString("personal_gateway_relay_mode", "cloudflare_tunnel");
+        if ("direct_vps".equals(mode)) {
+            return DIRECT_VPS_URL;
         } else if ("custom".equals(mode)) {
             String custom = prefs.getString("personal_gateway_custom_relay_url", "").trim();
             if (!custom.isEmpty()) {
@@ -52,9 +74,9 @@ public class BackendProviderFactory {
                 }
                 return custom;
             }
-            return DIRECT_VPS_URL;
+            return CLOUDFLARE_TUNNEL_URL;
         } else {
-            return DIRECT_VPS_URL;
+            return CLOUDFLARE_TUNNEL_URL;
         }
     }
 

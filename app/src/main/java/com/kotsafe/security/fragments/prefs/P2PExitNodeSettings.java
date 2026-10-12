@@ -650,10 +650,8 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
 
             SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(safeContext);
             if (bundle.controlUrl != null && !bundle.controlUrl.isEmpty()) {
-                if (bundle.controlUrl.contains("130.210.16.110")) {
-                    p.edit().putString("personal_gateway_relay_mode", "direct_vps").apply();
-                } else if (bundle.controlUrl.contains("trycloudflare.com")) {
-                    p.edit().putString("personal_gateway_relay_mode", "cloudflare_tunnel").apply();
+                if (BackendProviderFactory.isRelayEndpoint(bundle.controlUrl)) {
+                    p.edit().putString("personal_gateway_relay_mode", bundle.controlUrl.contains("trycloudflare.com") ? "cloudflare_tunnel" : "direct_vps").apply();
                 } else {
                     p.edit().putString("personal_gateway_relay_mode", "custom")
                             .putString("personal_gateway_custom_relay_url", bundle.controlUrl)

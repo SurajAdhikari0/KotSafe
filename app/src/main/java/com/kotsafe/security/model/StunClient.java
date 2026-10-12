@@ -41,12 +41,12 @@ public class StunClient {
     private static final int STUN_BINDING_REQUEST = 0x0001;
     private static final int STUN_BINDING_RESPONSE = 0x0101;
 
-    // Public reliable STUN servers (including our Oracle Coturn STUN)
+    // Public reliable STUN servers for NAT hole punching
     private static final String[] STUN_SERVERS = {
-            "130.210.16.110:3478",
+            "stun.cloudflare.com:3478",
             "stun.l.google.com:19302",
             "stun1.l.google.com:19302",
-            "stun.cloudflare.com:3478"
+            "stun2.l.google.com:19302"
     };
 
     private static final ExecutorService sExecutor = Executors.newSingleThreadExecutor();

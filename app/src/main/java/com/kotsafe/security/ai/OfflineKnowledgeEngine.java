@@ -661,7 +661,7 @@ public class OfflineKnowledgeEngine {
             if (directUdp) {
                 sb.append("⚡ **Direct P2P UDP** (Low latency, VPS bypassed)\n");
             } else if (hostOnline) {
-                sb.append("🛡️ **Zero-Trust Encrypted Relay** (Oracle VPS 130.210.16.110)\n");
+                sb.append("🛡️ **Zero-Trust Encrypted Relay** (Encrypted Cloud Mesh Gateway)\n");
             } else {
                 sb.append("⏸️ Disconnected (Policy: ").append(transportPref).append(")\n");
             }

@@ -14,6 +14,7 @@ import com.kotsafe.security.Utils;
 import com.kotsafe.security.decoders.Ja3Fingerprinter;
 import com.kotsafe.security.model.WebCategoryEngine;
 import com.kotsafe.security.model.UnifiedIncidentTimeline;
+import com.kotsafe.security.model.backend.BackendProviderFactory;
 
 /**
  * Always-on network security monitor.
@@ -99,7 +100,7 @@ public class NetworkSecurityMonitor {
                 || "com.kotsafe.security".equals(packageName)
                 || (appName != null && (appName.startsWith("[P2P Remote:") || appName.startsWith("[P2P Decrypted:")))
                 || (domain != null && domain.contains("trycloudflare.com"))
-                || "130.210.16.110".equals(ip);
+                || BackendProviderFactory.isRelayEndpoint(ip);
 
         try {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);

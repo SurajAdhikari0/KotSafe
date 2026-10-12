@@ -447,7 +447,7 @@ public class SecurityBlocklistManager {
                 // DNS resolvers
                 "1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4", "9.9.9.9", "149.112.112.112",
                 // KotSafe VPS relay
-                "130.210.16.110",
+                com.kotsafe.security.model.backend.BackendProviderFactory.getDirectVpsHost(),
                 // Meta / WhatsApp well-known IPs (sample anchors for the CIDR ranges)
                 "31.13.64.1", "31.13.65.1", "31.13.66.1", "31.13.68.1", "31.13.69.1",
                 "31.13.70.1", "31.13.71.1", "31.13.72.1", "31.13.73.1", "31.13.74.1",
@@ -802,7 +802,7 @@ public class SecurityBlocklistManager {
         }
 
         // 0.1 Authorized P2P Infrastructure (Direct VPS IP, Cloudflare Tunnel & Configured Relay Host)
-        if ("130.210.16.110".equals(val) || val.contains("130.210.16.110") || val.contains("trycloudflare.com")) {
+        if (com.kotsafe.security.model.backend.BackendProviderFactory.isRelayEndpoint(val)) {
             return true;
         }
         try {

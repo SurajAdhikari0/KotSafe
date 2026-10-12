@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.kotsafe.security.Log;
+import com.kotsafe.security.model.backend.BackendProviderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,7 +209,7 @@ public class SecurityRulesDb extends SQLiteOpenHelper {
         if (clean.equals("127.0.0.1") || clean.equalsIgnoreCase("localhost")
                 || clean.equals("8.8.8.8") || clean.equals("8.8.4.4")
                 || clean.equals("1.1.1.1") || clean.equals("1.0.0.1")
-                || clean.equals("130.210.16.110")) {
+                || clean.equals(BackendProviderFactory.getDirectVpsHost())) {
             Log.w(TAG, "Prevented recorded block rule for critical DNS / Loopback / P2P Relay IP: " + clean);
             return -1;
         }

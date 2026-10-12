@@ -12,7 +12,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">127.0.0.1</domain>
         <domain includeSubdomains="false">localhost</domain>
-        <domain includeSubdomains="false">130.210.16.110</domain>
     </domain-config>
 
     <!-- Allow user certificates (e.g. proxy/testing CAs) only in debug builds -->
