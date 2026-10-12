@@ -221,6 +221,20 @@ cd KotSafe
 
 ---
 
+## 🤝 Contributing & Security Research
+
+KotSafe is a community-driven, sovereign mobile security project. We actively welcome and invite **security researchers, malware analysts, reverse engineers, cryptographers, and network engineers** to collaborate and contribute:
+
+### 🛡️ Areas Where Security Researchers Can Help:
+* **Malware Indicators & C2 Patterns**: Contribute known command-and-control (C2) domains, IP blocklists, and anomalous beaconing signatures.
+* **JA3 / JA3S TLS Fingerprints**: Expand the built-in JA3 database to detect mobile banking trojans, spyware, and evasive C2 implants.
+* **Protocol Parsers & Wire Decoders**: Help improve dissection of HTTP/2, HTTP/3 (QUIC), gRPC, DoH, and proprietary IoT telemetry protocols.
+* **Zero-Trust & Kernel Hardening**: Audit the native C++/JNI packet engine (KotEngine), memory safety, and VPN routing boundary checks.
+* **AI & Heuristic Triage**: Refine on-device neural prompts and heuristic scoring models to reduce false positives in enterprise workflows.
+* **Vulnerability Disclosure & Bug Reports**: Discovered a security flaw or edge-case bug? Please report it via [GitHub Issues](https://github.com/SurajAdhikari0/KotSafe/issues) or submit a Pull Request.
+
+---
+
 ## 👤 Author & Project Maintainer
 
 * **Suraj Adhikari** — Founder, Lead Architect & Security Systems Engineer
@@ -228,13 +242,11 @@ cd KotSafe
 
 ---
 
-## 📜 License & Intellectual Property
+## 📜 License
 
-KotSafe is free software distributed under the **GNU General Public License v3.0**. See the complete [LICENSE](LICENSE) file for terms and conditions.
+KotSafe is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version (GPLv3+)**.
 
-* **Client Application**: Released under GNU GPLv3 for public transparency and community defense.
-* **P2P Engine & Backend Relay Infrastructure**: All backend signaling, Coturn STUN/TURN traversal configurations, and enterprise SOC integrations are proprietary assets owned exclusively by Suraj Adhikari.
-* **Commercial Enterprise Licensing**: Custom enterprise deployments, private fleet relays, and closed-source modifications require a separate Commercial License from the author.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [GNU General Public License (LICENSE)](LICENSE) for full details.
 
 Copyright (c) 2026 Suraj Adhikari. All rights reserved.
 
