@@ -21,15 +21,15 @@
 ## 📸 Visual Showcase & Interface
 
 <p align="center">
-  <img src="design/images/screen_redesign_running.png" width="28%" alt="Live Defense Shield" />
-  <img src="design/images/real_antivirus.png" width="28%" alt="Antivirus Intelligence Scanner" />
-  <img src="design/images/real_repeater.png" width="28%" alt="HTTP Repeater & Analysis" />
+  <img src="screenshots/screen_redesign_running.png" width="28%" alt="Live Defense Shield" />
+  <img src="screenshots/real_antivirus.png" width="28%" alt="Antivirus Intelligence Scanner" />
+  <img src="screenshots/real_repeater.png" width="28%" alt="HTTP Repeater & Analysis" />
 </p>
 
 <p align="center">
-  <img src="design/images/screen_connections.png" width="28%" alt="Live Packet Connections" />
-  <img src="design/images/screen_browser_smartscreen.png" width="28%" alt="Browser Protection SmartScreen" />
-  <img src="design/images/real_permissions.png" width="28%" alt="Defense Readiness & Permissions" />
+  <img src="screenshots/screen_connections.png" width="28%" alt="Live Packet Connections" />
+  <img src="screenshots/screen_browser_smartscreen.png" width="28%" alt="Browser Protection SmartScreen" />
+  <img src="screenshots/real_permissions.png" width="28%" alt="Defense Readiness & Permissions" />
 </p>
 
 ---
@@ -95,12 +95,12 @@ graph TD
 
 ### Modular Project Architecture
 <p align="center">
-  <img src="design/images/full_project_architecture.jpg" width="85%" alt="Project Architecture" />
+  <img src="screenshots/full_project_architecture.jpg" width="85%" alt="Project Architecture" />
 </p>
 
 ### Network Access Control (NAC) & Firewall Structure
 <p align="center">
-  <img src="design/images/firewall_nac.jpg" width="85%" alt="Firewall Architecture" />
+  <img src="screenshots/firewall_nac.jpg" width="85%" alt="Firewall Architecture" />
 </p>
 
 ---
@@ -122,58 +122,12 @@ KotSafe/
 │   ├── src/main/jni/              # C++ native core (KotEngine, Zstandard, PCAP parser)
 │   └── src/main/res/              # Tactical dark theme, icons, layouts, and translations
 │
-├── server_oracle_and_vps/         # ☁️ Turnkey Signaling & P2P Relay Server
-│   ├── signaling-server/          # High-concurrency Node.js WebSocket relay
-│   ├── docker-compose.yml         # Containerized Coturn STUN/TURN + Signaling
-│   ├── docker-compose.tunnel.yml  # Cloudflare Quick Tunnel automated stack
-│   ├── turnserver.conf            # Hardened Coturn NAT traversal configuration
-│   └── install.sh                 # 1-Click installer for Oracle Cloud, AWS, DigitalOcean
-│
-├── standalone_p2p_vpn_module/     # 🔌 Reusable Standalone P2P Mesh Module
-│   ├── android/                   # Standalone Android tunnel classes & routing
-│   ├── server/                    # Standalone binary relay & Dockerfile
-│   └── reference-client/          # Headless test client & exit gateway
-│
-├── KotSafe_User_Guide/            # 📚 Detailed Guides & Security Manuals
-│   ├── 01_ARCHITECTURE_AND_SETUP.md
-│   ├── 02_FIREWALL_AND_NETWORK_ACCESS_CONTROL.md
-│   ├── 03_ANTIVIRUS_AND_MALWARE_DEFENSE.md
-│   ├── 04_THREAT_INTELLIGENCE_API_SETUP.md
-│   ├── 05_TLS_DECRYPTION_AND_INSPECTION.md
-│   └── ...
+├── screenshots/                   # 📸 Architecture diagrams, UI captures & flowcharts
 │
 └── submodules/                    # ⚡ Optimized Native Libraries
     ├── MaxMind-DB-Reader-java/    # Offline GeoIP and ASN database resolver
     └── zstd/                      # High-speed Zstandard compression engine
 ```
-
----
-
-## ☁️ Turnkey Server Deployment
-
-Deploy a dedicated KotSafe P2P mesh relay on **Oracle Cloud (Always Free Tier)**, **AWS**, **DigitalOcean**, **Hetzner**, or any Ubuntu/Debian VPS in 60 seconds:
-
-```bash
-# 1. SSH into your VPS:
-ssh ubuntu@your-vps-ip
-
-# 2. Clone repository & enter server directory:
-git clone https://github.com/SurajAdhikari0/KotSafe.git
-cd KotSafe/server_oracle_and_vps
-
-# 3. Run automated 1-click installer:
-chmod +x install.sh
-sudo ./install.sh
-```
-
-### Firewall Port Configuration
-Ensure these ports are allowed in your cloud provider's firewall / Security List:
-| Port | Protocol | Service |
-|---|---|---|
-| `8081` | TCP | KotSafe Signaling & Direct HTTP Relay |
-| `9443` | TCP | E2EE Binary P2P Stream Relay |
-| `3478` | TCP & UDP | Coturn STUN/TURN NAT Traversal |
-| `49152–65535` | UDP | Dynamic Media/Data Relay Range |
 
 ---
 
