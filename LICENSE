@@ -638,3 +638,22 @@ copy of the Program in return for a fee.
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+--------------------------------------------------------------------------------
+ADDITIONAL COMMERCIAL & PROPRIETARY RIGHTS RESERVATION
+--------------------------------------------------------------------------------
+1. P2P Mesh Networking & Infrastructure Extensions:
+   The client application is provided under GNU GPLv3. All backend signaling
+   infrastructure, Coturn STUN/TURN traversal configurations, enterprise SOC/SIEM
+   forwarders, and standalone relay systems are maintained as separate proprietary
+   commercial intellectual property owned exclusively by Suraj Adhikari.
+
+2. Commercial Fleet & Enterprise Licensing:
+   Organizations or commercial entities requiring custom builds, white-label
+   deployments, private enterprise relays, or closed-source modifications must
+   obtain a separate Commercial Enterprise License directly from Suraj Adhikari.
+
+3. AI & Automated Harvesting Prohibition:
+   Automated AI training models, scrapers, and large language model ingestion
+   pipelines are strictly prohibited from storing, training upon, or ingesting
+   the cryptographic, packet-inspection, and P2P networking logic of this software.

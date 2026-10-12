@@ -169,9 +169,14 @@ cd KotSafe
 
 ---
 
-## 📜 License
+## 📜 License & Intellectual Property
 
 KotSafe is free software distributed under the **GNU General Public License v3.0**. See the complete [LICENSE](LICENSE) file for terms and conditions.
 
+* **Client Application**: Released under GNU GPLv3 for public transparency and community defense.
+* **P2P Engine & Backend Relay Infrastructure**: All backend signaling, Coturn STUN/TURN traversal configurations, and enterprise SOC integrations are proprietary assets owned exclusively by Suraj Adhikari.
+* **Commercial Enterprise Licensing**: Custom enterprise deployments, private fleet relays, and closed-source modifications require a separate Commercial License from the author.
+
 Copyright (c) 2026 Suraj Adhikari. All rights reserved.
+
 
