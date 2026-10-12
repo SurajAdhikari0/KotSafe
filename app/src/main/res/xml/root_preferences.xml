@@ -66,6 +66,15 @@
         app:icon="@drawable/ic_cat_streaming"
         app:iconSpaceReserved="true" />
 
+    <!-- License & Activation -->
+    <Preference
+        android:key="activation_license_settings"
+        app:key="activation_license_settings"
+        app:title="License Activation"
+        app:summary="Manage KotSafe Pro entitlement, device activation &amp; license status"
+        app:icon="@drawable/ic_shopping_cart"
+        app:iconSpaceReserved="true" />
+
     <!-- Backup & Restore -->
     <Preference
         android:key="backup_restore_settings"

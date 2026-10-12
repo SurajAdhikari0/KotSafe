@@ -103,6 +103,8 @@ public class OfflineKnowledgeEngine {
             answer = getDdnsSetupGuide(context);
         } else if (matches(q, "home router", "connect to home router", "connect home router", "router proxy", "route through router", "route to router", "connect router", "socks5 router", "router socks5", "connect to router", "route to home", "connect to home", "connect home", "use home wifi", "home wifi outside", "out of station", "tunnel to home", "route through home", "home network", "route traffic from router", "traffic through router", "traffic through home")) {
             answer = getHomeRouterProxyResponse(context, userQuery);
+        } else if (matches(q, "p2p", "exit node", "gateway mode", "personal gateway", "peer to peer", "mesh tunnel", "hole punch", "pairing bundle", "direct punch", "app routing", "kill switch", "tunnel cipher", "diagnos", "diagnose")) {
+            answer = getP2PComprehensiveResponse(context, q);
         } else if (matches(q, "slow", "speed", "lag", "latency", "ping", "internet slow", "slow internet", "wifi slow", "slow connection", "why slow")) {
             answer = getNetworkPerformanceGuide(context);
         } else if (matches(q, "battery", "drain", "power", "battery usage", "consumes battery", "battery drain", "battery drain fast")) {
@@ -113,8 +115,6 @@ public class OfflineKnowledgeEngine {
             answer = getAboutKotSafeGuide(context);
         } else if (matches(q, "tailscale", "mesh vpn", "wireguard", "private vpn", "netguard", "local firewall", "shadowsocks", "v2ray", "v2rayng", "proxy client", "adguard", "ad blocking firewall", "adguard mode", "netguard mode", "tailscale mode", "uptailscale", "architecture mode", "operating mode", "authentication on setup", "always use authentication", "use authentication", "require authentication", "auth setup")) {
             answer = getCoreArchitectureModesGuide(context, userQuery);
-        } else if (matches(q, "p2p", "exit node", "gateway mode", "personal gateway", "peer to peer", "mesh tunnel", "hole punch", "pairing bundle", "direct punch", "app routing", "kill switch", "tunnel cipher", "diagnos", "diagnose")) {
-            answer = getP2PComprehensiveResponse(context, q);
         } else if (matches(q, "single-socket", "single socket", "unaggregated", "raw socket", "socket mode", "aggregation", "flow aggregat", "socket diagnostic")) {
             answer = getSingleSocketDiagnosticsGuide(context);
         } else if (matches(q, "dns", "doh", "dot", "dnscrypt", "resolver", "domain name", "name server", "plain text dns", "encrypted dns", "dns preset", "dns speed", "what is dns")) {

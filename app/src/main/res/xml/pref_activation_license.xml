@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2026 KotSafe Cyber Security Project -->
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="cat_license_status"
+        app:title="Current Entitlement"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="pref_license_badge"
+            app:title="License Status: Freemium"
+            app:summary="Community Free Tier (1 connected device limit)"
+            app:icon="@drawable/ic_lock"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_license_details"
+            app:title="Plan &amp; Capacity"
+            app:summary="Freemium • 1 Exit Device • Standard Features"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_license_masked_key"
+            app:title="License Key"
+            app:summary="None"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_license_expiry"
+            app:title="Valid Until"
+            app:summary="Lifetime Free"
+            app:iconSpaceReserved="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="cat_license_actions"
+        app:title="License Management"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="pref_license_activate_key"
+            app:title="Activate License Key"
+            app:summary="Enter your KOT-PRO or KOT-ENT activation key to unlock Pro features"
+            app:icon="@drawable/ic_lock_open"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_license_revalidate"
+            app:title="Re-validate License"
+            app:summary="Verify license integrity and synchronize seat entitlement with relay server"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_license_deactivate"
+            app:title="Deactivate License"
+            app:summary="Release seat on this device and restore Freemium tier"
+            app:icon="@drawable/ic_close"
+            app:iconSpaceReserved="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="cat_license_features"
+        app:title="KotSafe Pro Privileges"
+        app:iconSpaceReserved="true">
+
+        <Preference
+            android:key="pref_feat_p2p"
+            app:title="Multi-Device P2P Exit Nodes"
+            app:summary="Connect up to 6 client devices simultaneously through your encrypted mesh"
+            app:icon="@drawable/ic_pref_p2p"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_feat_ai"
+            app:title="AI Autonomous Cyber Defense"
+            app:summary="Real-time heuristic threat detection, YARA rules &amp; forensic sandbox"
+            app:icon="@drawable/ic_cat_ai"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_feat_tls"
+            app:title="Deep TLS Decryption &amp; PCAP Export"
+            app:summary="Full packet payload inspection, root capture &amp; Wireshark exporter"
+            app:icon="@drawable/ic_pref_wizard"
+            app:iconSpaceReserved="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

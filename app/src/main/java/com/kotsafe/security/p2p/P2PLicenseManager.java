@@ -20,6 +20,8 @@ import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
+import com.kotsafe.security.model.backend.BackendProviderFactory;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -43,6 +45,8 @@ import java.util.concurrent.Executors;
 public final class P2PLicenseManager {
 
     private static final String TAG = "P2PLicenseManager";
+    public static final String DEFAULT_COMMUNITY_LICENSE = "KOT-PRO-CD33C6B9-FD8E";
+
     private static final String PREF_IS_PRO_ACTIVATED = "p2p_license_is_pro_activated";
     private static final String PREF_LICENSE_KEY = "p2p_license_active_key";
     private static final String PREF_LICENSE_TIER = "p2p_license_tier";
@@ -76,6 +80,29 @@ public final class P2PLicenseManager {
     private P2PLicenseManager(Context context) {
         mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    /**
+     * Automatically provisions a KotSafe Pro community promotional license for all users.
+     * Unlocks up to 6 concurrent exit devices and full security engines.
+     * If the server later revokes or expires this key, the device automatically reverts to Freemium.
+     */
+    public void autoProvisionCommunityLicenseIfNeeded() {
+        if (!mPrefs.getBoolean(PREF_IS_PRO_ACTIVATED, false) || getActiveLicenseKey().isEmpty()) {
+            Log.i(TAG, "Auto-provisioning KotSafe Pro Community License: " + DEFAULT_COMMUNITY_LICENSE);
+            long oneYear = System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000);
+            mPrefs.edit()
+                    .putBoolean(PREF_IS_PRO_ACTIVATED, true)
+                    .putString(PREF_LICENSE_KEY, DEFAULT_COMMUNITY_LICENSE)
+                    .putString(PREF_LICENSE_TIER, Tier.PRO.name())
+                    .putLong(PREF_LICENSE_EXPIRES, oneYear)
+                    .putInt(PREF_LICENSE_MAX_DEVICES, 6)
+                    .putString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, "6")
+                    .apply();
+
+            // Background verification with server: if server revokes it, automatically downgrades
+            verifyWithServerInBackground(DEFAULT_COMMUNITY_LICENSE);
+        }
     }
 
     /**
@@ -119,11 +146,11 @@ public final class P2PLicenseManager {
             return 1; // Strict Freemium Enforcement
         }
         try {
-            String selected = mPrefs.getString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, "2");
+            String selected = mPrefs.getString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, "6");
             int val = Integer.parseInt(selected);
             return Math.max(1, Math.min(6, val));
         } catch (Exception e) {
-            return 2;
+            return 6;
         }
     }
 
@@ -152,7 +179,8 @@ public final class P2PLicenseManager {
                 }
 
                 // 2. Online verification with relay server
-                String serverUrl = "https://couples-weekly-functionality-goal.trycloudflare.com/v1/license/verify";
+                String baseUrl = BackendProviderFactory.getEffectiveControlUrl(mContext);
+                String serverUrl = baseUrl + "/v1/license/verify";
                 boolean onlineSuccess = false;
                 Tier tier = cleanKey.contains("ENT") ? Tier.ENTERPRISE : Tier.PRO;
                 int maxDevices = 6;
@@ -175,7 +203,13 @@ public final class P2PLicenseManager {
                         os.write(req.toString().getBytes(StandardCharsets.UTF_8));
                     }
 
-                    if (conn.getResponseCode() == 200) {
+                    int code = conn.getResponseCode();
+                    if (code == 403 || code == 401) {
+                        Log.w(TAG, "Server rejected/revoked license key: " + cleanKey);
+                        revokeLicense();
+                        postError(callback, "License has expired or was revoked by server.");
+                        return;
+                    } else if (code == 200) {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                         StringBuilder sb = new StringBuilder();
                         String line;
@@ -189,6 +223,11 @@ public final class P2PLicenseManager {
                             tier = "ENTERPRISE".equalsIgnoreCase(serverTier) ? Tier.ENTERPRISE : Tier.PRO;
                             maxDevices = resp.optInt("maxDevices", 6);
                             expiresAt = resp.optLong("expiresAt", expiresAt);
+                        } else {
+                            Log.w(TAG, "Server returned valid=false for key: " + cleanKey);
+                            revokeLicense();
+                            postError(callback, "License key is invalid or revoked.");
+                            return;
                         }
                     }
                 } catch (Exception onlineEx) {
@@ -224,6 +263,56 @@ public final class P2PLicenseManager {
             } catch (Exception e) {
                 Log.e(TAG, "License activation error: " + e.getMessage(), e);
                 postError(callback, "Activation failed: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Background verification with relay server. If the server revokes the promotional
+     * license or marks it expired, the local device is automatically downgraded to Freemium.
+     */
+    public void verifyWithServerInBackground(String key) {
+        if (key == null || key.isEmpty()) return;
+        mExecutor.execute(() -> {
+            try {
+                String baseUrl = BackendProviderFactory.getEffectiveControlUrl(mContext);
+                URL url = new URL(baseUrl + "/v1/license/verify");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+                conn.setDoOutput(true);
+
+                JSONObject req = new JSONObject();
+                req.put("licenseKey", key);
+                req.put("deviceId", mPrefs.getString(GatewayPreferenceKeys.DEVICE_ID, "android-device"));
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(req.toString().getBytes(StandardCharsets.UTF_8));
+                }
+
+                int code = conn.getResponseCode();
+                if (code == 403 || code == 401) {
+                    Log.w(TAG, "Server revoked license (" + code + "). Reverting to Freemium.");
+                    revokeLicense();
+                } else if (code == 200) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    JSONObject resp = new JSONObject(sb.toString());
+                    if (!resp.optBoolean("valid", false)) {
+                        Log.w(TAG, "Server returned valid=false. Reverting to Freemium.");
+                        revokeLicense();
+                    } else {
+                        Log.i(TAG, "Server verified promotional license: active");
+                    }
+                }
+            } catch (Exception e) {
+                Log.d(TAG, "Background server license check offline/skipped: " + e.getMessage());
             }
         });
     }

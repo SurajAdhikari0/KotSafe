@@ -118,6 +118,9 @@ public class KotSafe extends Application {
             com.kotsafe.security.model.P2PExitNodeService.start(this);
         }
 
+        // Auto-provision KotSafe Pro Community License for all users
+        com.kotsafe.security.p2p.P2PLicenseManager.getInstance(this).autoProvisionCommunityLicenseIfNeeded();
+
         // Listen to package events
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);

@@ -77,6 +77,7 @@ import com.kotsafe.security.fragments.prefs.StreamingProxySettingsFragment;
 import com.kotsafe.security.fragments.prefs.BackupRestoreSettingsFragment;
 import com.kotsafe.security.fragments.prefs.AnalyticsLogsSettingsFragment;
 import com.kotsafe.security.fragments.prefs.AppearanceLanguageSettingsFragment;
+import com.kotsafe.security.fragments.prefs.ActivationLicenseSettingsFragment;
 import com.kotsafe.security.interfaces.FragmentViewCreatedListener;
 import com.kotsafe.security.model.Prefs;
 import com.kotsafe.security.R;
@@ -255,6 +256,9 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
         } else if(prefKey.equals("appearance_language_settings")) {
             targetFragment = new AppearanceLanguageSettingsFragment();
             setTitle("Appearance and Language");
+        } else if(prefKey.equals("activation_license_settings")) {
+            targetFragment = new ActivationLicenseSettingsFragment();
+            setTitle("License Activation");
         } else if(prefKey.equals("geolocation")) {
             targetFragment = new GeoipSettings();
             setTitle(R.string.geolocation);
