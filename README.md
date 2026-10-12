@@ -158,7 +158,7 @@ Deploy a dedicated KotSafe P2P mesh relay on **Oracle Cloud (Always Free Tier)**
 ssh ubuntu@your-vps-ip
 
 # 2. Clone repository & enter server directory:
-git clone https://github.com/Surajadhikari716/KotSafe.git
+git clone https://github.com/SurajAdhikari0/KotSafe.git
 cd KotSafe/server_oracle_and_vps
 
 # 3. Run automated 1-click installer:
@@ -188,7 +188,7 @@ Ensure these ports are allowed in your cloud provider's firewall / Security List
 ### Command-Line Build
 ```bash
 # Clone with all submodules:
-git clone --recursive https://github.com/Surajadhikari716/KotSafe.git
+git clone --recursive https://github.com/SurajAdhikari0/KotSafe.git
 cd KotSafe
 
 # Compile debug APK:
@@ -211,6 +211,7 @@ cd KotSafe
 ## 👤 Author & Project Maintainer
 
 * **Suraj Adhikari** — Founder, Lead Architect & Security Systems Engineer
+  * GitHub: [@SurajAdhikari0](https://github.com/SurajAdhikari0)
 
 ---
 
