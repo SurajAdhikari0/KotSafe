@@ -15,7 +15,18 @@
   <a href="#-privacy--zero-telemetry-guarantee"><img src="https://img.shields.io/badge/Privacy-100%25%20On--Device-success.svg" alt="100% On-Device" /></a>
   <a href="#-offline-ai-assistant"><img src="https://img.shields.io/badge/AI-Offline%20Neural%20Core-purple.svg" alt="Offline AI" /></a>
   <a href="https://github.com/SurajAdhikari0/KotSafe/releases/latest"><img src="https://img.shields.io/github/v/release/SurajAdhikari0/KotSafe?label=Download%20APK&color=green&logo=android" alt="Download APK" /></a>
+  <a href="https://github.com/SurajAdhikari0/KotSafe/issues"><img src="https://img.shields.io/badge/Status-Under%20Construction%20%7C%20Active%20Beta-orange.svg" alt="Status: Under Construction" /></a>
 </p>
+
+---
+
+> [!WARNING]
+> ### 🚧 Project Under Active Construction — Expect Bugs & Rapid Changes
+> **KotSafe is currently undergoing heavy architectural modernization and rapid active development.**  
+> Because cutting-edge native packet engines (KotEngine C++/JNI), on-device neural AI models, and P2P mesh routing protocols are continuously evolving:
+> * **Expect bugs, instability, and rough edges:** You may encounter crashes, performance quirks, or incomplete features in current builds.
+> * **Not recommended for mission-critical production environments** without prior isolated testing.
+> * **Found a bug?** Please submit detailed crash traces, logs, or reproduction steps via [GitHub Issues](https://github.com/SurajAdhikari0/KotSafe/issues). Community contributions and feedback are greatly appreciated!
 
 ---
 
