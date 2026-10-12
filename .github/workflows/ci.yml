@@ -1,0 +1,51 @@
+name: KotSafe CI & Unit Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & Test Android Core
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission to Gradlew
+        run: chmod +x gradlew
+
+      - name: Run Unit Tests
+        run: ./gradlew testStandardDebugUnitTest --stacktrace
+
+      - name: Compile Standard & Full-Power Debug APKs
+        run: ./gradlew assembleStandardDebug assembleFullPowerDebug --stacktrace
+
+      - name: Upload Debug APKs
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: kotsafe-debug-apks
+          path: |
+            app/build/outputs/apk/standard/debug/*.apk
+            app/build/outputs/apk/fullPower/debug/*.apk
+          retention-days: 7

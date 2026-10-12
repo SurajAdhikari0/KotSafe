@@ -10,6 +10,8 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg" alt="License: GPL-3.0" /></a>
+  <a href="SECURITY.md"><img src="https://img.shields.io/badge/Security-Policy-brightgreen.svg" alt="Security Policy" /></a>
+  <a href="https://github.com/SurajAdhikari0/KotSafe/actions/workflows/ci.yml"><img src="https://github.com/SurajAdhikari0/KotSafe/actions/workflows/ci.yml/badge.svg" alt="CI Build" /></a>
   <a href="#-building-the-android-app"><img src="https://img.shields.io/badge/Platform-Android%207.0%2B%20(API%2024%2B)-brightgreen.svg" alt="Android API 24+" /></a>
   <a href="#-turnkey-server-deployment"><img src="https://img.shields.io/badge/Mesh%20Relay-Oracle%20Cloud%20%2F%20VPS%20Ready-blue.svg" alt="VPS Ready" /></a>
   <a href="#-privacy--zero-telemetry-guarantee"><img src="https://img.shields.io/badge/Privacy-100%25%20On--Device-success.svg" alt="100% On-Device" /></a>
