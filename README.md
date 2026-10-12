@@ -211,7 +211,6 @@ cd KotSafe
 ## 👤 Author & Project Maintainer
 
 * **Suraj Adhikari** — Founder, Lead Architect & Security Systems Engineer
-  * GitHub: [@Surajadhikari716](https://github.com/Surajadhikari716)
 
 ---
 
