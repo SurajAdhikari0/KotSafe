@@ -562,7 +562,8 @@ public class CaptureService extends VpnService implements Runnable {
             mSettings.socks5_proxy_port = 8095;
             mSettings.block_quic_mode = Prefs.BlockQuicMode.ALWAYS;
             mSettings.ip_mode = Prefs.IpMode.BOTH;
-            if (dns_server == null || "9.9.9.9".equals(dns_server)) {
+            if (dns_server == null || "9.9.9.9".equals(dns_server)
+                    || dns_server.startsWith("192.168.") || dns_server.startsWith("10.") || dns_server.startsWith("172.")) {
                 dns_server = "1.1.1.1";
             }
         }
@@ -1611,8 +1612,11 @@ public class CaptureService extends VpnService implements Runnable {
                     com.kotsafe.security.engine.KotEngineBridge bridge = com.kotsafe.security.engine.KotEngineBridge.getInstance();
                     bridge.setProtectDelegate(this::protect);
                     bridge.setPrivateDnsBlocked(mSettings.auto_block_private_dns);
+                    boolean isGatewayClient = mPrefs.getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.CLIENT_ENABLED,
+                            mPrefs.getBoolean(Prefs.PREF_P2P_EXIT_NODE_CLIENT_ENABLED, false));
                     String customDns = mPrefs.getString(Prefs.PREF_DNS_SERVER_V4, "").trim();
-                    if (customDns.isEmpty() || "9.9.9.9".equals(customDns)) {
+                    if (customDns.isEmpty() || "9.9.9.9".equals(customDns)
+                            || (isGatewayClient && (customDns.startsWith("192.168.") || customDns.startsWith("10.") || customDns.startsWith("172.")))) {
                         customDns = (dns_server != null && !dns_server.isEmpty() && !"9.9.9.9".equals(dns_server)) ? dns_server : "1.1.1.1";
                     }
                     bridge.setCustomDns(customDns);

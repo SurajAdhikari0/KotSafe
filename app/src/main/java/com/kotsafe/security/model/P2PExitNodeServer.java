@@ -44,8 +44,10 @@
 package com.kotsafe.security.model;
 
 import android.content.Context;
+import androidx.preference.PreferenceManager;
 
 import com.kotsafe.security.Log;
+import com.kotsafe.security.p2p.GatewayPreferenceKeys;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -374,8 +376,7 @@ public class P2PExitNodeServer {
                 out.writeByte(0x00); // Auth success
                 out.flush();
             } else if (supportsNoAuth) {
-                out.writeByte(0x05);
-                out.writeByte(0x00); // No Auth
+                out.write(new byte[]{0x05, 0x00}); // No Auth
                 out.flush();
             } else {
                 out.writeByte(0x05);
@@ -423,14 +424,22 @@ public class P2PExitNodeServer {
             Log.i(TAG, "[P2P Remote: " + clientIp + "] Request destination: " + targetHost + ":" + targetPort);
 
             // Deny private / loopback target destinations (SSRF / internal LAN protection per exit policy)
+            // unless Developer P2P LAN Gateway / Local Service Access is explicitly enabled
             try {
                 InetAddress resolved = InetAddress.getByName(targetHost);
                 if (resolved.isLoopbackAddress() || resolved.isSiteLocalAddress() ||
                         resolved.isLinkLocalAddress() || resolved.isAnyLocalAddress()) {
-                    Log.w(TAG, "[P2P Remote: " + clientIp + "] BLOCKED private/loopback destination: " + targetHost);
-                    sendSocksReply(out, 0x02); // Connection not allowed by ruleset
-                    clientSocket.close();
-                    return;
+                    boolean allowLocalServices = mContext != null &&
+                            PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false) &&
+                            PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false);
+                    if (!allowLocalServices) {
+                        Log.w(TAG, "[P2P Remote: " + clientIp + "] BLOCKED private/loopback destination (Local Service Access disabled): " + targetHost);
+                        sendSocksReply(out, 0x02); // Connection not allowed by ruleset
+                        clientSocket.close();
+                        return;
+                    } else {
+                        Log.i(TAG, "[P2P Remote: " + clientIp + "] ALLOWED private/loopback destination (P2P LAN Gateway enabled): " + targetHost);
+                    }
                 }
             } catch (Exception e) {
                 // If pre-check getByName cannot resolve, proceed to targetSocket.connect which performs full network resolution
@@ -541,12 +550,13 @@ public class P2PExitNodeServer {
     }
 
     private void sendSocksReply(DataOutputStream out, int replyCode) throws IOException {
-        out.writeByte(0x05);
-        out.writeByte(replyCode);
-        out.writeByte(0x00); // RSV
-        out.writeByte(0x01); // IPv4
-        out.writeInt(0);     // 0.0.0.0
-        out.writeShort(0);   // Port 0
+        byte[] reply = new byte[10];
+        reply[0] = 0x05;
+        reply[1] = (byte) replyCode;
+        reply[2] = 0x00; // RSV
+        reply[3] = 0x01; // IPv4
+        // bytes 4..9 are default 0 (0.0.0.0:0)
+        out.write(reply, 0, 10);
         out.flush();
     }
 
@@ -609,6 +619,7 @@ public class P2PExitNodeServer {
             bout.flush();
         } catch (Exception ignored) {
         } finally {
+            try { dst.getOutputStream().flush(); } catch (Exception ignored) {}
             try { dst.shutdownOutput(); } catch (Exception ignored) {}
         }
     }

@@ -32,6 +32,71 @@ public class AdvancedDeveloperSettingsFragment extends SettingsSubFragment {
                 return true;
             });
         }
+
+        SwitchPreference localAccessPref = findPreference(com.kotsafe.security.p2p.GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS);
+        if (localAccessPref != null) {
+            localAccessPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabling = Boolean.TRUE.equals(newValue);
+                if (enabling) {
+                    boolean exitActive = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                            .getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.EXIT_ENABLED, false);
+                    if (!exitActive) {
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle(R.string.gateway_local_service_requires_exit_title)
+                                .setMessage(R.string.gateway_local_service_requires_exit_message)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setPositiveButton(android.R.string.ok, null)
+                                .show();
+                        return false;
+                    }
+                    showLocalServiceAccessWarningDialog(localAccessPref);
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SwitchPreference localAccessPref = findPreference(com.kotsafe.security.p2p.GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS);
+        if (localAccessPref != null) {
+            boolean exitActive = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    .getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.EXIT_ENABLED, false);
+            if (!exitActive && localAccessPref.isChecked()) {
+                localAccessPref.setChecked(false);
+                PreferenceManager.getDefaultSharedPreferences(requireContext())
+                        .edit().putBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false).apply();
+            }
+        }
+    }
+
+    private void showLocalServiceAccessWarningDialog(SwitchPreference pref) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.gateway_local_service_warning_title)
+                .setMessage(R.string.gateway_local_service_warning_message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(R.string.gateway_local_service_warning_confirm, (dialog, which) -> {
+                    SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                    p.edit().putBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, true).apply();
+                    if (pref != null) {
+                        pref.setChecked(true);
+                    }
+                    Toast.makeText(requireContext(), R.string.gateway_local_service_enabled_toast, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+                    if (pref != null) {
+                        pref.setChecked(false);
+                    }
+                })
+                .setOnCancelListener(dialog -> {
+                    if (pref != null) {
+                        pref.setChecked(false);
+                    }
+                })
+                .show();
     }
 
     @Override

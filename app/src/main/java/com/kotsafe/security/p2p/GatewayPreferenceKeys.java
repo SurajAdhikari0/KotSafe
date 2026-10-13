@@ -51,5 +51,8 @@ public final class GatewayPreferenceKeys {
     public static final String LICENSE_STATUS = "personal_gateway_license_status";
     public static final String ACTIVATE_LICENSE = "personal_gateway_activate_license";
 
+    // P2P LAN & Local Service Access (Developer SSRF / LAN Gateway Toggle)
+    public static final String LOCAL_SERVICE_ACCESS = "personal_gateway_local_service_access";
+
     private GatewayPreferenceKeys() { }
 }

@@ -112,4 +112,19 @@
             app:iconSpaceReserved="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:key="cat_p2p_developer_tools"
+        app:title="@string/gateway_local_service_category"
+        app:icon="@drawable/ic_pref_p2p"
+        app:iconSpaceReserved="true">
+
+        <SwitchPreference
+            app:key="personal_gateway_local_service_access"
+            app:title="@string/gateway_local_service_access_title"
+            app:summary="@string/gateway_local_service_access_summary"
+            app:icon="@drawable/ic_lan"
+            app:iconSpaceReserved="true"
+            app:defaultValue="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

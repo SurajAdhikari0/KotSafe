@@ -206,6 +206,7 @@ public class Prefs {
     public static final String PREF_PERSONAL_GATEWAY_TRANSPORT_MODE = "personal_gateway_transport_mode";
     public static final String PREF_PERSONAL_GATEWAY_KILL_SWITCH = "personal_gateway_kill_switch";
     public static final String PREF_PERSONAL_GATEWAY_PAIRING_BUNDLE = "personal_gateway_pairing_bundle";
+    public static final String PREF_PERSONAL_GATEWAY_LOCAL_SERVICE_ACCESS = "personal_gateway_local_service_access";
 
     /* The default maximum connections to log into the ConnectionsRegister. Older connections are dropped.
      * Average Java-heap cost is ~2 KB per connection (covers payload-minimal mode and possible new additions);

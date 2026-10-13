@@ -37,15 +37,17 @@ jobs:
       - name: Run Unit Tests
         run: ./gradlew testStandardDebugUnitTest --stacktrace
 
-      - name: Compile Standard & Full-Power Debug APKs
-        run: ./gradlew assembleStandardDebug assembleFullPowerDebug --stacktrace
+      - name: Compile Standard & Full-Power APKs (Release & Debug)
+        run: ./gradlew assembleStandardDebug assembleFullPowerDebug assembleStandardRelease assembleFullPowerRelease --stacktrace
 
-      - name: Upload Debug APKs
+      - name: Upload KotSafe APK Artifacts
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: kotsafe-debug-apks
+          name: kotsafe-apks
           path: |
             app/build/outputs/apk/standard/debug/*.apk
+            app/build/outputs/apk/standard/release/*.apk
             app/build/outputs/apk/fullPower/debug/*.apk
-          retention-days: 7
+            app/build/outputs/apk/fullPower/release/*.apk
+          retention-days: 14

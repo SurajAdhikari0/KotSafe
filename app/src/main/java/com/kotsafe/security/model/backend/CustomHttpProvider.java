@@ -100,6 +100,8 @@ public class CustomHttpProvider implements BackendProvider {
     private static final int HEADER_LEN = 18;
     /** 64 KB relay chunk — optimal high-speed framing without TLS fragmentation */
     private static final int CHUNK = 64 * 1024;
+    /** 1350 B MTU-safe chunk for Direct P2P UDP datagrams to avoid fragmentation and EMSGSIZE */
+    private static final int DIRECT_UDP_CHUNK = 1350;
 
     /** Per-direction, per-stream credit window (32MB). Prevents artificial latency stalls. */
     private static final int FLOW_WINDOW = 32 * 1024 * 1024;
@@ -214,6 +216,7 @@ public class CustomHttpProvider implements BackendProvider {
         final Queue<byte[]> pendingWrites = new ConcurrentLinkedQueue<>();
         final AtomicBoolean isFlushing = new AtomicBoolean(false);
         volatile Socket socket;
+        volatile boolean closeRequested;
         volatile boolean closed;
 
         Stream(String id, Socket socket, WebSocket ws, String token) {
@@ -222,6 +225,12 @@ public class CustomHttpProvider implements BackendProvider {
 
         void setConnectedSocket(Socket s) {
             this.socket = s;
+            if (closeRequested) {
+                closed = true;
+                if (s != null) try { s.close(); } catch (Exception ignored) {}
+                return;
+            }
+            flushPendingWrites();
         }
 
         void enqueueWrite(byte[] b, int offset, int len) {
@@ -232,12 +241,21 @@ public class CustomHttpProvider implements BackendProvider {
         }
 
         void flushPendingWrites() {
-            if (closed || pendingWrites.isEmpty()) return;
+            if (closed) return;
+            if (socket == null) {
+                // SOCKS bridge socket is still connecting asynchronously in background thread;
+                // do not flush yet and do NOT mark closed.
+                return;
+            }
+            if (pendingWrites.isEmpty() && !closeRequested) return;
             if (!isFlushing.compareAndSet(false, true)) return;
             sRelayExecutor.execute(() -> {
                 try {
                     synchronized (writeLock) {
-                        if (closed || socket == null || !socket.isConnected() || socket.isClosed()) {
+                        if (closed) return;
+                        if (socket == null) return;
+                        if (!socket.isConnected() || socket.isClosed()) {
+                            closed = true;
                             return;
                         }
                         try {
@@ -256,16 +274,28 @@ public class CustomHttpProvider implements BackendProvider {
                                         + "\",\"streamId\":\"" + id
                                         + "\",\"n\":" + totalWritten + "}");
                             }
+                            if (closeRequested && pendingWrites.isEmpty()) {
+                                closed = true;
+                                Socket s = socket;
+                                if (s != null && !s.isClosed()) {
+                                    try { s.shutdownOutput(); } catch (Exception ignored) {}
+                                    try { s.close(); } catch (Exception ignored) {}
+                                }
+                            }
                         } catch (Exception e) {
                             Log.w(TAG, "write to stream " + id + " failed: " + e.getMessage());
                             sStreams.remove(id);
-                            markClosed();
-                            sendClose(ws, token, id);
+                            closed = true;
+                            if (ws != null) {
+                                sendClose(ws, token, id);
+                            }
+                            Socket s = socket;
+                            if (s != null) try { s.close(); } catch (Exception ignored) {}
                         }
                     }
                 } finally {
                     isFlushing.set(false);
-                    if (!pendingWrites.isEmpty()) {
+                    if (!pendingWrites.isEmpty() || (closeRequested && !closed)) {
                         flushPendingWrites();
                     }
                 }
@@ -276,7 +306,7 @@ public class CustomHttpProvider implements BackendProvider {
         void acquire(int n) {
             synchronized (credit) {
                 long deadline = System.currentTimeMillis() + 30_000;
-                while (!closed && unacked.get() >= FLOW_WINDOW) {
+                while (!closed && !closeRequested && unacked.get() >= FLOW_WINDOW) {
                     long wait = deadline - System.currentTimeMillis();
                     if (wait <= 0) break;
                     try { credit.wait(Math.min(wait, 500)); } catch (InterruptedException e) {
@@ -294,10 +324,9 @@ public class CustomHttpProvider implements BackendProvider {
         }
 
         void markClosed() {
-            closed = true;
+            closeRequested = true;
             synchronized (credit) { credit.notifyAll(); }
-            Socket s = socket;
-            if (s != null) try { s.close(); } catch (Exception ignored) {}
+            flushPendingWrites();
         }
     }
 
@@ -772,9 +801,12 @@ public class CustomHttpProvider implements BackendProvider {
                     }
 
                     case "error": {
-                        Log.w(TAG, "Relay error: " + msg.optString("message"));
-                        CandidateListener l = listener;
-                        if (l != null) l.onError(msg.optString("message", "unknown_error"));
+                        String errMsg = msg.optString("message", "unknown_error");
+                        Log.w(TAG, "Relay error: " + errMsg);
+                        if (!"unknown_message_type".equals(errMsg)) {
+                            CandidateListener l = listener;
+                            if (l != null) l.onError(errMsg);
+                        }
                         return;
                     }
 
@@ -1031,6 +1063,14 @@ public class CustomHttpProvider implements BackendProvider {
         try {
             byte[] plaintext = cipher.openBytes(streamId, peerDirection, encryptedData, 0, encryptedData.length);
             Stream st = sStreams.get(streamId);
+            if (plaintext == null || plaintext.length == 0) {
+                // Stream close / FIN from peer
+                if (st != null) {
+                    st.markClosed();
+                    sStreams.remove(streamId);
+                }
+                return;
+            }
             if (st == null && isHost) {
                 openHostStreamDirect(streamId, plaintext);
             } else if (st != null && !st.closed) {
@@ -1071,7 +1111,7 @@ public class CustomHttpProvider implements BackendProvider {
     }
 
     private static void pumpToDirectUdp(Stream st, boolean isHost) {
-        byte[] buf = new byte[CHUNK];
+        byte[] buf = new byte[DIRECT_UDP_CHUNK];
         com.kotsafe.security.p2p.TunnelCipher cipher = sTunnelCipher;
         String direction = isHost ? com.kotsafe.security.p2p.TunnelCipher.EXIT_TO_CLIENT : com.kotsafe.security.p2p.TunnelCipher.CLIENT_TO_EXIT;
 
@@ -1092,6 +1132,11 @@ public class CustomHttpProvider implements BackendProvider {
                         break;
                     }
                 }
+            }
+            // Signal FIN / EOF to peer
+            if (cipher != null && com.kotsafe.security.p2p.DirectPunchCoordinator.getInstance().isDirectReady()) {
+                byte[] finCiphertext = cipher.sealBytes(st.id, direction, new byte[0], 0, 0);
+                com.kotsafe.security.p2p.DirectPunchCoordinator.getInstance().sendDirectData(st.id, finCiphertext);
             }
         } catch (Exception e) {
             Log.d(TAG, "pumpToDirectUdp finished for stream " + st.id + ": " + e.getMessage());

@@ -43,6 +43,13 @@
             app:title="Battery Saver Guard"
             app:summary="Conserve host battery when discharging below 20%"
             app:defaultValue="true" />
+        <SwitchPreference
+            app:key="personal_gateway_local_service_access"
+            app:title="@string/gateway_local_service_access_title"
+            app:summary="@string/gateway_local_service_access_summary"
+            app:icon="@drawable/ic_lan"
+            app:dependency="personal_gateway_exit_enabled"
+            app:defaultValue="false" />
         <ListPreference
             app:key="personal_gateway_exit_max_devices"
             app:title="@string/gateway_exit_max_devices_title"

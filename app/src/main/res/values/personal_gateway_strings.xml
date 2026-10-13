@@ -84,4 +84,15 @@
     <string name="gateway_license_status_title">P2P License Status</string>
     <string name="gateway_license_activate_title">Activate KotSafe Pro</string>
     <string name="gateway_license_activate_summary">Unlock 2–6 concurrent exit devices &amp; high-speed cloud relay</string>
+
+    <!-- P2P Local Service Access / LAN Gateway -->
+    <string name="gateway_local_service_category">P2P LAN &amp; Local Services</string>
+    <string name="gateway_local_service_access_title">P2P LAN Gateway (Local Service Access)</string>
+    <string name="gateway_local_service_access_summary">Allow paired devices to access the exit node\'s local network (Wi-Fi router admin panels, local servers, IoT devices)</string>
+    <string name="gateway_local_service_warning_title">⚠️ Security Warning: Local LAN Access</string>
+    <string name="gateway_local_service_warning_message">Enabling this gives connected P2P client devices full access to private IP addresses on your local network (e.g. 192.168.x.x, 10.x.x.x, 172.16.x.x, and localhost).\n\nThis exposes:\n• Wi-Fi router admin portals (e.g. 192.168.1.1)\n• Local development web servers and API endpoints\n• Network-attached devices and printers\n\n⚠️ Only enable this if all paired client devices belong to you or are completely trusted.\n\nDo you want to enable P2P Local Service Access?</string>
+    <string name="gateway_local_service_warning_confirm">I Understand &amp; Enable</string>
+    <string name="gateway_local_service_enabled_toast">P2P Local Service Access enabled</string>
+    <string name="gateway_local_service_requires_exit_title">Exit Node Not Enabled</string>
+    <string name="gateway_local_service_requires_exit_message">P2P Local Service Access can only be enabled when this device is actively configured as an Exit Node.\n\nPlease enable \"This device as an exit\" first under Personal Gateway settings.</string>
 </resources>

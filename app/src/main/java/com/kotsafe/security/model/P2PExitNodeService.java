@@ -356,9 +356,25 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
             try {
                 ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 if (cm != null) {
-                    Network activeNet = cm.getActiveNetwork();
-                    if (activeNet != null) {
-                        NetworkCapabilities caps = cm.getNetworkCapabilities(activeNet);
+                    Network[] allNetworks = cm.getAllNetworks();
+                    Network underlying = null;
+                    if (allNetworks != null) {
+                        for (Network n : allNetworks) {
+                            NetworkCapabilities c = cm.getNetworkCapabilities(n);
+                            if (c != null && !c.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                                    && (c.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                                    || c.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                                    || c.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))) {
+                                underlying = n;
+                                break;
+                            }
+                        }
+                    }
+                    if (underlying == null) {
+                        underlying = cm.getActiveNetwork();
+                    }
+                    if (underlying != null) {
+                        NetworkCapabilities caps = cm.getNetworkCapabilities(underlying);
                         if (caps != null) {
                             if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                                 networkType = "wifi";
@@ -388,6 +404,21 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
                                 networkType = "ethernet";
                                 ssid = "Ethernet";
                             }
+                        }
+                    }
+                }
+                if (networkType.equals("none")) {
+                    WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    if (wifiManager != null && wifiManager.isWifiEnabled()) {
+                        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                        if (wifiInfo != null && wifiInfo.getNetworkId() != -1) {
+                            networkType = "wifi";
+                            String rawSsid = wifiInfo.getSSID();
+                            if (rawSsid != null && !rawSsid.equals("<unknown ssid>")) {
+                                ssid = rawSsid.replace("\"", "");
+                            }
+                            if (ssid.isEmpty()) ssid = "Connected Wi-Fi";
+                            signalDbm = wifiInfo.getRssi();
                         }
                     }
                 }
@@ -479,7 +510,7 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
                 com.kotsafe.security.p2p.SecurePairingBundle parsed =
                         com.kotsafe.security.p2p.SecurePairingBundle.parse(bundleUri);
                 if (parsed != null && parsed.room != null) {
-                    if (pairingToken.isEmpty() || !pairingToken.contains(parsed.room)) {
+                    if (pairingToken.isEmpty()) {
                         pairingToken = "host_" + parsed.room;
                         prefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, pairingToken).apply();
                     }
@@ -492,15 +523,16 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
         final List<Candidate> candidates =
                 java.util.Collections.synchronizedList(new ArrayList<>());
 
+        final int punchPort = port + 2;
         String localIp = UpnpPortMapper.getBestLocalIpAddress();
         if (localIp != null && !localIp.equals("127.0.0.1")) {
-            candidates.add(new Candidate(Candidate.Type.LAN, localIp, port));
+            candidates.add(new Candidate(Candidate.Type.LAN, localIp, punchPort));
         }
         for (String lip : UpnpPortMapper.getAllLocalCandidateIps()) {
-            if (!lip.equals("127.0.0.1")) candidates.add(new Candidate(Candidate.Type.LAN, lip, port));
+            if (!lip.equals("127.0.0.1")) candidates.add(new Candidate(Candidate.Type.LAN, lip, punchPort));
         }
         String globalIpv6 = UpnpPortMapper.getGlobalIpv6Address();
-        if (globalIpv6 != null) candidates.add(new Candidate(Candidate.Type.GLOBAL_IPV6, globalIpv6, port));
+        if (globalIpv6 != null) candidates.add(new Candidate(Candidate.Type.GLOBAL_IPV6, globalIpv6, punchPort));
 
         Candidate stunDirect = com.kotsafe.security.p2p.DirectPunchCoordinator.getInstance().getStunCandidate();
         if (stunDirect != null) {

@@ -12,6 +12,11 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <android/log.h>
+
+#define LOG_TAG "KotFwd"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 
 #define NETCAP_NIL_FWD UINT32_MAX
 #define MAX_UDP_REPLY 65535
@@ -42,7 +47,8 @@ typedef enum {
     TCP_FLOW_SOCKS_GREETING_ACK,
     TCP_FLOW_SOCKS_CONNECT_ACK,
     TCP_FLOW_ESTABLISHED,
-    TCP_FLOW_FIN_WAIT
+    TCP_FLOW_FIN_WAIT,
+    TCP_FLOW_SERVER_FIN
 } tcp_flow_state_t;
 
 typedef struct {
@@ -52,6 +58,8 @@ typedef struct {
     time_t last_seen;
     uint32_t client_seq;      /* Current client seq tracked */
     uint32_t server_seq;      /* Synthetic server seq tracked */
+    uint8_t socks_buf[32];    /* Buffer for incremental SOCKS5 handshake accumulation */
+    uint8_t socks_buf_len;    /* Number of accumulated bytes in socks_buf */
     uint8_t occupied;
     uint32_t hash_next;
 } tcp_flow_t;
@@ -809,6 +817,7 @@ int netcap_forward_handle_tcp(netcap_forward_engine_t *f,
     if (tcp_flags & TCP_FLAG_SYN) {
         if (!flow) {
             flow = create_tcp_flow(f, key, seq);
+            LOGI("SYN handled: port=%d flow=%p", key->dst_port, flow);
             return flow ? 0 : -1;
         }
         return 0;
@@ -817,6 +826,7 @@ int netcap_forward_handle_tcp(netcap_forward_engine_t *f,
     if (!flow) {
         /* Out-of-order or unknown flow: reply with RST */
         if (!(tcp_flags & TCP_FLAG_RST)) {
+            LOGW("No flow found for dst_port %d, src_port %d! Sending RST (flags=0x%02x seq=%u)", key->dst_port, key->src_port, tcp_flags, seq);
             write_tcp(f, key, TCP_FLAG_RST | TCP_FLAG_ACK, 0, seq + 1, NULL, 0);
         }
         return -1;
@@ -841,9 +851,23 @@ int netcap_forward_handle_tcp(netcap_forward_engine_t *f,
     /* 3. Client FIN */
     if (tcp_flags & TCP_FLAG_FIN) {
         flow->client_seq = seq + 1;
-        shutdown(flow->sock, SHUT_WR);
+        if (flow->sock >= 0) {
+            shutdown(flow->sock, SHUT_WR);
+        }
         write_tcp(f, key, TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
-        flow->state = TCP_FLOW_FIN_WAIT;
+        if (flow->state == TCP_FLOW_SERVER_FIN) {
+            uint32_t bucket = fwd_hash(key) & f->tcp_bucket_mask;
+            uint32_t cur = f->tcp_buckets[bucket];
+            while (cur != NETCAP_NIL_FWD) {
+                if (&f->tcp_flows[cur] == flow) {
+                    close_tcp_flow_slot(f, cur);
+                    break;
+                }
+                cur = f->tcp_flows[cur].hash_next;
+            }
+        } else {
+            flow->state = TCP_FLOW_FIN_WAIT;
+        }
         return 0;
     }
 
@@ -927,6 +951,7 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
     for (uint32_t i = 0; i < f->tcp_capacity && npoll < 256; i++) {
         if (!f->tcp_flows[i].occupied) continue;
         tcp_flow_t *s = &f->tcp_flows[i];
+        if (s->sock < 0) continue;
         pfds[npoll].fd = s->sock;
         pfds[npoll].revents = 0;
         flow_indices[npoll] = i;
@@ -969,14 +994,17 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
                         flow->state = TCP_FLOW_SOCKS_GREETING_ACK;
                         flow->last_seen = time(NULL);
                     } else {
+                        LOGW("SOCKS_CONNECTING send greeting failed: sn=%zd errno=%d", sn, errno);
                         write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                         close_tcp_flow_slot(f, idx);
                     }
                 } else {
+                    LOGW("SOCKS_CONNECTING getsockopt SO_ERROR=%d", err);
                     write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                     close_tcp_flow_slot(f, idx);
                 }
             } else if (pfds[k].revents & (POLLERR | POLLHUP)) {
+                LOGW("SOCKS_CONNECTING poll revents=0x%x", pfds[k].revents);
                 write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                 close_tcp_flow_slot(f, idx);
             }
@@ -986,31 +1014,44 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
         /* SOCKS5 waiting for greeting response */
         if (flow->state == TCP_FLOW_SOCKS_GREETING_ACK) {
             if (pfds[k].revents & POLLIN) {
-                uint8_t resp[2];
-                ssize_t n = recv(flow->sock, resp, 2, 0);
-                if (n == 2 && resp[0] == 0x05 && resp[1] == 0x00) {
-                    if (flow->key.family == 4) {
-                        uint8_t req[10];
-                        req[0] = 0x05; req[1] = 0x01; req[2] = 0x00; req[3] = 0x01;
-                        memcpy(req + 4, flow->key.dst_ip, 4);
-                        uint16_t dp = htons(flow->key.dst_port);
-                        memcpy(req + 8, &dp, 2);
-                        send(flow->sock, req, 10, 0);
-                    } else {
-                        uint8_t req[22];
-                        req[0] = 0x05; req[1] = 0x01; req[2] = 0x00; req[3] = 0x04;
-                        memcpy(req + 4, flow->key.dst_ip, 16);
-                        uint16_t dp = htons(flow->key.dst_port);
-                        memcpy(req + 20, &dp, 2);
-                        send(flow->sock, req, 22, 0);
+                ssize_t n = recv(flow->sock, flow->socks_buf + flow->socks_buf_len,
+                                 2 - flow->socks_buf_len, 0);
+                if (n > 0) {
+                    flow->socks_buf_len += (uint8_t)n;
+                    if (flow->socks_buf_len < 2) {
+                        continue; /* Wait for remaining greeting byte */
                     }
-                    flow->state = TCP_FLOW_SOCKS_CONNECT_ACK;
-                    flow->last_seen = time(NULL);
-                } else {
+                    if (flow->socks_buf[0] == 0x05 && flow->socks_buf[1] == 0x00) {
+                        flow->socks_buf_len = 0;
+                        if (flow->key.family == 4) {
+                            uint8_t req[10];
+                            req[0] = 0x05; req[1] = 0x01; req[2] = 0x00; req[3] = 0x01;
+                            memcpy(req + 4, flow->key.dst_ip, 4);
+                            uint16_t dp = htons(flow->key.dst_port);
+                            memcpy(req + 8, &dp, 2);
+                            send(flow->sock, req, 10, 0);
+                        } else {
+                            uint8_t req[22];
+                            req[0] = 0x05; req[1] = 0x01; req[2] = 0x00; req[3] = 0x04;
+                            memcpy(req + 4, flow->key.dst_ip, 16);
+                            uint16_t dp = htons(flow->key.dst_port);
+                            memcpy(req + 20, &dp, 2);
+                            send(flow->sock, req, 22, 0);
+                        }
+                        flow->state = TCP_FLOW_SOCKS_CONNECT_ACK;
+                        flow->last_seen = time(NULL);
+                    } else {
+                        LOGW("SOCKS_GREETING_ACK invalid: resp=[0x%02x, 0x%02x]", flow->socks_buf[0], flow->socks_buf[1]);
+                        write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
+                        close_tcp_flow_slot(f, idx);
+                    }
+                } else if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
+                    LOGW("SOCKS_GREETING_ACK EOF or error: n=%zd errno=%d", n, errno);
                     write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                     close_tcp_flow_slot(f, idx);
                 }
             } else if (pfds[k].revents & (POLLERR | POLLHUP)) {
+                LOGW("SOCKS_GREETING_ACK poll revents=0x%x", pfds[k].revents);
                 write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                 close_tcp_flow_slot(f, idx);
             }
@@ -1020,18 +1061,49 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
         /* SOCKS5 waiting for connect response */
         if (flow->state == TCP_FLOW_SOCKS_CONNECT_ACK) {
             if (pfds[k].revents & POLLIN) {
-                uint8_t resp[64];
-                ssize_t n = recv(flow->sock, resp, sizeof(resp), 0);
-                if (n >= 4 && resp[0] == 0x05 && resp[1] == 0x00) {
-                    flow->state = TCP_FLOW_ESTABLISHED;
-                    flow->last_seen = time(NULL);
-                    write_tcp(f, &flow->key, TCP_FLAG_SYN | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
-                    flow->server_seq += 1;
-                } else {
+                ssize_t n = recv(flow->sock, flow->socks_buf + flow->socks_buf_len,
+                                 sizeof(flow->socks_buf) - flow->socks_buf_len, 0);
+                if (n > 0) {
+                    flow->socks_buf_len += (uint8_t)n;
+                    if (flow->socks_buf_len < 4) {
+                        continue; /* Wait for ATYP */
+                    }
+                    uint32_t expected_len = 10;
+                    if (flow->socks_buf[3] == 0x04) {
+                        expected_len = 22;
+                    } else if (flow->socks_buf[3] == 0x03) {
+                        if (flow->socks_buf_len < 5) continue;
+                        expected_len = 4 + 1 + flow->socks_buf[4] + 2;
+                    }
+                    if (flow->socks_buf_len < expected_len) {
+                        continue; /* Wait for full BND.ADDR + BND.PORT */
+                    }
+                    if (flow->socks_buf[0] == 0x05 && flow->socks_buf[1] == 0x00) {
+                        flow->state = TCP_FLOW_ESTABLISHED;
+                        flow->last_seen = time(NULL);
+                        LOGI("SOCKS_CONNECT_ACK success -> sending SYN-ACK for port %d", flow->key.dst_port);
+                        write_tcp(f, &flow->key, TCP_FLAG_SYN | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
+                        flow->server_seq += 1;
+
+                        uint32_t extra = flow->socks_buf_len - expected_len;
+                        if (extra > 0) {
+                            write_tcp(f, &flow->key, TCP_FLAG_ACK | TCP_FLAG_PSH, flow->server_seq, flow->client_seq,
+                                      flow->socks_buf + expected_len, extra);
+                            flow->server_seq += extra;
+                        }
+                        flow->socks_buf_len = 0;
+                    } else {
+                        LOGW("SOCKS_CONNECT_ACK rejected: resp=[0x%02x, 0x%02x]", flow->socks_buf[0], flow->socks_buf[1]);
+                        write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
+                        close_tcp_flow_slot(f, idx);
+                    }
+                } else if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
+                    LOGW("SOCKS_CONNECT_ACK EOF or error: n=%zd errno=%d", n, errno);
                     write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                     close_tcp_flow_slot(f, idx);
                 }
             } else if (pfds[k].revents & (POLLERR | POLLHUP)) {
+                LOGW("SOCKS_CONNECT_ACK poll revents=0x%x", pfds[k].revents);
                 write_tcp(f, &flow->key, TCP_FLAG_RST | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                 close_tcp_flow_slot(f, idx);
             }
@@ -1077,7 +1149,16 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
                         /* Server sent FIN */
                         write_tcp(f, &flow->key, TCP_FLAG_FIN | TCP_FLAG_ACK, flow->server_seq, flow->client_seq, NULL, 0);
                         flow->server_seq += 1;
-                        close_tcp_flow_slot(f, idx);
+                        if (flow->state == TCP_FLOW_FIN_WAIT) {
+                            close_tcp_flow_slot(f, idx);
+                        } else {
+                            flow->state = TCP_FLOW_SERVER_FIN;
+                            flow->last_seen = time(NULL);
+                            if (flow->sock >= 0) {
+                                close(flow->sock);
+                                flow->sock = -1;
+                            }
+                        }
                         break;
                     } else {
                         if (errno != EAGAIN && errno != EWOULDBLOCK) {

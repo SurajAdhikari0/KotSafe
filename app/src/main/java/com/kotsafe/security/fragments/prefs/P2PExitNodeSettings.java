@@ -264,6 +264,34 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
             return true;
         });
 
+        // Local Service Access / LAN Gateway Switch
+        SwitchPreference localAccessPref = findPreference(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS);
+        if (localAccessPref != null) {
+            localAccessPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabling = Boolean.TRUE.equals(newValue);
+                if (enabling) {
+                    boolean exitActive = prefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false);
+                    if (!exitActive) {
+                        Context ctx = getSafeContext();
+                        if (ctx != null) {
+                            new AlertDialog.Builder(ctx)
+                                    .setTitle(R.string.gateway_local_service_requires_exit_title)
+                                    .setMessage(R.string.gateway_local_service_requires_exit_message)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .show();
+                        }
+                        return false;
+                    }
+                    showLocalServiceAccessWarningDialog(prefs, localAccessPref);
+                    return false;
+                } else {
+                    prefs.edit().putBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false).apply();
+                    return true;
+                }
+            });
+        }
+
         // Show Pairing QR Code
         mShowPairingQr.setOnPreferenceClickListener(preference -> {
             boolean consentAgreed = prefs.getBoolean(GatewayPreferenceKeys.HOST_CONSENT_AGREED, false);
@@ -285,7 +313,7 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
                     try {
                         SecurePairingBundle parsed = SecurePairingBundle.parse(pairingBundle);
                         if (parsed != null && parsed.room != null) {
-                            if (backendToken.isEmpty() || !backendToken.contains(parsed.room)) {
+                            if (backendToken.isEmpty()) {
                                 backendToken = "client_" + parsed.room;
                                 prefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, backendToken).apply();
                             }
@@ -528,6 +556,27 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
                 .show();
     }
 
+    private void showLocalServiceAccessWarningDialog(SharedPreferences prefs, SwitchPreference pref) {
+        Context ctx = getSafeContext();
+        if (ctx == null) return;
+        new AlertDialog.Builder(ctx)
+                .setTitle(R.string.gateway_local_service_warning_title)
+                .setMessage(R.string.gateway_local_service_warning_message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(R.string.gateway_local_service_warning_confirm, (dialog, which) -> {
+                    prefs.edit().putBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, true).apply();
+                    if (pref != null) pref.setChecked(true);
+                    Toast.makeText(ctx, R.string.gateway_local_service_enabled_toast, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+                    if (pref != null) pref.setChecked(false);
+                })
+                .setOnCancelListener(dialog -> {
+                    if (pref != null) pref.setChecked(false);
+                })
+                .show();
+    }
+
     private void showClientLegalWarningDialog(SharedPreferences prefs, String backendToken) {
         Context ctx = getSafeContext();
         if (ctx == null) return;
@@ -560,7 +609,7 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
                 SecurePairingBundle parsed = SecurePairingBundle.parse(bundleUri);
                 if (parsed != null && parsed.room != null) {
                     String curToken = prefs.getString(Prefs.PREF_P2P_BACKEND_PAIRING, "");
-                    if (curToken.isEmpty() || !curToken.contains(parsed.room)) {
+                    if (curToken.isEmpty()) {
                         prefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, "host_" + parsed.room).apply();
                     }
                 }
@@ -580,7 +629,14 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
     }
 
     private void disableExitNodeHosting(SharedPreferences prefs) {
-        prefs.edit().putBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false).apply();
+        prefs.edit()
+                .putBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false)
+                .putBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false)
+                .apply();
+        SwitchPreference localPref = findPreference(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS);
+        if (localPref != null) {
+            localPref.setChecked(false);
+        }
         Context ctx = getSafeContext();
         if (ctx != null) {
             P2PExitNodeService.stop(ctx);
@@ -590,7 +646,14 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
     private void enableClientGatewayMode(SharedPreferences prefs, String backendToken) {
         if (mExitEnabled != null && mExitEnabled.isChecked()) {
             mExitEnabled.setChecked(false);
-            prefs.edit().putBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false).apply();
+            prefs.edit()
+                    .putBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false)
+                    .putBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false)
+                    .apply();
+            SwitchPreference localPref = findPreference(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS);
+            if (localPref != null) {
+                localPref.setChecked(false);
+            }
             Context ctx = getSafeContext();
             if (ctx != null) {
                 P2PExitNodeService.stop(ctx);
