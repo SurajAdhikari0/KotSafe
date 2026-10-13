@@ -181,8 +181,9 @@ public class YaraRuleEngine {
                 "ahmyth.mine.nhp", "ahmyth/mine/nhp", "AhmythService", "x0000ca", "x0000mi", "x0000sm", "x0000cl", "x0000co", "x0000lo"
         );
         ahMythRule.customEvaluator = (text, hits) -> {
+            boolean hasAnchor = hits.contains("ahmyth.mine.nhp") || hits.contains("ahmyth/mine/nhp") || hits.contains("AhmythService");
+            if (!hasAnchor) return false;
             if (hits.contains("ahmyth.mine.nhp") || hits.contains("ahmyth/mine/nhp")) return true;
-            if (hits.contains("AhmythService") && (hits.contains("x0000ca") || hits.contains("x0000mi") || hits.contains("x0000sm"))) return true;
             int cmdHits = 0;
             if (hits.contains("x0000ca")) cmdHits++;
             if (hits.contains("x0000mi")) cmdHits++;
@@ -190,7 +191,7 @@ public class YaraRuleEngine {
             if (hits.contains("x0000cl")) cmdHits++;
             if (hits.contains("x0000co")) cmdHits++;
             if (hits.contains("x0000lo")) cmdHits++;
-            return cmdHits >= 3;
+            return cmdHits >= 2;
         };
         list.add(ahMythRule);
 
@@ -520,6 +521,14 @@ public class YaraRuleEngine {
                     if (buffer == null) continue;
 
                     for (YaraRule rule : mRules) {
+                        // Native libraries (.so) should only be evaluated against native exploit/rootkit rules,
+                        // never against Java/Dalvik bytecode rules (which cause binary string false positives)
+                        if (name.endsWith(".so")) {
+                            if (rule.tags == null || (!rule.tags.contains("root") && !rule.tags.contains("exploit") && !rule.tags.contains("privilege_escalation"))) {
+                                continue;
+                            }
+                        }
+
                         YaraMatch match = rule.evaluate(buffer, name);
                         if (match != null) {
                             // System app override: if system app, downgrade severity to LOW

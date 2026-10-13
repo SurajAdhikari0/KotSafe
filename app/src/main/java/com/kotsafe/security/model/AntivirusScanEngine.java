@@ -1641,11 +1641,38 @@ public class AntivirusScanEngine {
                                         if (context != null) {
                                             PackageInfo pi = context.getPackageManager().getPackageArchiveInfo(f.getAbsolutePath(), 0);
                                             if (pi != null && pi.packageName != null &&
-                                                    (pi.packageName.equals(context.getPackageName()) || pi.packageName.startsWith("com.kotsafe.security") || pi.packageName.startsWith("com.kotsafe.security"))) {
+                                                    (pi.packageName.equals(context.getPackageName()) || pi.packageName.startsWith("com.kotsafe.security"))) {
                                                 isSelfApk = true;
+                                            }
+                                            // Split APK check: getPackageArchiveInfo returns null on split APKs!
+                                            if (!isSelfApk && context.getApplicationInfo() != null) {
+                                                ApplicationInfo myAi = context.getApplicationInfo();
+                                                String absPath = f.getAbsolutePath();
+                                                if (absPath.equals(myAi.sourceDir)) {
+                                                    isSelfApk = true;
+                                                } else if (myAi.splitSourceDirs != null) {
+                                                    for (String sPath : myAi.splitSourceDirs) {
+                                                        if (absPath.equals(sPath) || f.getName().equals(new File(sPath).getName())) {
+                                                            isSelfApk = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     } catch (Exception ignored) {}
+
+                                    // Split APK or downloaded backup package fallback check
+                                    if (!isSelfApk && (lowerName.startsWith("split_") || lowerName.contains("kotsafe"))) {
+                                        try (java.util.zip.ZipFile zf = new java.util.zip.ZipFile(f)) {
+                                            if (zf.getEntry("lib/arm64-v8a/libkotengine.so") != null
+                                                    || zf.getEntry("lib/armeabi-v7a/libkotengine.so") != null
+                                                    || zf.getEntry("lib/x86_64/libkotengine.so") != null
+                                                    || zf.getEntry("lib/x86/libkotengine.so") != null) {
+                                                isSelfApk = true;
+                                            }
+                                        } catch (Exception ignored) {}
+                                    }
                                 }
 
                                 if (isSelfApk) {

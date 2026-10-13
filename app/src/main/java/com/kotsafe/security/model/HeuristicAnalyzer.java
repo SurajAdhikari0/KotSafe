@@ -55,18 +55,25 @@ public class HeuristicAnalyzer {
         // Suspicious TLDs
         if (domain != null) {
             String d = domain.toLowerCase();
+            boolean isCdnOrCloud = isKnownCdnOrCloudDomain(d);
+
             if (matchesSuspiciousTld(d))
                 r.addFinding(20, "Suspicious TLD: " + d);
             if (d.contains("dyndns") || d.contains("no-ip") || d.contains("hopto")
                     || d.contains("duckdns") || d.contains("ddns"))
                 r.addFinding(25, "Dynamic DNS detected: " + d);
-            if (d.matches(".*[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}.*"))
+            if (!isCdnOrCloud && d.matches(".*[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}-[0-9]{1,3}.*"))
                 r.addFinding(15, "IP-in-domain (possible C2): " + d);
-            if (d.length() > 50)
+            if (!isCdnOrCloud && d.length() > 60)
                 r.addFinding(10, "Unusually long domain (DGA?): " + d.substring(0, 30) + "…");
-            // High entropy domain (DGA detection heuristic)
-            if (domainEntropy(d) > 3.8)
-                r.addFinding(20, "High entropy domain (possible DGA): " + d);
+            // High entropy subdomain (DGA detection heuristic) — isolate first label to avoid FQDN/CDN false positives
+            if (!isCdnOrCloud) {
+                int firstDot = d.indexOf('.');
+                String subLabel = firstDot > 0 ? d.substring(0, firstDot) : d;
+                if (subLabel.length() >= 14 && domainEntropy(subLabel) >= 4.4) {
+                    r.addFinding(20, "High entropy subdomain (possible DGA): " + subLabel);
+                }
+            }
         }
 
         // Suspicious ports
@@ -74,7 +81,7 @@ public class HeuristicAnalyzer {
             r.addFinding(20, "Suspicious port: " + port);
 
         // Raw IP connection (no domain) to non-CDN range
-        if (domain == null && ip != null && !isPrivateIp(ip))
+        if (domain == null && ip != null && !isPrivateIp(ip) && !BackendProviderFactory.isRelayEndpoint(ip))
             r.addFinding(10, "Raw IP connection (no domain): " + ip);
 
         r.isSuspicious = r.riskScore >= 30;
@@ -188,5 +195,25 @@ public class HeuristicAnalyzer {
             }
         }
         return entropy;
+    }
+
+    public static boolean isKnownCdnOrCloudDomain(String d) {
+        if (d == null || d.isEmpty()) return false;
+        return d.endsWith(".cloudfront.net")
+                || d.endsWith(".amazonaws.com")
+                || d.endsWith(".akamaiedge.net")
+                || d.endsWith(".akamaihd.net")
+                || d.endsWith(".akamai.net")
+                || d.endsWith(".fastly.net")
+                || d.endsWith(".cloudflare.com")
+                || d.endsWith(".cloudflare-dns.com")
+                || d.endsWith(".trycloudflare.com")
+                || d.endsWith(".1e100.net")
+                || d.endsWith(".googleusercontent.com")
+                || d.endsWith(".azureedge.net")
+                || d.endsWith(".trafficmanager.net")
+                || d.endsWith(".github.com")
+                || d.endsWith(".githubusercontent.com")
+                || d.endsWith(".jsdelivr.net");
     }
 }
