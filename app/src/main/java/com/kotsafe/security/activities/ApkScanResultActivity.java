@@ -98,6 +98,13 @@ public class ApkScanResultActivity extends AppCompatActivity {
     private MaterialButton   mBtnInstall;
     private MaterialButton   mBtnCancel;
 
+    // AI Threat Explainer (Phase 2)
+    private MaterialCardView mCardAiExplanation;
+    private TextView         mTvAiThreatCategory;
+    private TextView         mTvAiExplanationBody;
+    private TextView         mTvAiActionPlan;
+    private MaterialButton   mBtnAskAiExplainer;
+
     // Installing animation UI
     private LinearLayout     mLayoutInstalling;
     private ProgressBar      mProgressInstallingSpinner;
@@ -162,6 +169,12 @@ public class ApkScanResultActivity extends AppCompatActivity {
         mTvThreatWarning           = findViewById(R.id.tv_threat_warning);
         mBtnInstall                = findViewById(R.id.btn_install);
         mBtnCancel                 = findViewById(R.id.btn_cancel);
+
+        mCardAiExplanation        = findViewById(R.id.card_ai_explanation);
+        mTvAiThreatCategory       = findViewById(R.id.tv_ai_threat_category);
+        mTvAiExplanationBody       = findViewById(R.id.tv_ai_explanation_body);
+        mTvAiActionPlan           = findViewById(R.id.tv_ai_action_plan);
+        mBtnAskAiExplainer        = findViewById(R.id.btn_ask_ai_explainer);
 
         mLayoutInstalling          = findViewById(R.id.layout_installing_progress);
         mProgressInstallingSpinner = findViewById(R.id.progress_installing_spinner);
@@ -254,6 +267,48 @@ public class ApkScanResultActivity extends AppCompatActivity {
         }
 
         mTvScanDuration.setText(String.format(Locale.US, "%.1f s", r.scanDurationMs / 1000.0));
+
+        // ── AI Threat Explainer (Phase 2) ───────────────────────────────────────
+        if (mCardAiExplanation != null) {
+            if (r.aiExplanation != null && !r.aiExplanation.isEmpty()) {
+                mCardAiExplanation.setVisibility(View.VISIBLE);
+                if (mTvAiThreatCategory != null) {
+                    mTvAiThreatCategory.setText(r.mlThreatCategory != null && !r.mlThreatCategory.isEmpty() ? r.mlThreatCategory : "SUSPICIOUS");
+                }
+                if (mTvAiExplanationBody != null) {
+                    mTvAiExplanationBody.setText(r.aiExplanation);
+                }
+                if (mTvAiActionPlan != null) {
+                    mTvAiActionPlan.setText(r.aiActionPlan != null && !r.aiActionPlan.isEmpty() ? "Action: " + r.aiActionPlan : "Action: Do not install.");
+                }
+                if (mBtnAskAiExplainer != null) {
+                    mBtnAskAiExplainer.setOnClickListener(v -> {
+                        Intent aiIntent = new Intent(this, AiAssistantActivity.class);
+                        String prompt = (r.aiConversationalPrompt != null && !r.aiConversationalPrompt.isEmpty())
+                                ? r.aiConversationalPrompt
+                                : "Can you explain why " + r.appName + " (" + r.packageName + ") is flagged and what risks it poses?";
+                        aiIntent.putExtra("prompt", prompt);
+                        startActivity(aiIntent);
+                    });
+                }
+            } else if (ApkPreInstallScanner.VERDICT_THREAT.equals(r.verdict) || ApkPreInstallScanner.VERDICT_SUSPICIOUS.equals(r.verdict)) {
+                com.kotsafe.security.ai.ThreatContextBuilder.ThreatExplanationReport fallbackReport =
+                        com.kotsafe.security.ai.ThreatContextBuilder.buildReport(r.appName, r.packageName, null, r.evidenceTitles);
+                mCardAiExplanation.setVisibility(View.VISIBLE);
+                if (mTvAiThreatCategory != null) mTvAiThreatCategory.setText(fallbackReport.category);
+                if (mTvAiExplanationBody != null) mTvAiExplanationBody.setText(fallbackReport.plainEnglishRisk);
+                if (mTvAiActionPlan != null) mTvAiActionPlan.setText("Action: " + fallbackReport.actionPlan);
+                if (mBtnAskAiExplainer != null) {
+                    mBtnAskAiExplainer.setOnClickListener(v -> {
+                        Intent aiIntent = new Intent(this, AiAssistantActivity.class);
+                        aiIntent.putExtra("prompt", fallbackReport.conversationalPrompt);
+                        startActivity(aiIntent);
+                    });
+                }
+            } else {
+                mCardAiExplanation.setVisibility(View.GONE);
+            }
+        }
 
         // ── Evidence findings ──────────────────────────────────────────────────
         if (!r.evidenceTitles.isEmpty()) {

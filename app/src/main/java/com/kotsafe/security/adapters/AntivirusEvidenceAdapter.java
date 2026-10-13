@@ -244,6 +244,11 @@ public class AntivirusEvidenceAdapter extends RecyclerView.Adapter<AntivirusEvid
                 intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_IS_SYSTEM_APP, item.isSystemApp);
                 intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_IS_WHITELISTED, item.isWhitelisted);
                 intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_SYSTEM_REASON, item.systemReason);
+                intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_AI_EXPLANATION, item.aiExplanation);
+                intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_AI_ACTION_PLAN, item.aiActionPlan);
+                intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_AI_PROMPT, item.aiConversationalPrompt);
+                intent.putStringArrayListExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_MITRE_TECHNIQUES, new java.util.ArrayList<>(item.mitreTechniques));
+                intent.putExtra(com.kotsafe.security.activities.EvidenceDetailActivity.EXTRA_RISK_SCORE, item.mlRiskScore > 0 ? item.mlRiskScore : 0);
                 mContext.startActivity(intent);
             }
         });

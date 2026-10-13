@@ -37,6 +37,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kotsafe.security.ai.ThreatContextBuilder;
+import com.kotsafe.security.ai.ml.MlMalwareClassifier;
+
 /**
  * Pre-install APK scanner — runs the full antivirus & EDR pipeline on an arbitrary APK file
  * before the system installer is invoked. Reuses all existing infrastructure:
@@ -127,6 +130,13 @@ public class ApkPreInstallScanner {
         public String  tiDetails        = "";
         public String  tiMalwareFamily  = "";
 
+        // On-Device ML & AI Threat Explainer (Phase 1 & Phase 2)
+        public int     mlRiskScore = 0;
+        public String  mlThreatCategory = "";
+        public String  aiExplanation = "";
+        public String  aiActionPlan = "";
+        public String  aiConversationalPrompt = "";
+
         // Evidence list for display (serialized as String pairs for Parcel simplicity)
         public List<String> evidenceTitles   = new ArrayList<>();
         public List<String> evidenceDetails  = new ArrayList<>();
@@ -185,6 +195,11 @@ public class ApkPreInstallScanner {
             tiProvider         = in.readString();
             tiDetails          = in.readString();
             tiMalwareFamily    = in.readString();
+            mlRiskScore        = in.readInt();
+            mlThreatCategory   = in.readString();
+            aiExplanation      = in.readString();
+            aiActionPlan       = in.readString();
+            aiConversationalPrompt = in.readString();
             evidenceTitles     = in.createStringArrayList();
             evidenceDetails    = in.createStringArrayList();
             evidenceSeverity   = in.createStringArrayList();
@@ -241,6 +256,11 @@ public class ApkPreInstallScanner {
             dest.writeString(tiProvider);
             dest.writeString(tiDetails);
             dest.writeString(tiMalwareFamily);
+            dest.writeInt(mlRiskScore);
+            dest.writeString(mlThreatCategory);
+            dest.writeString(aiExplanation);
+            dest.writeString(aiActionPlan);
+            dest.writeString(aiConversationalPrompt);
             dest.writeStringList(evidenceTitles);
             dest.writeStringList(evidenceDetails);
             dest.writeStringList(evidenceSeverity);
@@ -429,6 +449,34 @@ public class ApkPreInstallScanner {
                         ? "Packed with " + dexResult.detectedPackerName + " — evading static analysis"
                         : "DEX structure matches known packer signatures — evading static analysis";
                 addEvidence(report, "Packer / Obfuscation Detected", desc, AntivirusEvidenceItem.SEVERITY_MALICIOUS);
+            }
+
+            // ── Phase 3b: On-Device ML Malware Classifier & Semantic Explainer ──
+            if (dexResult.featureVector != null) {
+                MlMalwareClassifier.ClassificationResult mlRes =
+                        MlMalwareClassifier.getInstance().classify(dexResult.featureVector);
+                report.mlRiskScore = mlRes.threatScore;
+                report.mlThreatCategory = mlRes.threatCategory;
+
+                if (mlRes.isMalicious || mlRes.isSuspicious) {
+                    ThreatContextBuilder.ThreatExplanationReport expReport =
+                            ThreatContextBuilder.buildReport(report.appName, report.packageName, mlRes, dexResult.detectedFeatures);
+                    report.aiExplanation = expReport.plainEnglishRisk;
+                    report.aiActionPlan = expReport.actionPlan;
+                    report.aiConversationalPrompt = expReport.conversationalPrompt;
+
+                    for (String tech : expReport.mitreTechniqueLabels) {
+                        if (!report.mitreTechniques.contains(tech)) {
+                            report.mitreTechniques.add(tech);
+                        }
+                    }
+
+                    String severity = mlRes.isMalicious ? AntivirusEvidenceItem.SEVERITY_MALICIOUS : AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
+                    String evidenceTitle = "AI Threat Classification: " + mlRes.threatCategory;
+                    String evidenceDetail = expReport.headline + " (ML Risk: " + mlRes.threatScore + "/100). "
+                            + (mlRes.contributingFeatures.isEmpty() ? "" : "Identified: " + String.join(", ", mlRes.contributingFeatures));
+                    addEvidence(report, evidenceTitle, evidenceDetail, severity);
+                }
             }
 
             // ── Phase 3c: Static binary & DEX IOC extraction ─────────────────
@@ -703,6 +751,15 @@ public class ApkPreInstallScanner {
                     AntivirusEvidenceItem.SEVERITY_MALICIOUS);
             if (!r.mitreTechniques.contains("T1027.002 - Software Packing / Dynamic Dropper")) {
                 r.mitreTechniques.add("T1027.002 - Software Packing / Dynamic Dropper");
+            }
+        }
+
+        // On-Device ML Classifier Evaluation
+        if (r.mlRiskScore > 0) {
+            if (r.mlRiskScore >= 70) {
+                score = Math.max(score, r.mlRiskScore);
+            } else if (r.mlRiskScore >= 40) {
+                score = Math.max(score, (int)(r.mlRiskScore * 0.85f));
             }
         }
 

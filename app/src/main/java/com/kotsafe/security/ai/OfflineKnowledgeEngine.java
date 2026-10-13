@@ -88,6 +88,11 @@ public class OfflineKnowledgeEngine {
             if (invAns != null) return invAns;
         }
 
+        // Deep APK / ML Threat Explainer Intent (Phase 2 Semantic Reasoning)
+        if (q.contains("kotsafe ai security audit") || q.contains("threat category:") || (q.contains("audit for ") && q.contains("risk score"))) {
+            return generateApkThreatExplainerResponse(userQuery);
+        }
+
         String answer;
         if (matches(q, "audit", "posture", "is my phone secure", "am i secure", "security score", "health check", "device check", "audit device", "audit phone", "audit my phone")) {
             answer = generateDeviceSecurityAudit(context);
@@ -1733,6 +1738,100 @@ public class OfflineKnowledgeEngine {
         sb.append("• **Split APK & App Gate Verifier**: Audits split APK bundles and DEX entropy.\n\n");
         sb.append("Tap below to launch the dedicated Antivirus Scanner immediately:\n\n");
         sb.append("[RULE_ACTION:START_SCAN:ANTIVIRUS]");
+        return sb.toString();
+    }
+
+    public static String generateApkThreatExplainerResponse(String appName, String packageName,
+                                                            int riskScore, String category,
+                                                            List<String> capabilities, String actionPlan) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("### 🛡️ KotSafe AI Threat Explainer & Autonomous Security Audit\n\n");
+        sb.append("**Target Application**: ").append(appName != null ? appName : "Unknown").append("\n");
+        sb.append("**Package Name**: `").append(packageName != null ? packageName : "").append("`\n");
+        sb.append("**Risk Score**: ").append(riskScore).append(" / 100\n");
+        sb.append("**Threat Profile**: **").append(category != null ? category : "SUSPICIOUS").append("**\n\n");
+
+        sb.append("#### 🚨 Why this app is dangerous:\n");
+        sb.append(generateApkThreatExplainerResponse(category != null ? category : ""));
+        sb.append("\n\n");
+
+        if (capabilities != null && !capabilities.isEmpty()) {
+            sb.append("#### 🔍 Observed Capabilities:\n");
+            for (String cap : capabilities) {
+                sb.append("• ").append(cap).append("\n");
+            }
+            sb.append("\n");
+        }
+
+        sb.append("#### 🛡️ What KotSafe did:\n");
+        sb.append("• Recorded cryptographic hash and behavioral feature vector.\n");
+        sb.append("• Flagged anomalous bytecode structures in on-device AI decision forest.\n");
+        sb.append("• Correlated indicators against MITRE ATT&CK Mobile Matrix.\n\n");
+
+        sb.append("#### ⚡ What you should do:\n");
+        if (actionPlan != null && !actionPlan.isEmpty()) {
+            sb.append(actionPlan).append("\n");
+        } else {
+            sb.append("Uninstall this application immediately and do not grant any requested permissions.\n");
+        }
+
+        return sb.toString();
+    }
+
+    public static String generateApkThreatExplainerResponse(String query) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("### 🛡️ KotSafe AI Threat Explainer & Autonomous Security Audit\n\n");
+        sb.append("KotSafe's On-Device ML and Semantic Reasoning Engine evaluated this application against mobile threat archetypes.\n\n");
+
+        String lower = query.toLowerCase(Locale.ROOT);
+        boolean isBanker = lower.contains("banking_trojan") || lower.contains("overlay") || lower.contains("accessibility");
+        boolean isDropper = lower.contains("dropper_packer") || lower.contains("packer") || lower.contains("dexclassloader");
+        boolean isSpyware = lower.contains("spyware_rat") || lower.contains("audio") || lower.contains("camera") || lower.contains("surveillance");
+        boolean isSms = lower.contains("sms_fraud") || lower.contains("sms");
+
+        if (isBanker) {
+            sb.append("#### 🚨 Primary Threat Vector: Mobile Banking Trojan & Credential Harvester\n");
+            sb.append("• **Mechanism**: The application requests or bundles Accessibility Service access combined with screen overlay permissions (`TYPE_APPLICATION_OVERLAY`).\n");
+            sb.append("• **Exploitation Pattern**: When a target banking, payment, or cryptocurrency app is launched, the trojan draws an identical fake login window on top to capture credentials and PINs.\n");
+            sb.append("• **2FA Bypass**: Intercepts incoming SMS verification codes in the background to bypass one-time password (OTP) verification.\n\n");
+            sb.append("#### 🌐 MITRE ATT&CK Mobile Tactics:\n");
+            sb.append("• **[T1417 Input Capture]**: Accessibility event snooping and keystroke interception.\n");
+            sb.append("• **[T1513 Screen Capture]**: Overlay hijacking of foreground window context.\n");
+            sb.append("• **[T1412 Capture SMS Data]**: Automated exfiltration of 2FA SMS tokens.\n\n");
+            sb.append("#### ⚡ Recommended Immediate Action:\n");
+            sb.append("1. **Do not launch your banking apps** until this package is uninstalled.\n");
+            sb.append("2. Open **Android Settings > Accessibility** and ensure this application is toggled **OFF**.\n");
+            sb.append("3. Uninstall the application immediately via Android Settings > Apps.");
+        } else if (isDropper) {
+            sb.append("#### 🚨 Primary Threat Vector: Malicious Dropper / Obfuscated Stager\n");
+            sb.append("• **Mechanism**: Contains a tiny initial Dalvik DEX footprint paired with a heavy encrypted asset or native stub payload.\n");
+            sb.append("• **Exploitation Pattern**: Dynamic bytecode invocation via `DexClassLoader` to unpack secondary code at runtime, evading static app store review.\n\n");
+            sb.append("#### 🌐 MITRE ATT&CK Mobile Tactics:\n");
+            sb.append("• **[T1406 Obfuscated Files or Information]**: Dynamic Dalvik bytecode loading.\n");
+            sb.append("• **[T1407 Download New Code at Runtime]**: Staged payload delivery from remote servers.\n\n");
+            sb.append("#### ⚡ Recommended Immediate Action:\n");
+            sb.append("1. Revoke **'Install unknown apps'** permission from this app.\n");
+            sb.append("2. Uninstall the package to prevent dynamic execution of secondary payloads.");
+        } else if (isSpyware) {
+            sb.append("#### 🚨 Primary Threat Vector: Spyware & Remote Access Trojan (RAT)\n");
+            sb.append("• **Mechanism**: Bundles unauthorized audio recording, camera access, continuous GPS tracking, and hardware serial collection.\n");
+            sb.append("• **Exploitation Pattern**: Establishes background command-and-control (C2) persistence using `BOOT_COMPLETED` receivers and executes shell commands.\n\n");
+            sb.append("#### 🌐 MITRE ATT&CK Mobile Tactics:\n");
+            sb.append("• **[T1429 Audio Capture]** & **[T1430 Location Tracking]**: Unauthorized background sensor activation.\n");
+            sb.append("• **[T1404 Exploitation for Privilege Escalation]**: Direct shell and root command execution.\n\n");
+            sb.append("#### ⚡ Recommended Immediate Action:\n");
+            sb.append("1. Revoke Camera, Microphone, and Location permissions immediately.\n");
+            sb.append("2. Enable KotSafe Firewall to block all outbound C2 traffic.\n");
+            sb.append("3. Uninstall the application.");
+        } else {
+            sb.append("#### 🔍 Threat Vector Analysis: Elevated Capability Risk\n");
+            sb.append("KotSafe identified anomalous permission combinations, high string entropy, or evasive SDK targeting.\n\n");
+            sb.append("#### ⚡ Action Plan:\n");
+            sb.append("1. Audit the permissions granted to this app in Android Settings.\n");
+            sb.append("2. Review active outbound network flows in KotSafe.\n");
+            sb.append("3. Remove the app if you did not intentionally install it from a trusted developer.");
+        }
+
         return sb.toString();
     }
 }

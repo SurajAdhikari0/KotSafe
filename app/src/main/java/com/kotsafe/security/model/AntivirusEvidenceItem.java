@@ -58,6 +58,13 @@ public class AntivirusEvidenceItem implements Serializable {
     public boolean isWhitelisted = false;
     public String systemReason = "";
 
+    // AI Threat Explainer & Semantic Reasoning (Phase 2)
+    public String aiExplanation = "";
+    public String aiActionPlan = "";
+    public String aiConversationalPrompt = "";
+    public java.util.List<String> mitreTechniques = new java.util.ArrayList<>();
+    public int mlRiskScore = 0;
+
     public AntivirusEvidenceItem() {}
 
     public AntivirusEvidenceItem(String type, String title, String subtitle, String iocValue, String severity, String details) {

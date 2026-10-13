@@ -36,6 +36,8 @@ import com.kotsafe.security.ConnectionsRegister;
 import com.kotsafe.security.Log;
 import com.kotsafe.security.ThreatIntelApiClient;
 import com.kotsafe.security.Utils;
+import com.kotsafe.security.ai.ThreatContextBuilder;
+import com.kotsafe.security.ai.ml.MlMalwareClassifier;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -606,7 +608,55 @@ public class AntivirusScanEngine {
                                 DexStructuralParser.DexAnalysisResult dexRes = DexStructuralParser.analyzeApk(apkFile);
                                 dexRes.featureVector.contentHash = sha256;
                                 hashDb.upsertFeatureVector(dexRes.featureVector);
-                                if (dexRes.heuristicConfidenceScore >= 50 && !entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
+
+                                // Phase 1: On-Device ML Malware Classifier & Phase 2: Threat Explainer
+                                MlMalwareClassifier.ClassificationResult mlRes =
+                                        MlMalwareClassifier.getInstance().classify(dexRes.featureVector);
+                                if (mlRes.isMalicious || mlRes.isSuspicious) {
+                                    result.behavioralAnomaliesCount++;
+                                    if (mlRes.isMalicious) {
+                                        entry.threatStatus = FileHashEntry.THREAT_MALICIOUS;
+                                    } else if (!entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
+                                        entry.threatStatus = FileHashEntry.THREAT_SUSPICIOUS;
+                                    }
+                                    entry.threatDetails = "[AI ML: " + mlRes.threatCategory + " (" + mlRes.threatScore + "%)] "
+                                            + String.join(" | ", mlRes.contributingFeatures);
+                                    hashDb.enqueueVtLookup(sha256, apkFile.getAbsolutePath());
+
+                                    // Build Phase 2 Threat Explanation Report & MITRE ATT&CK Matrix
+                                    ThreatContextBuilder.ThreatExplanationReport expReport =
+                                            ThreatContextBuilder.buildReport(appLabel, pkgInfo.packageName, mlRes, dexRes.detectedFeatures);
+                                    assessment.reasons.add("AI Detection: " + expReport.headline + " (" + expReport.riskScore + "% risk)");
+
+                                    AntivirusEvidenceItem aiItem = new AntivirusEvidenceItem();
+                                    aiItem.type = AntivirusEvidenceItem.TYPE_APP_HASH;
+                                    aiItem.iocValue = sha256 != null ? sha256 : pkgInfo.packageName;
+                                    aiItem.sha256 = sha256 != null ? sha256 : "";
+                                    aiItem.filePath = apkFile.getAbsolutePath();
+                                    aiItem.fileSizeFormatted = Utils.formatBytes(apkFile.length());
+                                    aiItem.title = "AI Threat Detection: " + mlRes.threatCategory;
+                                    aiItem.subtitle = appLabel + " (" + pkgInfo.packageName + ")";
+                                    aiItem.packageName = pkgInfo.packageName;
+                                    aiItem.isSystemApp = false;
+                                    aiItem.threatCategory = mlRes.threatCategory;
+                                    aiItem.malwareFamily = mlRes.threatCategory;
+                                    aiItem.verdict = mlRes.isMalicious ? AppTrustEvaluator.VERDICT_MALICIOUS : AppTrustEvaluator.VERDICT_SUSPICIOUS;
+                                    aiItem.confidence = mlRes.threatScore >= 75 ? "HIGH" : "MEDIUM";
+                                    aiItem.mlRiskScore = mlRes.threatScore;
+                                    aiItem.aiExplanation = expReport.plainEnglishRisk;
+                                    aiItem.aiActionPlan = expReport.actionPlan;
+                                    aiItem.aiConversationalPrompt = expReport.conversationalPrompt;
+                                    aiItem.mitreTechniques.addAll(expReport.mitreTechniqueLabels);
+                                    aiItem.forensicReasons.addAll(mlRes.contributingFeatures);
+                                    aiItem.severity = mlRes.isMalicious ? AntivirusEvidenceItem.SEVERITY_MALICIOUS : AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
+                                    aiItem.details = expReport.plainEnglishRisk + "\n\nRecommended Action:\n" + expReport.actionPlan;
+                                    if (mlRes.isMalicious) {
+                                        result.threatsDetected++;
+                                    } else {
+                                        result.suspiciousDetected++;
+                                    }
+                                    items.add(aiItem);
+                                } else if (dexRes.heuristicConfidenceScore >= 50 && !entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
                                     result.behavioralAnomaliesCount++;
                                     entry.threatStatus = FileHashEntry.THREAT_SUSPICIOUS;
                                     entry.threatDetails = "[Structural DEX Analysis] " + String.join(" | ", dexRes.detectedFeatures);

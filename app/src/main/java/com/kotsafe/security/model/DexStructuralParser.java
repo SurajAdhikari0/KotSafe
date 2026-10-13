@@ -125,6 +125,7 @@ public class DexStructuralParser {
         }
 
         result.featureVector.nativeLibCount = nativeLibCount;
+        result.featureVector.dexSizeKb = (float) totalDexBytes / 1024.0f;
         if (totalDexBytes > 0) {
             result.featureVector.assetToCodeRatio = (float) totalAssetBytes / (float) totalDexBytes;
         }
@@ -138,8 +139,11 @@ public class DexStructuralParser {
             result.detectedFeatures.add("packer_stub_high_asset_ratio");
         }
 
-        if (result.hasPackerStub && !result.detectedPackerName.isEmpty() && !result.detectedFeatures.contains("Packer: " + result.detectedPackerName)) {
-            result.detectedFeatures.add("Packer: " + result.detectedPackerName);
+        if (result.hasPackerStub) {
+            result.featureVector.hasPackerStub = 1.0f;
+            if (!result.detectedPackerName.isEmpty() && !result.detectedFeatures.contains("Packer: " + result.detectedPackerName)) {
+                result.detectedFeatures.add("Packer: " + result.detectedPackerName);
+            }
         }
 
         if (firstDexBytes != null && firstDexBytes.length >= 0x70) {
@@ -178,6 +182,13 @@ public class DexStructuralParser {
             int dynamicLoadingCount = 0;
             int dangerousExecCount = 0;
             int smsAbuseCount = 0;
+            int cryptoOpsCount = 0;
+            int deviceIdAccessCount = 0;
+            int audioCameraCount = 0;
+            int locationCount = 0;
+            int rawSocketCount = 0;
+            int pmTamperingCount = 0;
+            int windowOverlayCount = 0;
             double totalEntropy = 0;
             int entropySampleCount = 0;
 
@@ -213,6 +224,31 @@ public class DexStructuralParser {
                     smsAbuseCount++;
                     extractedTokens.add("SmsTelephony");
                 }
+                if (s.contains("Cipher") || s.contains("SecretKeySpec") || s.contains("DESKeySpec") || s.contains("AES/CBC")) {
+                    cryptoOpsCount++;
+                }
+                if (s.contains("getDeviceId") || s.contains("getImei") || s.contains("getSubscriberId") || s.contains("ANDROID_ID")) {
+                    deviceIdAccessCount++;
+                    extractedTokens.add("DeviceIdentifierAccess");
+                }
+                if (s.contains("AudioRecord") || s.contains("MediaRecorder") || s.contains("Camera.open")) {
+                    audioCameraCount++;
+                    extractedTokens.add("AudioCameraSurveillance");
+                }
+                if (s.contains("LocationManager") || s.contains("requestLocationUpdates") || s.contains("getLastKnownLocation")) {
+                    locationCount++;
+                }
+                if (s.contains("HttpURLConnection") || s.contains("SocketChannel") || s.contains("DatagramSocket") || s.contains("OkHttpClient")) {
+                    rawSocketCount++;
+                }
+                if (s.contains("installPackage") || s.contains("getInstallerPackageName") || s.contains("deletePackage")) {
+                    pmTamperingCount++;
+                }
+                if (s.contains("TYPE_APPLICATION_OVERLAY") || s.contains("FLAG_NOT_TOUCHABLE") || s.contains("TYPE_SYSTEM_ALERT")) {
+                    windowOverlayCount++;
+                    extractedTokens.add("WindowOverlayHijack");
+                }
+
                 if (s.contains("ALLATORIxDEMO")) {
                     extractedTokens.add("Allatori Obfuscator");
                 }
@@ -231,6 +267,17 @@ public class DexStructuralParser {
                 result.featureVector.stringEntropy = (float) (totalEntropy / entropySampleCount);
             }
 
+            result.featureVector.dynamicLoadingCount = dynamicLoadingCount;
+            result.featureVector.processExecCount = dangerousExecCount;
+            result.featureVector.smsAbuseCount = smsAbuseCount;
+            result.featureVector.cryptoOpsCount = cryptoOpsCount;
+            result.featureVector.deviceIdAccessCount = deviceIdAccessCount;
+            result.featureVector.audioCameraCount = audioCameraCount;
+            result.featureVector.locationCount = locationCount;
+            result.featureVector.rawSocketCount = rawSocketCount;
+            result.featureVector.pmTamperingCount = pmTamperingCount;
+            result.featureVector.windowOverlayCount = windowOverlayCount;
+
             result.hasDynamicLoading = dynamicLoadingCount > 0;
             result.hasDangerousExec = dangerousExecCount > 0;
             result.hasSmsAbuse = smsAbuseCount > 0;
@@ -238,6 +285,10 @@ public class DexStructuralParser {
             if (result.hasDynamicLoading) result.detectedFeatures.add("Dynamic Code Loading (DexClassLoader)");
             if (result.hasDangerousExec) result.detectedFeatures.add("Direct Shell / Root Command Execution");
             if (result.hasSmsAbuse) result.detectedFeatures.add("Background SMS Dispatch Execution");
+            if (windowOverlayCount > 0) result.detectedFeatures.add("Screen Overlay Hijack Capabilities");
+            if (deviceIdAccessCount > 0) result.detectedFeatures.add("Hardware Fingerprint & Device ID Collection");
+            if (audioCameraCount > 0) result.detectedFeatures.add("Background Audio/Camera Recording");
+
             for (String tok : extractedTokens) {
                 if ((tok.endsWith("Obfuscator") || tok.endsWith("Protector")) && !result.detectedFeatures.contains(tok)) {
                     result.detectedFeatures.add(tok);

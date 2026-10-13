@@ -46,6 +46,10 @@ public class EvidenceDetailActivity extends BaseActivity {
     public static final String EXTRA_IS_SYSTEM_APP = "extra_is_system_app";
     public static final String EXTRA_IS_WHITELISTED = "extra_is_whitelisted";
     public static final String EXTRA_SYSTEM_REASON = "extra_system_reason";
+    public static final String EXTRA_AI_EXPLANATION = "extra_ai_explanation";
+    public static final String EXTRA_AI_ACTION_PLAN = "extra_ai_action_plan";
+    public static final String EXTRA_AI_PROMPT = "extra_ai_prompt";
+    public static final String EXTRA_MITRE_TECHNIQUES = "extra_mitre_techniques";
 
     private String mFilePath;
     private String mSha256;
@@ -63,6 +67,10 @@ public class EvidenceDetailActivity extends BaseActivity {
     private boolean mIsSystemApp;
     private boolean mIsWhitelisted;
     private String mSystemReason;
+    private String mAiExplanation;
+    private String mAiActionPlan;
+    private String mAiPrompt;
+    private java.util.ArrayList<String> mMitreTechniques;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +109,10 @@ public class EvidenceDetailActivity extends BaseActivity {
             mIsSystemApp = intent.getBooleanExtra(EXTRA_IS_SYSTEM_APP, false);
             mIsWhitelisted = intent.getBooleanExtra(EXTRA_IS_WHITELISTED, false);
             mSystemReason = intent.getStringExtra(EXTRA_SYSTEM_REASON);
+            mAiExplanation = intent.getStringExtra(EXTRA_AI_EXPLANATION);
+            mAiActionPlan = intent.getStringExtra(EXTRA_AI_ACTION_PLAN);
+            mAiPrompt = intent.getStringExtra(EXTRA_AI_PROMPT);
+            mMitreTechniques = intent.getStringArrayListExtra(EXTRA_MITRE_TECHNIQUES);
         }
 
         if (mTitle == null) mTitle = "Evidence Item";
@@ -123,6 +135,16 @@ public class EvidenceDetailActivity extends BaseActivity {
         }
         if (mSystemReason == null || mSystemReason.isEmpty()) {
             mSystemReason = "This app is important to run Android OS services.";
+        }
+
+        if ((mAiExplanation == null || mAiExplanation.isEmpty()) && !mIsSystemApp
+                && (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equalsIgnoreCase(mSeverity)
+                || AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equalsIgnoreCase(mSeverity))) {
+            com.kotsafe.security.ai.ThreatContextBuilder.ThreatExplanationReport fallbackReport =
+                    com.kotsafe.security.ai.ThreatContextBuilder.buildReport(mTitle, mPackageName, null, java.util.Collections.singletonList(mDetails));
+            mAiExplanation = fallbackReport.plainEnglishRisk;
+            mAiActionPlan = fallbackReport.actionPlan;
+            mAiPrompt = fallbackReport.conversationalPrompt;
         }
     }
 
@@ -223,6 +245,37 @@ public class EvidenceDetailActivity extends BaseActivity {
             tvBadge.setText(mIsSystemApp ? "SYSTEM (SAFE)" : "CLEAN");
             tvBadge.setBackgroundResource(R.drawable.bg_badge_service);
             tvRiskScore.setTextColor(ContextCompat.getColor(this, R.color.ok));
+        }
+
+        // AI Threat Analysis & Reasoning (Phase 2)
+        View cardAi = findViewById(R.id.card_ai_explainer);
+        TextView tvAiCatBadge = findViewById(R.id.tv_ai_category_badge);
+        TextView tvAiExplanation = findViewById(R.id.tv_ai_explanation_text);
+        TextView tvAiActionPlan = findViewById(R.id.tv_ai_action_plan_text);
+        MaterialButton btnConsultAi = findViewById(R.id.btn_consult_ai);
+
+        if (mAiExplanation != null && !mAiExplanation.isEmpty() && !mIsSystemApp) {
+            if (cardAi != null) cardAi.setVisibility(View.VISIBLE);
+            if (tvAiCatBadge != null) {
+                String cat = (mMalwareFamily != null && !mMalwareFamily.isEmpty()) ? mMalwareFamily : "SUSPICIOUS";
+                tvAiCatBadge.setText(cat);
+            }
+            if (tvAiExplanation != null) tvAiExplanation.setText(mAiExplanation);
+            if (tvAiActionPlan != null) {
+                tvAiActionPlan.setText(mAiActionPlan != null && !mAiActionPlan.isEmpty() ? mAiActionPlan : "Recommended: Inspect origin and uninstall if untrusted.");
+            }
+            if (btnConsultAi != null) {
+                btnConsultAi.setOnClickListener(v -> {
+                    Intent aiIntent = new Intent(this, AiAssistantActivity.class);
+                    String prompt = (mAiPrompt != null && !mAiPrompt.isEmpty())
+                            ? mAiPrompt
+                            : "Can you explain why " + (mPackageName != null ? mPackageName : "this application") + " was flagged and what action I should take?";
+                    aiIntent.putExtra("prompt", prompt);
+                    startActivity(aiIntent);
+                });
+            }
+        } else {
+            if (cardAi != null) cardAi.setVisibility(View.GONE);
         }
 
         // MITRE ATT&CK Mobile Matrix Correlation
