@@ -633,12 +633,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- Interactive Collapsible Header -->
             <LinearLayout
+                android:id="@+id/btn_toggle_workbenches"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
+                android:paddingVertical="4dp"
+                android:layout_marginBottom="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -649,13 +655,41 @@
                     android:textColor="@color/cardWorkbenchSubtext"
                     android:letterSpacing="0.08" />
 
+                <TextView
+                    android:id="@+id/tv_workbenches_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="6 Tools"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorAccent"
+                    android:background="@drawable/badge_pill_proto"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp" />
+
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
                     android:background="@color/cardWorkbenchBorder" />
+
+                <ImageView
+                    android:id="@+id/iv_workbenches_chevron"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_expand_more"
+                    app:tint="@color/cardWorkbenchSubtext" />
             </LinearLayout>
+
+            <!-- Collapsible Workbenches Content Container -->
+            <LinearLayout
+                android:id="@+id/workbenches_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
             <!-- Row 1: Firewall & Antivirus Radar -->
             <LinearLayout
@@ -1037,6 +1071,7 @@
                     android:layout_height="18dp"
                     android:src="@drawable/ic_navigate_next"
                     app:tint="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -1465,23 +1500,47 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Card Header with All Settings Shortcut -->
+            <!-- Card Header with Toggle and All Settings Shortcut -->
             <LinearLayout
+                android:id="@+id/btn_toggle_capture_config"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
+                android:paddingVertical="4dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="CAPTURE CONFIGURATION"
                     android:textSize="11sp"
                     android:textStyle="bold"
                     android:textColor="?android:attr/textColorHint"
                     android:letterSpacing="0.08" />
+
+                <TextView
+                    android:id="@+id/tv_capture_config_summary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="6dp"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:text="All Apps • TLS Off"
+                    android:textSize="10sp"
+                    android:textColor="?attr/colorAccent"
+                    android:visibility="gone" />
+
+                <View
+                    android:id="@+id/capture_config_header_spacer"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:visibility="visible" />
 
                 <LinearLayout
                     android:id="@+id/btn_capture_more_settings"
@@ -1489,7 +1548,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingHorizontal="8dp"
+                    android:paddingHorizontal="6dp"
                     android:paddingVertical="4dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
@@ -1511,7 +1570,23 @@
                         android:textColor="?attr/colorAccent"
                         android:letterSpacing="0.04" />
                 </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/iv_capture_config_chevron"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/ic_expand_more"
+                    app:tint="?android:attr/textColorHint" />
             </LinearLayout>
+
+            <!-- Collapsible Capture Configuration Content Container -->
+            <LinearLayout
+                android:id="@+id/capture_config_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="6dp">
 
             <!-- Row 1: Target Apps -->
             <LinearLayout
@@ -1914,6 +1989,7 @@
                     android:text="@string/decryption_no_filter_warn"
                     android:textColor="@color/warning"
                     android:textSize="12sp" />
+            </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 

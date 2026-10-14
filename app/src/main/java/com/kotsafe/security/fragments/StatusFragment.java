@@ -167,6 +167,17 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
     private TextView mTelemetryTotConns;
     private TextView mTelemetryDropped;
     private View mQuickWorkbenchesSection;
+    private View mBtnToggleWorkbenches;
+    private View mWorkbenchesContent;
+    private ImageView mIvWorkbenchesChevron;
+    private TextView mTvWorkbenchesBadge;
+
+    private View mBtnToggleCaptureConfig;
+    private View mCaptureConfigContent;
+    private ImageView mIvCaptureConfigChevron;
+    private TextView mTvCaptureConfigSummary;
+    private View mCaptureConfigHeaderSpacer;
+
     private TextView mPostureFwText;
     private TextView mPostureAvText;
     private TextView mPostureAiText;
@@ -422,6 +433,8 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
 
         View postureTi = view.findViewById(R.id.status_posture_threats);
         if (postureTi != null) postureTi.setOnClickListener(v -> showSocSentinelDialog());
+
+        setupCollapsibleSections(view);
 
         // Personal Gateway Card Binding
         mCardPersonalGateway = view.findViewById(R.id.card_personal_gateway);
@@ -769,6 +782,92 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
         }
 
         recheckFilterWarning();
+
+        if (mTvCaptureConfigSummary != null) {
+            String appText = effective ? (mAppFilter.size() + " apps") : "All Apps";
+            String tlsText = tlsEnabled ? "TLS On" : "TLS Off";
+            mTvCaptureConfigSummary.setText(appText + " • " + tlsText);
+        }
+    }
+
+    private void setupCollapsibleSections(View rootView) {
+        if (mPrefs == null || rootView == null) return;
+
+        mBtnToggleWorkbenches = rootView.findViewById(R.id.btn_toggle_workbenches);
+        mWorkbenchesContent = rootView.findViewById(R.id.workbenches_content);
+        mIvWorkbenchesChevron = rootView.findViewById(R.id.iv_workbenches_chevron);
+        mTvWorkbenchesBadge = rootView.findViewById(R.id.tv_workbenches_badge);
+
+        mBtnToggleCaptureConfig = rootView.findViewById(R.id.btn_toggle_capture_config);
+        mCaptureConfigContent = rootView.findViewById(R.id.capture_config_content);
+        mIvCaptureConfigChevron = rootView.findViewById(R.id.iv_capture_config_chevron);
+        mTvCaptureConfigSummary = rootView.findViewById(R.id.tv_capture_config_summary);
+        mCaptureConfigHeaderSpacer = rootView.findViewById(R.id.capture_config_header_spacer);
+
+        boolean wbExpanded = mPrefs.getBoolean(Prefs.PREF_WORKBENCHES_EXPANDED, false);
+        boolean capExpanded = mPrefs.getBoolean(Prefs.PREF_CAPTURE_CONFIG_EXPANDED, false);
+
+        if (mWorkbenchesContent != null) {
+            mWorkbenchesContent.setVisibility(wbExpanded ? View.VISIBLE : View.GONE);
+        }
+        if (mIvWorkbenchesChevron != null) {
+            mIvWorkbenchesChevron.setRotation(wbExpanded ? 180f : 0f);
+        }
+        if (mTvWorkbenchesBadge != null) {
+            mTvWorkbenchesBadge.setText(wbExpanded ? "6 Tools" : "6 Tools ▼");
+        }
+
+        if (mBtnToggleWorkbenches != null && mWorkbenchesContent != null) {
+            mBtnToggleWorkbenches.setOnClickListener(v -> {
+                boolean isExpanded = mWorkbenchesContent.getVisibility() == View.VISIBLE;
+                boolean willExpand = !isExpanded;
+                if (rootView instanceof android.view.ViewGroup) {
+                    android.transition.TransitionManager.beginDelayedTransition((android.view.ViewGroup) rootView);
+                }
+                mWorkbenchesContent.setVisibility(willExpand ? View.VISIBLE : View.GONE);
+                if (mIvWorkbenchesChevron != null) {
+                    mIvWorkbenchesChevron.animate().rotation(willExpand ? 180f : 0f).setDuration(220).start();
+                }
+                if (mTvWorkbenchesBadge != null) {
+                    mTvWorkbenchesBadge.setText(willExpand ? "6 Tools" : "6 Tools ▼");
+                }
+                mPrefs.edit().putBoolean(Prefs.PREF_WORKBENCHES_EXPANDED, willExpand).apply();
+            });
+        }
+
+        if (mCaptureConfigContent != null) {
+            mCaptureConfigContent.setVisibility(capExpanded ? View.VISIBLE : View.GONE);
+        }
+        if (mIvCaptureConfigChevron != null) {
+            mIvCaptureConfigChevron.setRotation(capExpanded ? 180f : 0f);
+        }
+        if (mTvCaptureConfigSummary != null) {
+            mTvCaptureConfigSummary.setVisibility(capExpanded ? View.GONE : View.VISIBLE);
+        }
+        if (mCaptureConfigHeaderSpacer != null) {
+            mCaptureConfigHeaderSpacer.setVisibility(capExpanded ? View.VISIBLE : View.GONE);
+        }
+
+        if (mBtnToggleCaptureConfig != null && mCaptureConfigContent != null) {
+            mBtnToggleCaptureConfig.setOnClickListener(v -> {
+                boolean isExpanded = mCaptureConfigContent.getVisibility() == View.VISIBLE;
+                boolean willExpand = !isExpanded;
+                if (rootView instanceof android.view.ViewGroup) {
+                    android.transition.TransitionManager.beginDelayedTransition((android.view.ViewGroup) rootView);
+                }
+                mCaptureConfigContent.setVisibility(willExpand ? View.VISIBLE : View.GONE);
+                if (mIvCaptureConfigChevron != null) {
+                    mIvCaptureConfigChevron.animate().rotation(willExpand ? 180f : 0f).setDuration(220).start();
+                }
+                if (mTvCaptureConfigSummary != null) {
+                    mTvCaptureConfigSummary.setVisibility(willExpand ? View.GONE : View.VISIBLE);
+                }
+                if (mCaptureConfigHeaderSpacer != null) {
+                    mCaptureConfigHeaderSpacer.setVisibility(willExpand ? View.VISIBLE : View.GONE);
+                }
+                mPrefs.edit().putBoolean(Prefs.PREF_CAPTURE_CONFIG_EXPANDED, willExpand).apply();
+            });
+        }
     }
 
     private void onStatsUpdate(CaptureStats stats) {

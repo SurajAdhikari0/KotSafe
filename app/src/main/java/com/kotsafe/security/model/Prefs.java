@@ -112,6 +112,8 @@ public class Prefs {
     public static final String PREF_PORT_MAPPING_ENABLED = "port_mapping_enabled";
     public static final String PREF_PORT_MAPPING_EXEMPTIONS = "port_mapping_exemptions";
     public static final String PREF_BLOCK_NEW_APPS = "block_new_apps";
+    public static final String PREF_WORKBENCHES_EXPANDED = "workbenches_expanded";
+    public static final String PREF_CAPTURE_CONFIG_EXPANDED = "capture_config_expanded";
     public static final String PREF_PAYLOAD_NOTICE_ACK = "payload_notice";
     public static final String PREF_REMOTE_COLLECTOR_ACK = "remote_collector_notice";
     public static final String PREF_MITMPROXY_OPTS = "mitmproxy_opts";
