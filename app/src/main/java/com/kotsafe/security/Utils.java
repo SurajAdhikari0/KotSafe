@@ -106,6 +106,7 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -2127,11 +2128,24 @@ public class Utils {
     // https://medium.com/androiddevelopers/insets-handling-tips-for-android-15s-edge-to-edge-enforcement-872774e8839b
     public static void enableEdgeToEdge(ComponentActivity activity) {
         EdgeToEdge.enable(activity);
+        updateSystemBarAppearance(activity);
+    }
 
-        // use light icons even with the light theme
+    public static void updateSystemBarAppearance(Activity activity) {
+        if (activity == null) return;
+        boolean isNight = (activity.getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
         Window window = activity.getWindow();
-        WindowCompat.getInsetsController(window, window.getDecorView())
-                .setAppearanceLightStatusBars(false);
+        if (window != null) {
+            WindowInsetsControllerCompat insetsController =
+                    WindowCompat.getInsetsController(window, window.getDecorView());
+            if (insetsController != null) {
+                // In light mode (!isNight), status bar icons should be dark (black) so they are clearly visible on white background
+                // In dark mode (isNight), status bar icons should be light (white) on dark background
+                insetsController.setAppearanceLightStatusBars(!isNight);
+                insetsController.setAppearanceLightNavigationBars(!isNight);
+            }
+        }
     }
 
     /// Fixes dispatching of insets to ViewPager2 children

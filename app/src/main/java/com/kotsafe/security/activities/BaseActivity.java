@@ -41,6 +41,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Utils.updateSystemBarAppearance(this);
         PhysicalSecurityManager psm = PhysicalSecurityManager.getInstance(this);
         if (psm.isScreenshotProtectionEnabled()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
@@ -54,6 +55,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void setContentView(int res)  {
         super.setContentView(res);
+        Utils.updateSystemBarAppearance(this);
 
         View root = findViewById(android.R.id.content);
         if (root != null) {

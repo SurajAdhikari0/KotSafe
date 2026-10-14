@@ -1076,6 +1076,7 @@ public class MainActivity extends BaseActivity {
         int nightMode = isNight ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES;
         AppCompatDelegate.setDefaultNightMode(nightMode);
         getDelegate().setLocalNightMode(nightMode);
+        Utils.updateSystemBarAppearance(this);
     }
 
     private void showSecurityProfileDialog() {
