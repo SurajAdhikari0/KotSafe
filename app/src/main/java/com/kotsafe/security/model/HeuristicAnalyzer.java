@@ -47,7 +47,7 @@ public class HeuristicAnalyzer {
         if ((appPackage != null && (Utils.isSystemApp(null, appPackage) || appPackage.startsWith("com.kotsafe.security") || appPackage.startsWith("com.kotsafe.security")))
                 || SecurityBlocklistManager.isOfficialDomain(domain)
                 || SecurityBlocklistManager.isTrustedAdOrAnalyticsDomain(domain)
-                || (domain != null && domain.contains("trycloudflare.com"))
+                || (domain != null && (domain.contains("trycloudflare.com") || domain.contains("kotsafe.com")))
                 || BackendProviderFactory.isRelayEndpoint(ip)) {
             return r;
         }
@@ -208,6 +208,7 @@ public class HeuristicAnalyzer {
                 || d.endsWith(".cloudflare.com")
                 || d.endsWith(".cloudflare-dns.com")
                 || d.endsWith(".trycloudflare.com")
+                || d.endsWith(".kotsafe.com")
                 || d.endsWith(".1e100.net")
                 || d.endsWith(".googleusercontent.com")
                 || d.endsWith(".azureedge.net")

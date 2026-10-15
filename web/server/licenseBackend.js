@@ -94,12 +94,29 @@ function isRateLimited(ip) {
   return false;
 }
 
+const DEFAULT_PRIVATE_KEY_PEM = `-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgyWnDYzJ+OLnHdm+8
+XjD+BthgPXY8olsqfFEkmDeZ7L+hRANCAAR+c5I5pUWGHZoDam0lpP+bmfRYlzQ5
+0zZMK96/NGosYithppS7D4LYhYJGtY8WlFr/5/vpOoj8ENc9QtrrVbP2
+-----END PRIVATE KEY-----`;
+
+const PRIVATE_KEY_PEM = process.env.LICENSE_PRIVATE_KEY || DEFAULT_PRIVATE_KEY_PEM;
+
 function computeSignature(payload, deviceId) {
   const expires = payload.expiresAt || '';
   const used = payload.seats?.used ?? 0;
   const max = payload.seats?.max ?? 0;
   const canonical = `${payload.status}:${payload.plan}:${expires}:${used}:${max}:${deviceId}`;
-  return crypto.createHmac('sha256', SALT).update(canonical).digest('hex').toUpperCase();
+
+  try {
+    const signer = crypto.createSign('SHA256');
+    signer.update(canonical);
+    // IEEE-P1363 produces 64-byte raw signature (128 hex chars) natively verifiable by Web Crypto API
+    return signer.sign({ key: PRIVATE_KEY_PEM, dsaEncoding: 'ieee-p1363' }).toString('hex').toUpperCase();
+  } catch (err) {
+    console.warn('[KotSafe Backend] ECDSA signing failed, falling back to HMAC:', err);
+    return crypto.createHmac('sha256', SALT).update(canonical).digest('hex').toUpperCase();
+  }
 }
 
 function sendJson(res, statusCode, data, headers = {}) {
@@ -140,12 +157,26 @@ const server = http.createServer((req, res) => {
     );
   }
 
+  const MAX_BODY_SIZE = 64 * 1024; // 64 KB limit
   let bodyData = '';
+  let bodyTooLarge = false;
+
   req.on('data', chunk => {
+    if (bodyTooLarge) return;
     bodyData += chunk;
+    if (bodyData.length > MAX_BODY_SIZE) {
+      bodyTooLarge = true;
+      sendJson(res, 413, {
+        status: 'invalid',
+        errorCode: 'PAYLOAD_TOO_LARGE',
+        message: 'Payload exceeds maximum allowed size (64KB)'
+      });
+      req.destroy();
+    }
   });
 
   req.on('end', () => {
+    if (bodyTooLarge) return;
     let body = {};
     try {
       if (bodyData) body = JSON.parse(bodyData);

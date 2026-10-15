@@ -714,7 +714,7 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
             SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(safeContext);
             if (bundle.controlUrl != null && !bundle.controlUrl.isEmpty()) {
                 if (BackendProviderFactory.isRelayEndpoint(bundle.controlUrl)) {
-                    p.edit().putString("personal_gateway_relay_mode", bundle.controlUrl.contains("trycloudflare.com") ? "cloudflare_tunnel" : "direct_vps").apply();
+                    p.edit().putString("personal_gateway_relay_mode", (bundle.controlUrl.contains("trycloudflare.com") || bundle.controlUrl.contains("kotsafe.com")) ? "cloudflare_tunnel" : "direct_vps").apply();
                 } else {
                     p.edit().putString("personal_gateway_relay_mode", "custom")
                             .putString("personal_gateway_custom_relay_url", bundle.controlUrl)
@@ -741,6 +741,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
                                 String profName = "Exit Node (" + (bundle.room.length() > 8 ? bundle.room.substring(0, 8) : bundle.room) + ")";
                                 com.kotsafe.security.p2p.GatewayProfile prof = new com.kotsafe.security.p2p.GatewayProfile(
                                         "prof_" + System.currentTimeMillis(), profName, bundle.toQrUri(), clientToken, System.currentTimeMillis());
+                                if (bundle.exitIp != null && !bundle.exitIp.isEmpty()) {
+                                    prof.exitIp = bundle.exitIp;
+                                    com.kotsafe.security.p2p.GatewayTelemetry.getInstance().setExitNodeIp(bundle.exitIp);
+                                }
                                 com.kotsafe.security.p2p.GatewayProfileManager.saveProfile(safeContext, prof);
                                 com.kotsafe.security.p2p.GatewayProfileManager.setActiveProfile(safeContext, prof);
 

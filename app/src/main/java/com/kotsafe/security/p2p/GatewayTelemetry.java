@@ -86,23 +86,113 @@ public final class GatewayTelemetry {
         }
     }
 
-    public void fetchEgressIpAsync() {
-        if (exitNodeIp != null && !exitNodeIp.isEmpty()) return;
+    private String deviceIp = "";
+    public synchronized String getDeviceIp() { return deviceIp; }
+    public synchronized void setDeviceIp(String ip) {
+        if (ip != null && !ip.isEmpty() && !ip.equals(this.deviceIp)) {
+            this.deviceIp = ip;
+            notifyChanged();
+        }
+    }
+
+    public void fetchDeviceIpAsync() {
+        fetchDeviceIpAsync(false);
+    }
+
+    public void fetchDeviceIpAsync(boolean force) {
+        if (!force && deviceIp != null && !deviceIp.isEmpty()) return;
         new Thread(() -> {
-            try {
-                java.net.URL url = new java.net.URL("http://api.ipify.org");
-                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(3000);
-                conn.setReadTimeout(3000);
-                conn.setUseCaches(false);
-                try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream()))) {
-                    String ip = reader.readLine();
-                    if (ip != null && !ip.trim().isEmpty()) {
-                        setExitNodeIp(ip.trim());
+            String[] endpoints = new String[]{
+                "https://api.ipify.org",
+                "https://icanhazip.com"
+            };
+            for (String ep : endpoints) {
+                try {
+                    java.net.URL url = new java.net.URL(ep);
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                    conn.setConnectTimeout(3500);
+                    conn.setReadTimeout(3500);
+                    conn.setUseCaches(false);
+                    conn.setRequestProperty("User-Agent", "KotSafe/2.0");
+                    try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream()))) {
+                        String ip = reader.readLine();
+                        if (ip != null && !ip.trim().isEmpty() && ip.trim().matches("^[0-9a-fA-F:.]+$")) {
+                            setDeviceIp(ip.trim());
+                            return;
+                        }
                     }
+                } catch (Exception ignored) {}
+            }
+        }).start();
+    }
+
+    public void forceRefreshAllIpsAsync(int socksPort, Runnable onComplete) {
+        new Thread(() -> {
+            String[] endpoints = new String[]{
+                "https://api.ipify.org",
+                "https://icanhazip.com"
+            };
+
+            // 1. Force refresh Device IP (via direct interface)
+            for (String ep : endpoints) {
+                try {
+                    java.net.URL url = new java.net.URL(ep);
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                    conn.setConnectTimeout(3500);
+                    conn.setReadTimeout(3500);
+                    conn.setUseCaches(false);
+                    conn.setRequestProperty("User-Agent", "KotSafe/2.0");
+                    try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream()))) {
+                        String ip = reader.readLine();
+                        if (ip != null && !ip.trim().isEmpty() && ip.trim().matches("^[0-9a-fA-F:.]+$")) {
+                            setDeviceIp(ip.trim());
+                            break;
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            // 2. Refresh Exit Node IP via local SOCKS5 proxy
+            int port = (socksPort > 0) ? socksPort : 8095;
+            try {
+                java.net.Proxy proxy = new java.net.Proxy(java.net.Proxy.Type.SOCKS, new java.net.InetSocketAddress("127.0.0.1", port));
+                for (String ep : endpoints) {
+                    try {
+                        java.net.URL url = new java.net.URL(ep);
+                        java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection(proxy);
+                        conn.setConnectTimeout(4000);
+                        conn.setReadTimeout(4000);
+                        conn.setUseCaches(false);
+                        conn.setRequestProperty("User-Agent", "KotSafe/2.0");
+                        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream()))) {
+                            String ip = reader.readLine();
+                            if (ip != null && !ip.trim().isEmpty() && ip.trim().matches("^[0-9a-fA-F:.]+$")) {
+                                setExitNodeIp(ip.trim());
+                                break;
+                            }
+                        }
+                    } catch (Exception ignored) {}
                 }
             } catch (Exception ignored) {}
+
+            // 3. Trigger immediate P2P ping to refresh latency/RTT
+            try {
+                com.kotsafe.security.model.backend.CustomHttpProvider.sendImmediatePing();
+            } catch (Exception ignored) {}
+
+            notifyChanged();
+
+            if (onComplete != null) {
+                try {
+                    onComplete.run();
+                } catch (Exception ignored) {}
+            }
         }).start();
+    }
+
+    public void fetchEgressIpAsync() {
+        // App is disallowed from VPN tunnel, so direct HTTP requests from the app exit via raw cellular/Wi-Fi.
+        // forceRefreshAllIpsAsync routes through SOCKS5 proxy on 127.0.0.1:8095 to get current exit node IP.
     }
 
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();

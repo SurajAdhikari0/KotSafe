@@ -104,6 +104,13 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
         displayBackAction();
         setContentView(R.layout.fragment_activity);
 
+        // Settings top bar has dark navy #0B1D38 background: status bar icons must be crisp white
+        androidx.core.view.WindowInsetsControllerCompat insetsController =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(false);
+        }
+
         if (savedInstanceState == null) {
             Intent intent = getIntent();
             String targetPref = intent != null ? intent.getStringExtra(TARGET_PREF_EXTRA) : null;

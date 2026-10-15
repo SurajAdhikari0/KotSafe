@@ -30,7 +30,7 @@ public class BackendProviderFactory {
     private static volatile BackendProvider sCachedProvider = null;
     private static volatile String sCachedKey = null;
 
-    public static final String CLOUDFLARE_TUNNEL_URL = "https://couples-weekly-functionality-goal.trycloudflare.com";
+    public static final String CLOUDFLARE_TUNNEL_URL = "https://relay.kotsafe.com";
     public static final String DIRECT_VPS_URL = decodeRelayEndpoint();
     public static final String DEFAULT_CONTROL_URL = CLOUDFLARE_TUNNEL_URL;
 
@@ -53,7 +53,7 @@ public class BackendProviderFactory {
     public static boolean isRelayEndpoint(String val) {
         if (val == null || val.isEmpty()) return false;
         String host = getDirectVpsHost();
-        return (!host.isEmpty() && (val.equals(host) || val.contains(host))) || val.contains("trycloudflare.com");
+        return (!host.isEmpty() && (val.equals(host) || val.contains(host))) || val.contains("trycloudflare.com") || val.contains("kotsafe.com");
     }
 
     public static synchronized void invalidateCache() {

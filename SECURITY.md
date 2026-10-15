@@ -17,8 +17,9 @@ The KotSafe Security Team takes all security vulnerabilities, cryptographic flaw
 
 ### How to Report:
 * **Option 1 (Private GitHub Advisory)**: Please use GitHub's private vulnerability reporting feature by navigating to the [Security Advisories tab](https://github.com/SurajAdhikari0/KotSafe/security/advisories) on this repository and clicking **"Report a vulnerability"**.
-* **Option 2 (Direct Email)**: If you prefer direct communication or have sensitive exploit details, email the lead maintainer:
-  * **Contact**: [Suraj Adhikari](https://github.com/SurajAdhikari0)
+* **Option 2 (Direct Email)**: If you prefer direct communication or have sensitive exploit details, email our security team:
+  * **Email**: [support@kotsafe.com](mailto:support@kotsafe.com)
+  * **Lead Maintainer**: [Suraj Adhikari](https://github.com/SurajAdhikari0)
   * **Subject Prefix**: `[KotSafe Security Disclosure] - <Brief Description>`
 
 ### What to Include:

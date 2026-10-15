@@ -4,8 +4,8 @@
     <external-path name="external_files" path="." />
     <!-- Expose files from app-private external storage -->
     <external-files-path name="external_app_files" path="." />
-    <!-- Expose files from internal cache (temp copies of APKs from content URIs) -->
+    <!-- Expose files from internal cache (temp exports, logs, APK copies) -->
     <cache-path name="cache_files" path="." />
-    <!-- Expose files from internal files dir -->
-    <files-path name="internal_files" path="." />
+    <!-- Expose designated exports subfolder only -->
+    <files-path name="internal_exports" path="exports/" />
 </paths>

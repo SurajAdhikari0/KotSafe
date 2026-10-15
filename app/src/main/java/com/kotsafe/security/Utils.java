@@ -2140,9 +2140,18 @@ public class Utils {
             WindowInsetsControllerCompat insetsController =
                     WindowCompat.getInsetsController(window, window.getDecorView());
             if (insetsController != null) {
-                // In light mode (!isNight), status bar icons should be dark (black) so they are clearly visible on white background
-                // In dark mode (isNight), status bar icons should be light (white) on dark background
-                insetsController.setAppearanceLightStatusBars(!isNight);
+                View topBrandBar = activity.findViewById(R.id.top_brand_bar);
+                View toolbar = activity.findViewById(R.id.toolbar);
+                boolean isMainActivity = (topBrandBar != null);
+                boolean hasVisibleDarkToolbar = !isMainActivity && (toolbar != null && toolbar.getVisibility() == View.VISIBLE);
+
+                if (hasVisibleDarkToolbar) {
+                    // Settings / activities with dark navy (#0B1D38) toolbar: status bar icons MUST BE WHITE
+                    insetsController.setAppearanceLightStatusBars(false);
+                } else {
+                    // Home / MainActivity with white brand bar: status bar icons MUST BE BLACK in light mode (!isNight)
+                    insetsController.setAppearanceLightStatusBars(!isNight);
+                }
                 insetsController.setAppearanceLightNavigationBars(!isNight);
             }
         }

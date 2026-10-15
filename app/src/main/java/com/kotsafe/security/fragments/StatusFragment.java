@@ -42,8 +42,11 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.view.animation.RotateAnimation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -190,8 +193,11 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
     private TextView mGatewayCardHeader;
     private TextView mGatewayCardNodeName;
     private TextView mGatewayCardBadge;
+    private ImageView mGatewayCardBtnRefresh;
     private View mGatewayCardIpRow;
     private TextView mGatewayCardIpValue;
+    private View mGatewayCardDeviceIpRow;
+    private TextView mGatewayCardDeviceIpValue;
     private TextView mGatewayCardTransportLabel;
     private View mGatewayCardTelemetryRow;
     private TextView mGatewayCardPing;
@@ -441,8 +447,41 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
         mGatewayCardHeader = view.findViewById(R.id.gateway_card_header);
         mGatewayCardNodeName = view.findViewById(R.id.gateway_card_node_name);
         mGatewayCardBadge = view.findViewById(R.id.gateway_card_badge);
+        mGatewayCardBtnRefresh = view.findViewById(R.id.gateway_card_btn_refresh);
         mGatewayCardIpRow = view.findViewById(R.id.gateway_card_ip_row);
+
+        if (mGatewayCardBtnRefresh != null) {
+            AnimUtils.attachSpringTouch(mGatewayCardBtnRefresh);
+            mGatewayCardBtnRefresh.setOnClickListener(v -> {
+                RotateAnimation rotate = new RotateAnimation(0f, 360f,
+                        Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                rotate.setDuration(700);
+                rotate.setInterpolator(new LinearInterpolator());
+                mGatewayCardBtnRefresh.startAnimation(rotate);
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "🔄 Refreshing IP & exit node telemetry...", Toast.LENGTH_SHORT).show();
+                }
+                GatewayTelemetry.getInstance().forceRefreshAllIpsAsync(8095, () -> {
+                    if (isAdded() && getActivity() != null) {
+                        requireActivity().runOnUiThread(() -> {
+                            updateGatewayCardUI();
+                            Context c = getContext();
+                            if (c != null) {
+                                String eIp = GatewayTelemetry.getInstance().getExitNodeIp();
+                                if (eIp != null && !eIp.isEmpty()) {
+                                    Toast.makeText(c, "✅ Refreshed Exit IP: " + eIp, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(c, "✅ Telemetry & Device IP refreshed.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        }
         mGatewayCardIpValue = view.findViewById(R.id.gateway_card_ip_value);
+        mGatewayCardDeviceIpRow = view.findViewById(R.id.gateway_card_device_ip_row);
+        mGatewayCardDeviceIpValue = view.findViewById(R.id.gateway_card_device_ip_value);
         mGatewayCardTransportLabel = view.findViewById(R.id.gateway_card_transport_label);
         mGatewayCardTelemetryRow = view.findViewById(R.id.gateway_card_telemetry_row);
         mGatewayCardPing = view.findViewById(R.id.gateway_card_ping);
@@ -1385,9 +1424,23 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
             }
 
             String exitIp = telem.getExitNodeIp();
-            if ((exitIp == null || exitIp.isEmpty()) && activeProfile != null && activeProfile.exitIp != null && !activeProfile.exitIp.isEmpty()) {
-                exitIp = activeProfile.exitIp;
+            String devIp = telem.getDeviceIp();
+
+            // Guard against stale cellular IP mistakenly stored as exitIp
+            if (devIp != null && !devIp.isEmpty() && devIp.equals(exitIp)) {
+                exitIp = null;
+                telem.setExitNodeIp("");
             }
+
+            if ((exitIp == null || exitIp.isEmpty()) && activeProfile != null && activeProfile.exitIp != null && !activeProfile.exitIp.isEmpty()) {
+                if (devIp == null || !devIp.equals(activeProfile.exitIp)) {
+                    exitIp = activeProfile.exitIp;
+                } else {
+                    activeProfile.exitIp = "";
+                    GatewayProfileManager.saveProfile(ctx, activeProfile);
+                }
+            }
+
             if (exitIp != null && !exitIp.isEmpty()) {
                 mGatewayCardIpRow.setVisibility(View.VISIBLE);
                 mGatewayCardIpValue.setText(exitIp);
@@ -1397,10 +1450,20 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
                 }
             } else if (vpnRunning && clientOn) {
                 mGatewayCardIpRow.setVisibility(View.VISIBLE);
-                mGatewayCardIpValue.setText("Resolving...");
-                telem.fetchEgressIpAsync();
+                mGatewayCardIpValue.setText("Awaiting Exit Node IP...");
             } else {
                 mGatewayCardIpRow.setVisibility(View.GONE);
+            }
+
+            // Real Device IP (SIM / Wi-Fi)
+            if (mGatewayCardDeviceIpRow != null) {
+                mGatewayCardDeviceIpRow.setVisibility(View.VISIBLE);
+                if (devIp != null && !devIp.isEmpty()) {
+                    if (mGatewayCardDeviceIpValue != null) mGatewayCardDeviceIpValue.setText(devIp);
+                } else {
+                    if (mGatewayCardDeviceIpValue != null) mGatewayCardDeviceIpValue.setText("Detecting...");
+                    telem.fetchDeviceIpAsync();
+                }
             }
 
             if (directP2p) {

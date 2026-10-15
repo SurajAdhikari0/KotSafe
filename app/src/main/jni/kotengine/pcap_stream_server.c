@@ -32,7 +32,7 @@ static void write_headers_to_client(int sock) {
         "HTTP/1.1 200 OK\r\n"
         "Server: netcap_stream_server\r\n"
         "Content-Type: application/vnd.tcpdump.pcap\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
+        "X-Content-Type-Options: nosniff\r\n"
         "Connection: close\r\n\r\n";
     send(sock, http_resp, strlen(http_resp), 0);
 
@@ -79,7 +79,8 @@ netcap_stream_server_t *netcap_stream_server_create(uint16_t port) {
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = INADDR_ANY;
+    /* Security: bind strictly to loopback (127.0.0.1) to prevent unauthorized network eavesdropping */
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     addr.sin_port = htons(port);
 
     if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
@@ -200,6 +201,9 @@ void netcap_stream_server_broadcast(netcap_stream_server_t *srv, uint64_t ts_us,
             }
         }
     }
+
+    /* Security: zero out packet data buffer from stack */
+    memset(epb, 0, block_len);
 }
 
 uint32_t netcap_stream_server_client_count(const netcap_stream_server_t *srv) {

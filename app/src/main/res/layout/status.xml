@@ -298,6 +298,20 @@
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="4dp"
                     android:background="@drawable/badge_pill_proto" />
+
+                <!-- Small Refresh Icon for Quick IP & Telemetry Reload -->
+                <ImageView
+                    android:id="@+id/gateway_card_btn_refresh"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="8dp"
+                    android:padding="6dp"
+                    android:background="@drawable/ks_bg_btn_circle"
+                    android:src="@drawable/ic_refresh"
+                    app:tint="#38BDF8"
+                    android:contentDescription="Refresh IP address"
+                    android:clickable="true"
+                    android:focusable="true" />
             </LinearLayout>
 
             <!-- Middle Row: Egress IP & Routing Info -->
@@ -313,7 +327,7 @@
                     android:id="@+id/gateway_card_ip_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🌐 Exit IP: "
+                    android:text="🛡️ Exit Node IP: "
                     android:textSize="12sp"
                     android:textColor="@color/cardWorkbenchSubtext" />
 
@@ -321,7 +335,8 @@
                     android:id="@+id/gateway_card_ip_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="59.183.190.54"
+                    android:singleLine="true"
+                    android:text="Awaiting Exit Node IP..."
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="#00E676" />
@@ -331,9 +346,38 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="• Relay Tunnel"
+                    android:singleLine="true"
+                    android:text="• Cloudflare"
                     android:textSize="11sp"
                     android:textColor="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+
+            <!-- Real Device IP (SIM / Wi-Fi) Row -->
+            <LinearLayout
+                android:id="@+id/gateway_card_device_ip_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/gateway_card_device_ip_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📱 Real Device IP (SIM/Wi-Fi): "
+                    android:textSize="11sp"
+                    android:textColor="@color/cardWorkbenchSubtext" />
+
+                <TextView
+                    android:id="@+id/gateway_card_device_ip_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="Detecting..."
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="#38BDF8" />
             </LinearLayout>
 
             <!-- Live Telemetry Badges Row (Ping, Battery, Wi-Fi) -->

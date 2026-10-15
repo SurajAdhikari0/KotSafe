@@ -178,7 +178,7 @@
             app:summary="%s"
             app:entries="@array/gateway_relay_mode_entries"
             app:entryValues="@array/gateway_relay_mode_values"
-            app:defaultValue="direct_vps" />
+            app:defaultValue="cloudflare_tunnel" />
         <EditTextPreference
             app:key="personal_gateway_custom_relay_url"
             app:title="@string/gateway_custom_relay_url_title"

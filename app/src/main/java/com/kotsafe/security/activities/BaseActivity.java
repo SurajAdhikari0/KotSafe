@@ -42,6 +42,17 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Utils.updateSystemBarAppearance(this);
+        View topBrandBar = findViewById(R.id.top_brand_bar);
+        View toolbar = findViewById(R.id.toolbar);
+        boolean isMainActivity = (topBrandBar != null);
+        boolean hasVisibleDarkToolbar = !isMainActivity && (toolbar != null && toolbar.getVisibility() == View.VISIBLE);
+        if (hasVisibleDarkToolbar) {
+            androidx.core.view.WindowInsetsControllerCompat insetsController =
+                    androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+            if (insetsController != null) {
+                insetsController.setAppearanceLightStatusBars(false);
+            }
+        }
         PhysicalSecurityManager psm = PhysicalSecurityManager.getInstance(this);
         if (psm.isScreenshotProtectionEnabled()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
@@ -62,8 +73,20 @@ public class BaseActivity extends AppCompatActivity {
             root.setFilterTouchesWhenObscured(true);
         }
 
+        View topBrandBar = findViewById(R.id.top_brand_bar);
         View toolbar = findViewById(R.id.toolbar);
-        if (toolbar != null) {
+        boolean isMainActivity = (topBrandBar != null);
+        boolean hasVisibleDarkToolbar = !isMainActivity && (toolbar != null && toolbar.getVisibility() == View.VISIBLE);
+
+        if (hasVisibleDarkToolbar) {
+            androidx.core.view.WindowInsetsControllerCompat insetsController =
+                    androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+            if (insetsController != null) {
+                insetsController.setAppearanceLightStatusBars(false);
+            }
+        }
+
+        if (toolbar != null && toolbar.getVisibility() == View.VISIBLE) {
             // Fix padding of content below the toolbar
             ViewCompat.setOnApplyWindowInsetsListener(toolbar, (view, insets) -> {
                 int topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars() |

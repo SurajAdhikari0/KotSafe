@@ -39,8 +39,13 @@ public final class SecurePairingBundle {
     public final String room;
     public final String pairingSecret;
     public final String controlUrl;
+    public final String exitIp;
 
     public SecurePairingBundle(String room, String pairingSecret, String controlUrl) {
+        this(room, pairingSecret, controlUrl, null);
+    }
+
+    public SecurePairingBundle(String room, String pairingSecret, String controlUrl, String exitIp) {
         if (!isRoom(room)) throw new IllegalArgumentException("invalid room");
         if (!isSecret(pairingSecret)) throw new IllegalArgumentException("invalid pairing secret");
         if (controlUrl == null || (!controlUrl.startsWith("https://") && !controlUrl.startsWith("http://"))) {
@@ -49,11 +54,16 @@ public final class SecurePairingBundle {
         this.room = room;
         this.pairingSecret = pairingSecret;
         this.controlUrl = controlUrl;
+        this.exitIp = exitIp;
     }
 
     public String toQrUri() {
-        return "kotsafe-gateway://pair?v=2&room=" + encode(room) + "&secret=" + encode(pairingSecret)
+        String uri = "kotsafe-gateway://pair?v=2&room=" + encode(room) + "&secret=" + encode(pairingSecret)
                 + "&control=" + encode(controlUrl);
+        if (exitIp != null && !exitIp.isEmpty()) {
+            uri += "&exitIp=" + encode(exitIp);
+        }
+        return uri;
     }
 
     public static SecurePairingBundle parse(String raw) {
@@ -67,7 +77,7 @@ public final class SecurePairingBundle {
             if (pair.length == 2) values.put(decode(pair[0]), decode(pair[1]));
         }
         if (!"2".equals(values.get("v"))) throw new IllegalArgumentException("unsupported pairing version");
-        return new SecurePairingBundle(values.get("room"), values.get("secret"), values.get("control"));
+        return new SecurePairingBundle(values.get("room"), values.get("secret"), values.get("control"), values.get("exitIp"));
     }
 
     private static boolean isRoom(String value) {

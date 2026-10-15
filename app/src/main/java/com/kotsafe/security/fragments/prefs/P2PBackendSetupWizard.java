@@ -105,10 +105,10 @@ public class P2PBackendSetupWizard extends DialogFragment {
             customFields.setVisibility(View.VISIBLE);
             try {
                 org.json.JSONObject obj = new org.json.JSONObject(savedConfig);
-                customUrl.setText(obj.optString("serverUrl", "https://couples-weekly-functionality-goal.trycloudflare.com"));
+                customUrl.setText(obj.optString("serverUrl", "https://relay.kotsafe.com"));
                 customSecret.setText(obj.optString("sharedSecret", "cc1d91ed5dda86b294a001befb6fc66a01898f29261aff16c86fc7c9ab994be6"));
             } catch (Exception e) {
-                customUrl.setText("https://couples-weekly-functionality-goal.trycloudflare.com");
+                customUrl.setText("https://relay.kotsafe.com");
                 customSecret.setText("cc1d91ed5dda86b294a001befb6fc66a01898f29261aff16c86fc7c9ab994be6");
             }
         } else if (BackendProviderFactory.TYPE_FIREBASE.equals(savedType)) {
@@ -125,7 +125,7 @@ public class P2PBackendSetupWizard extends DialogFragment {
             providerGroup.check(R.id.radio_provider_custom);
             firebaseFields.setVisibility(View.GONE);
             customFields.setVisibility(View.VISIBLE);
-            customUrl.setText("https://couples-weekly-functionality-goal.trycloudflare.com");
+            customUrl.setText("https://relay.kotsafe.com");
             customSecret.setText("cc1d91ed5dda86b294a001befb6fc66a01898f29261aff16c86fc7c9ab994be6");
         }
 

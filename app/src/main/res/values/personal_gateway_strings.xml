@@ -35,17 +35,17 @@
     <string name="gateway_relay_mode_title">Relay Connection Mode</string>
     <string name="gateway_relay_mode_summary">Choose direct high-speed VPS or Cloudflare tunneling</string>
     <string-array name="gateway_relay_mode_entries">
-        <item>⚡ Dedicated VPS / Oracle Cloud Relay</item>
-        <item>☁️ Cloudflare Secure Tunnel (trycloudflare.com)</item>
+        <item>☁️ KotSafe Cloud Relay (relay.kotsafe.com)</item>
+        <item>⚡ Direct IP VPS Relay</item>
         <item>🛠️ Custom Server / Tunnel URL</item>
     </string-array>
     <string-array name="gateway_relay_mode_values">
-        <item>direct_vps</item>
         <item>cloudflare_tunnel</item>
+        <item>direct_vps</item>
         <item>custom</item>
     </string-array>
     <string name="gateway_custom_relay_url_title">Custom Relay URL</string>
-    <string name="gateway_custom_relay_url_summary">Specify custom IP:port or tunnel URL (e.g. http://1.2.3.4:8081)</string>
+    <string name="gateway_custom_relay_url_summary">Specify custom IP:port or tunnel URL (e.g. https://relay.kotsafe.com)</string>
 
     <string name="gateway_app_routing_title">P2P App Routing</string>
     <string name="gateway_select_apps_title">Select P2P Routed Apps</string>

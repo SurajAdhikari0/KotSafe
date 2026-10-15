@@ -67,9 +67,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.kotsafe.security.p2p.GatewayPreferenceKeys;
+import com.kotsafe.security.p2p.GatewayProfile;
+import com.kotsafe.security.p2p.GatewayProfileManager;
+import com.kotsafe.security.p2p.GatewayTelemetry;
+import com.kotsafe.security.model.P2PExitNodeServer;
 
 import com.kotsafe.security.AppsResolver;
 import com.kotsafe.security.Billing;
@@ -135,6 +144,17 @@ public class MainActivity extends BaseActivity {
     private ImageView mToolbarLogo;
     private Animation mLogoPulse;
 
+    // Exit node active connection banner
+    private View mBannerExitNodeConnected;
+    private TextView mTvBannerExitName;
+    private TextView mTvBannerExitBadge;
+    private TextView mTvBannerExitIp;
+    private TextView mTvBannerDeviceIp;
+    private TextView mTvBannerPing;
+    private ImageButton mBtnRefreshExitNodeBanner;
+    private final GatewayTelemetry.Listener mExitNodeTelemetryListener =
+            telemetry -> runOnUiThread(this::updateExitNodeBannerUI);
+
     // Swap-button color cycle: 0=green, 1=blue, 2=yellow
     private int mSwapColorIndex = 0;
     private static final int[] SWAP_COLORS = {
@@ -184,6 +204,13 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
+        // Ensure status bar icons are black in light mode because Home top bar is light/white
+        boolean isNight = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        androidx.core.view.WindowInsetsControllerCompat insetsController =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(!isNight);
+        }
         setTitle("KotSafe");
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -297,6 +324,8 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        GatewayTelemetry.getInstance().removeListener(mExitNodeTelemetryListener);
+
         if(!CaptureService.isServiceActive()) {
             boolean ignored = getTmpPcapPath().delete();
         }
@@ -341,6 +370,18 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // In Home / MainActivity, the top bar is top_brand_bar (light/white in day mode),
+        // so status bar icons MUST be black (!isNight) so they are clearly visible!
+        boolean isNight = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        androidx.core.view.WindowInsetsControllerCompat insetsController =
+                androidx.core.view.WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(!isNight);
+        }
+
+        GatewayTelemetry.getInstance().addListener(mExitNodeTelemetryListener);
+        updateExitNodeBannerUI();
+
         if (getIntent() != null && "connections".equals(getIntent().getStringExtra("open_tab"))) {
             getIntent().removeExtra("open_tab");
             mPager.setCurrentItem(POS_CONNECTIONS);
@@ -379,7 +420,7 @@ public class MainActivity extends BaseActivity {
                             SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                             if (bundle.controlUrl != null && !bundle.controlUrl.isEmpty()) {
                                 if (com.kotsafe.security.model.backend.BackendProviderFactory.isRelayEndpoint(bundle.controlUrl)) {
-                                    p.edit().putString("personal_gateway_relay_mode", bundle.controlUrl.contains("trycloudflare.com") ? "cloudflare_tunnel" : "direct_vps").apply();
+                                    p.edit().putString("personal_gateway_relay_mode", (bundle.controlUrl.contains("trycloudflare.com") || bundle.controlUrl.contains("kotsafe.com")) ? "cloudflare_tunnel" : "direct_vps").apply();
                                 } else {
                                     p.edit().putString("personal_gateway_relay_mode", "custom")
                                             .putString("personal_gateway_custom_relay_url", bundle.controlUrl)
@@ -495,7 +536,151 @@ public class MainActivity extends BaseActivity {
         mLogoPulse.setRepeatCount(Animation.INFINITE);
         mLogoPulse.setRepeatMode(Animation.REVERSE);
 
+        // Wire exit node active banner
+        mBannerExitNodeConnected = findViewById(R.id.banner_exit_node_connected);
+        mTvBannerExitName = findViewById(R.id.tv_banner_exit_name);
+        mTvBannerExitBadge = findViewById(R.id.tv_banner_exit_badge);
+        mTvBannerExitIp = findViewById(R.id.tv_banner_exit_ip);
+        mTvBannerDeviceIp = findViewById(R.id.tv_banner_device_ip);
+        mTvBannerPing = findViewById(R.id.tv_banner_ping);
+        mBtnRefreshExitNodeBanner = findViewById(R.id.btn_refresh_exit_node_banner);
+
+        if (mBannerExitNodeConnected != null) {
+            AnimUtils.attachSpringTouch(mBannerExitNodeConnected);
+            mBannerExitNodeConnected.setOnClickListener(v -> {
+                Intent intent = new Intent(this, SettingsActivity.class);
+                intent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "p2p_exit_node_settings");
+                startActivity(intent);
+            });
+        }
+
+        if (mBtnRefreshExitNodeBanner != null) {
+            AnimUtils.attachSpringTouch(mBtnRefreshExitNodeBanner);
+            mBtnRefreshExitNodeBanner.setOnClickListener(v -> refreshExitNodeIpAndTelemetry(mBtnRefreshExitNodeBanner));
+        }
+
         updateToolbarStatus();
+        updateExitNodeBannerUI();
+    }
+
+    private void refreshExitNodeIpAndTelemetry(View refreshIcon) {
+        if (refreshIcon != null) {
+            RotateAnimation rotate = new RotateAnimation(0f, 360f,
+                    Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+            rotate.setDuration(700);
+            rotate.setInterpolator(new LinearInterpolator());
+            refreshIcon.startAnimation(rotate);
+        }
+        Toast.makeText(this, "🔄 Refreshing IP addresses & exit node telemetry...", Toast.LENGTH_SHORT).show();
+        GatewayTelemetry.getInstance().forceRefreshAllIpsAsync(8095, () -> runOnUiThread(() -> {
+            updateExitNodeBannerUI();
+            String exitIp = GatewayTelemetry.getInstance().getExitNodeIp();
+            if (exitIp != null && !exitIp.isEmpty()) {
+                Toast.makeText(this, "✅ Refreshed Exit IP: " + exitIp, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "✅ Telemetry & Device IP refreshed.", Toast.LENGTH_SHORT).show();
+            }
+        }));
+    }
+
+    private void updateExitNodeBannerUI() {
+        if (mBannerExitNodeConnected == null) return;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean clientOn = prefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false);
+        boolean exitOn = prefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false);
+        boolean vpnActive = CaptureService.isServiceActive();
+
+        if ((!clientOn && !exitOn) || !vpnActive) {
+            mBannerExitNodeConnected.setVisibility(View.GONE);
+            return;
+        }
+
+        GatewayTelemetry telem = GatewayTelemetry.getInstance();
+        GatewayProfile activeProfile = GatewayProfileManager.getActiveProfile(this);
+
+        if (exitOn) {
+            mBannerExitNodeConnected.setVisibility(View.VISIBLE);
+            if (mTvBannerExitName != null) mTvBannerExitName.setText("Hosting Exit Gateway");
+            int clients = P2PExitNodeServer.getInstance().getActiveClients();
+            if (mTvBannerExitBadge != null) {
+                mTvBannerExitBadge.setText(clients > 0 ? "🟢 ACTIVE (" + clients + ")" : "🟡 STANDBY");
+                mTvBannerExitBadge.setTextColor(Color.parseColor(clients > 0 ? "#00E676" : "#FFC107"));
+            }
+            String devIp = telem.getDeviceIp();
+            if (mTvBannerExitIp != null) {
+                mTvBannerExitIp.setText("Host IP: " + (devIp != null && !devIp.isEmpty() ? devIp : "Detecting..."));
+            }
+            if (mTvBannerDeviceIp != null) mTvBannerDeviceIp.setVisibility(View.GONE);
+            if (mTvBannerPing != null) mTvBannerPing.setVisibility(View.GONE);
+            return;
+        }
+
+        mBannerExitNodeConnected.setVisibility(View.VISIBLE);
+        String nodeName = (activeProfile != null && activeProfile.name != null && !activeProfile.name.isEmpty())
+                ? activeProfile.name : "Paired Exit Node";
+        if (mTvBannerExitName != null) mTvBannerExitName.setText(nodeName);
+
+        boolean hostOnline = telem.isHostOnline();
+        boolean directP2p = telem.isDirectP2PActive();
+        boolean showWarning = telem.isHostInactiveWarning();
+
+        if (mTvBannerExitBadge != null) {
+            if (showWarning) {
+                mTvBannerExitBadge.setText("⚠️ UNRESPONSIVE");
+                mTvBannerExitBadge.setTextColor(Color.parseColor("#F59E0B"));
+            } else if (directP2p) {
+                mTvBannerExitBadge.setText("⚡ DIRECT P2P");
+                mTvBannerExitBadge.setTextColor(Color.parseColor("#00E676"));
+            } else if (hostOnline) {
+                mTvBannerExitBadge.setText("🟢 CONNECTED");
+                mTvBannerExitBadge.setTextColor(Color.parseColor("#00E676"));
+            } else {
+                mTvBannerExitBadge.setText("🟡 CONNECTING");
+                mTvBannerExitBadge.setTextColor(Color.parseColor("#FFC107"));
+            }
+        }
+
+        String exitIp = telem.getExitNodeIp();
+        String devIp = telem.getDeviceIp();
+
+        if (devIp != null && !devIp.isEmpty() && devIp.equals(exitIp)) {
+            exitIp = null;
+            telem.setExitNodeIp("");
+        }
+        if ((exitIp == null || exitIp.isEmpty()) && activeProfile != null && activeProfile.exitIp != null && !activeProfile.exitIp.isEmpty()) {
+            if (devIp == null || !devIp.equals(activeProfile.exitIp)) {
+                exitIp = activeProfile.exitIp;
+            }
+        }
+
+        if (mTvBannerExitIp != null) {
+            if (exitIp != null && !exitIp.isEmpty()) {
+                mTvBannerExitIp.setText("🛡️ Exit IP: " + exitIp);
+            } else {
+                mTvBannerExitIp.setText("🛡️ Exit IP: Detecting...");
+            }
+        }
+
+        if (mTvBannerDeviceIp != null) {
+            if (devIp != null && !devIp.isEmpty()) {
+                mTvBannerDeviceIp.setVisibility(View.VISIBLE);
+                mTvBannerDeviceIp.setText("• Real: " + devIp);
+            } else {
+                mTvBannerDeviceIp.setVisibility(View.VISIBLE);
+                mTvBannerDeviceIp.setText("• Real: Detecting...");
+                telem.fetchDeviceIpAsync();
+            }
+        }
+
+        if (mTvBannerPing != null) {
+            int rtt = telem.getLatencyMs();
+            if (rtt > 0) {
+                mTvBannerPing.setVisibility(View.VISIBLE);
+                mTvBannerPing.setText("• ⚡ " + rtt + "ms");
+            } else {
+                mTvBannerPing.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void showMorePopupMenu(View anchor) {
@@ -563,6 +748,8 @@ public class MainActivity extends BaseActivity {
                 mToolbarLogo.setAlpha(1f);
             }
         }
+
+        updateExitNodeBannerUI();
     }
 
     private void showWhatsNew() {

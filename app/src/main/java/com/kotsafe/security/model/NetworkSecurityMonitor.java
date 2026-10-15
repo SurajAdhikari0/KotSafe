@@ -99,7 +99,7 @@ public class NetworkSecurityMonitor {
                 || "com.kotsafe.security.p2p".equals(packageName)
                 || "com.kotsafe.security".equals(packageName)
                 || (appName != null && (appName.startsWith("[P2P Remote:") || appName.startsWith("[P2P Decrypted:")))
-                || (domain != null && domain.contains("trycloudflare.com"))
+                || (domain != null && (domain.contains("trycloudflare.com") || domain.contains("kotsafe.com")))
                 || BackendProviderFactory.isRelayEndpoint(ip);
 
         try {

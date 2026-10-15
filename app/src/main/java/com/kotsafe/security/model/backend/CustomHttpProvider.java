@@ -413,6 +413,17 @@ public class CustomHttpProvider implements BackendProvider {
         } catch (Exception ignored) {}
     }
 
+    public static void sendImmediatePing() {
+        for (Map.Entry<String, Link> entry : sLinks.entrySet()) {
+            Link l = entry.getValue();
+            if (l != null && !l.isHost && l.ws != null) {
+                try {
+                    l.ws.send(new org.json.JSONObject().put("type", "ping").put("t", System.currentTimeMillis()).toString());
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
     // ------------------------------------------------------------ instance
 
     private final String mServerUrl;
@@ -428,7 +439,7 @@ public class CustomHttpProvider implements BackendProvider {
                     try {
                         return okhttp3.Dns.SYSTEM.lookup(hostname);
                     } catch (UnknownHostException e) {
-                        if (hostname != null && hostname.endsWith(".trycloudflare.com")) {
+                        if (hostname != null && (hostname.endsWith(".trycloudflare.com") || hostname.endsWith(".kotsafe.com") || hostname.equals("kotsafe.com"))) {
                             List<InetAddress> anycast = new ArrayList<>();
                             try {
                                 anycast.add(InetAddress.getByName("104.16.230.132"));

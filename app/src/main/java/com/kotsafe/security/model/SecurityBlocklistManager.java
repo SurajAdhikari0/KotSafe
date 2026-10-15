@@ -313,6 +313,7 @@ public class SecurityBlocklistManager {
                 || d.equals("ccavenue.com") || d.endsWith(".ccavenue.com")
                 || d.equals("paypal.com") || d.endsWith(".paypal.com")
                 || d.equals("trycloudflare.com") || d.endsWith(".trycloudflare.com")
+                || d.equals("kotsafe.com") || d.endsWith(".kotsafe.com")
                 || d.equals("cloudflareaccess.com") || d.endsWith(".cloudflareaccess.com")
                 || d.equals("abuse.ch") || d.endsWith(".abuse.ch")
                 || d.equals("virustotal.com") || d.endsWith(".virustotal.com")
@@ -433,7 +434,7 @@ public class SecurityBlocklistManager {
                 "bgp.he.net", "bgpview.io", "peeringdb.com",
                 "dns.google", "one.one.one.one", "quad9.net",
                 "google.com", "googleapis.com", "gstatic.com", "1e100.net", "googleusercontent.com",
-                "cloudflare.com", "cloudflare-dns.com", "trycloudflare.com", "cloudflareaccess.com",
+                "cloudflare.com", "cloudflare-dns.com", "trycloudflare.com", "kotsafe.com", "cloudflareaccess.com",
                 "akamai.net", "akamaiedge.net", "akamaihd.net", "fastly.net",
                 "b-cdn.net", "bunny.net", "bunnycdn.com", "edgecastcdn.net", "systemcdn.net", "llnwd.net", "edgio.net",
                 "azureedge.net", "trafficmanager.net", "msecnd.net",
