@@ -943,6 +943,9 @@
     <string name="profile_protection_label">Protection Posture</string>
     <string name="profile_cloud_sync_ready">Enterprise Cloud Sync: Ready for Linking</string>
     <string name="profile_close_btn">Done</string>
+    <string name="profile_not_signed_in">Not signed in</string>
+    <string name="profile_sign_in">Sign In</string>
+    <string name="profile_sign_out">Sign Out</string>
 
     <!-- Threat Intelligence: URLhaus & ThreatFox -->
     <string name="urlhaus_title">URLhaus (Abuse.ch)</string>

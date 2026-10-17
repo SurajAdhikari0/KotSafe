@@ -89,7 +89,14 @@ public final class GatewayTelemetry {
     private String deviceIp = "";
     public synchronized String getDeviceIp() { return deviceIp; }
     public synchronized void setDeviceIp(String ip) {
-        if (ip != null && !ip.isEmpty() && !ip.equals(this.deviceIp)) {
+        if (ip == null) {
+            if (this.deviceIp != null) {
+                this.deviceIp = null;
+                notifyChanged();
+            }
+            return;
+        }
+        if (!ip.isEmpty() && !ip.equals(this.deviceIp)) {
             this.deviceIp = ip;
             notifyChanged();
         }
@@ -104,7 +111,9 @@ public final class GatewayTelemetry {
         new Thread(() -> {
             String[] endpoints = new String[]{
                 "https://api.ipify.org",
-                "https://icanhazip.com"
+                "https://icanhazip.com",
+                "https://checkip.amazonaws.com",
+                "https://ifconfig.me/ip"
             };
             for (String ep : endpoints) {
                 try {
@@ -130,7 +139,13 @@ public final class GatewayTelemetry {
         new Thread(() -> {
             String[] endpoints = new String[]{
                 "https://api.ipify.org",
-                "https://icanhazip.com"
+                "http://api.ipify.org",
+                "https://icanhazip.com",
+                "http://icanhazip.com",
+                "https://checkip.amazonaws.com",
+                "http://checkip.amazonaws.com",
+                "https://ifconfig.me/ip",
+                "http://ifconfig.me/ip"
             };
 
             // 1. Force refresh Device IP (via direct interface)
@@ -138,8 +153,8 @@ public final class GatewayTelemetry {
                 try {
                     java.net.URL url = new java.net.URL(ep);
                     java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
-                    conn.setConnectTimeout(3500);
-                    conn.setReadTimeout(3500);
+                    conn.setConnectTimeout(3000);
+                    conn.setReadTimeout(3000);
                     conn.setUseCaches(false);
                     conn.setRequestProperty("User-Agent", "KotSafe/2.0");
                     try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream()))) {
@@ -160,14 +175,25 @@ public final class GatewayTelemetry {
                     try {
                         java.net.URL url = new java.net.URL(ep);
                         java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection(proxy);
-                        conn.setConnectTimeout(4000);
-                        conn.setReadTimeout(4000);
+                        conn.setConnectTimeout(3500);
+                        conn.setReadTimeout(3500);
                         conn.setUseCaches(false);
                         conn.setRequestProperty("User-Agent", "KotSafe/2.0");
                         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(conn.getInputStream()))) {
                             String ip = reader.readLine();
                             if (ip != null && !ip.trim().isEmpty() && ip.trim().matches("^[0-9a-fA-F:.]+$")) {
                                 setExitNodeIp(ip.trim());
+                                try {
+                                    android.content.Context ctx = com.kotsafe.security.KotSafe.getInstance();
+                                    if (ctx != null) {
+                                        com.kotsafe.security.p2p.GatewayProfile active =
+                                                com.kotsafe.security.p2p.GatewayProfileManager.getActiveProfile(ctx);
+                                        if (active != null && !ip.trim().equals(active.exitIp)) {
+                                            active.exitIp = ip.trim();
+                                            com.kotsafe.security.p2p.GatewayProfileManager.saveProfile(ctx, active);
+                                        }
+                                    }
+                                } catch (Exception ignored) {}
                                 break;
                             }
                         }

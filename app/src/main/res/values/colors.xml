@@ -23,6 +23,8 @@
     <color name="colorPrimaryLight">#6B3FC8</color>
     <color name="colorAccent">#6366F1</color>
     <color name="colorAccentLight">#C7D2FE</color>
+    <color name="authLinkColor">#4338CA</color>
+    <color name="authLinkColorSecondary">#6366F1</color>
     <color name="colorSecondary">#0284C7</color>
     <color name="colorTertiary">#E11D48</color>
 
@@ -162,11 +164,51 @@
     <color name="bottomNavIndicator">#EDE8FF</color>
 
     <!-- Security Profile (Day Mode) -->
+    <!--
+        The profile is deliberately a true white canvas.  The supporting
+        surfaces are neutral rather than blue-grey, so the account page feels
+        calm and remains readable in bright daylight.
+    -->
     <color name="profileSheetBg">#FFFFFF</color>
-    <color name="profileCardBg">#F8FAFC</color>
-    <color name="profileCardBorder">#E2E8F0</color>
-    <color name="profileTierBadgeBg">#EDE8FF</color>
-    <color name="profileTierBadgeFg">#432494</color>
+    <color name="profileCardBg">#F8F9FA</color>
+    <color name="profileCardBorder">#E5E7EB</color>
+    <color name="profileTierBadgeBg">#EAF7F2</color>
+    <color name="profileTierBadgeFg">#087F5B</color>
+    <color name="profileHeroStart">#F8FAFC</color>
+    <color name="profileHeroEnd">#F1F5F9</color>
+    <color name="profileTextPrimary">#172033</color>
+    <color name="profileTextSecondary">#667085</color>
+    <color name="profileTextTertiary">#475467</color>
+    <color name="profileTextBody">#475467</color>
+    <color name="profileTextOnAccent">#FFFFFF</color>
+    <color name="profileAvatarText">#FFFFFF</color>
+    <color name="profileIconMuted">#667085</color>
+    <color name="profileChevron">#98A2B3</color>
+    <color name="profileAccent">#0F8A67</color>
+    <color name="profileAccentStrong">#087F5B</color>
+    <color name="profileAvatarEnd">#2563EB</color>
+    <color name="profileVerifiedBg">#0F8A67</color>
+    <color name="profileVerifiedIcon">#FFFFFF</color>
+    <color name="profileSuccess">#0F8A67</color>
+    <color name="profileSuccessText">#087F5B</color>
+    <color name="profileSuccessMuted">#397A63</color>
+    <color name="profileWarning">#B54708</color>
+    <color name="profileDanger">#D92D20</color>
+    <color name="profileCyanSurface">#EAF7F2</color>
+    <color name="profileCyanBorder">#B7E5D1</color>
+    <color name="profileAmberSurface">#FFF7E6</color>
+    <color name="profileNavySurface">#EEF2F6</color>
+    <color name="profileNavyBorder">#D0D5DD</color>
+    <color name="profileGreenCardBg">#F0FAF5</color>
+    <color name="profileGreenBorder">#B7E5D1</color>
+    <color name="profileGreenPillBg">#EAF7F2</color>
+    <color name="profileSegmentInactive">#D0D5DD</color>
+    <color name="profileDangerBg">#FEF3F2</color>
+    <color name="profileDangerBorder">#FECDCA</color>
+    <color name="profileThemeOptionBg">#FFFFFF</color>
+    <color name="profileThemeOptionBorder">#D0D5DD</color>
+    <color name="profileThemeSelectedBg">#EAF7F2</color>
+    <color name="profileThemeSelectedBorder">#0F8A67</color>
 
     <!-- Multi-Scanner Mode Colors (Files, URL, IP, Hash) -->
     <color name="mode_file">#58A6FF</color>

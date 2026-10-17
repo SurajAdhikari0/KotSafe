@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of KotSafe.
+  ~ Copyright 2026 - KotSafe Cyber Security Project
+  ~ Google Authenticator 2-Step Verification Setup Wizard (Step 1: Scan & Backup -> Step 2: Verify)
+  -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/profile_dialog_bg"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp">
+
+        <!-- ============================================================== -->
+        <!-- STEP 1: SCAN QR CODE & BACKUP KEY                              -->
+        <!-- ============================================================== -->
+        <LinearLayout
+            android:id="@+id/layout_step1_scan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_profile_2fa_phone"
+                        app:tint="@color/profileAccent"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Set up Authenticator"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/profileTextPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Step 1 of 2: Scan &amp; Backup Key"
+                        android:textSize="12sp"
+                        android:textColor="@color/profileAccent"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:lineSpacingExtra="2dp"
+                android:text="Use Google Authenticator or another app to scan this barcode, then backup your key before proceeding."
+                android:textColor="@color/profileTextSecondary"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="#1AFFFFFF" />
+
+            <!-- Google Style White QR Code Card Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_google_qr_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/iv_2fa_qr_code"
+                    android:layout_width="190dp"
+                    android:layout_height="190dp"
+                    android:scaleType="fitCenter"
+                    android:background="#FFFFFF"
+                    android:contentDescription="2FA QR Code" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="KotSafe Cloud 2FA Key"
+                    android:textColor="#5F6368"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+
+            <!-- Manual Setup & Backup Key Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Backup Secret Key"
+                    android:textColor="@color/profileTextPrimary"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/badge_backup_required"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_profile_pill_yellow"
+                    android:paddingStart="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="Backup Required"
+                    android:textColor="@color/profileWarning"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Backup Warning Box -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_profile_highlight_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="2dp"
+                    android:text="⚠️ You must backup this key. If your phone is lost, or your authenticator app resets unexpectedly, this key is the ONLY way to recover your account."
+                    android:textColor="@color/profileTextBody"
+                    android:textSize="11sp" />
+
+                <!-- Secret Key Box with Copy Button -->
+                <LinearLayout
+                    android:id="@+id/layout_backup_key_box"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_profile_device_action_btn"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/tv_2fa_secret_key"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="monospace"
+                        android:text="ABCD EFGH IJKL MNOP"
+                        android:textColor="@color/profileAccentStrong"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btn_copy_2fa_secret"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:background="@drawable/bg_profile_primary_cyan_btn"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="Copy Key"
+                        android:textColor="@color/profileTextOnAccent"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Backup Status Indicator -->
+                <TextView
+                    android:id="@+id/tv_backup_status_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="⚠️ Tap 'Copy Key' above to backup before continuing."
+                    android:textColor="@color/profileWarning"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btn_open_authenticator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Open Google Authenticator App ↗"
+                    android:textColor="@color/profileAccent"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Step 1 Actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cancel_setup_2fa"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Cancel"
+                    android:textColor="@color/profileTextSecondary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_step1_next"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:backgroundTint="@color/profileAccent"
+                    android:text="Next  →"
+                    android:textColor="@color/profileTextOnAccent"
+                    android:textStyle="bold"
+                    app:cornerRadius="14dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ============================================================== -->
+        <!-- STEP 2: VERIFICATION CODE                                      -->
+        <!-- ============================================================== -->
+        <LinearLayout
+            android:id="@+id/layout_step2_verify"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_profile_key"
+                        app:tint="@color/profileAccent"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Confirm Verification"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/profileTextPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Step 2 of 2: Enter 6-Digit Code"
+                        android:textSize="12sp"
+                        android:textColor="@color/profileAccent"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:lineSpacingExtra="2dp"
+                android:text="Enter the 6-digit verification code generated by Google Authenticator for KotSafe to turn on 2-Step Verification."
+                android:textColor="@color/profileTextSecondary"
+                android:textSize="12sp" />
+
+            <!-- Backup Confirmation Pill -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_profile_pill_green"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_profile_key"
+                    app:tint="@color/profileSuccess"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Backup key is saved for future recovery"
+                    android:textColor="@color/profileSuccess"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 6 Digit Code Input -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Enter 6-digit code"
+                android:textColor="@color/profileTextPrimary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_2fa_verify_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="000 000"
+                    android:inputType="number"
+                    android:letterSpacing="0.3"
+                    android:maxLength="6"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tv_2fa_setup_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/profileDanger"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <!-- Step 2 Actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="end"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_step2_back"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="← Back"
+                    android:textColor="@color/profileTextSecondary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_submit_setup_2fa"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:backgroundTint="@color/profileAccent"
+                    android:text="Verify &amp; Turn on"
+                    android:textColor="@color/profileTextOnAccent"
+                    android:textStyle="bold"
+                    app:cornerRadius="14dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

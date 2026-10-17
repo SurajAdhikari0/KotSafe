@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of KotSafe.
+  ~ Copyright 2026 - KotSafe Cyber Security Project
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="4dp">
+
+    <FrameLayout
+        android:id="@+id/icon_log_container"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bg_profile_cyan_icon_bg">
+
+        <ImageView
+            android:id="@+id/img_log_icon"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_shield"
+            app:tint="@color/profileAccent" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_log_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Security Event"
+            android:textColor="@color/profileTextPrimary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_log_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Device details • Timestamp"
+            android:textColor="@color/profileTextSecondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>

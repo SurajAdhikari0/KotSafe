@@ -73,6 +73,10 @@ public final class TunnelCipher {
         this.hmacKey = new SecretKeySpec(this.key, "HmacSHA256");
     }
 
+    public String getRoom() {
+        return room;
+    }
+
     public synchronized byte[] sealBytes(String streamId, String direction, byte[] plaintext, int offset, int len)
             throws GeneralSecurityException {
         String stateKey = streamId + ':' + direction;

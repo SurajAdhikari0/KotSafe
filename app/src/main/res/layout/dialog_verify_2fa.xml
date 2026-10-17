@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of KotSafe.
+  ~ Copyright 2026 - KotSafe Cyber Security Project
+  ~ Google 2-Step Verification Login Dialog
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/profile_dialog_bg"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="24dp"
+    android:paddingBottom="20dp">
+
+    <!-- Header: Google 2-Step Verification badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_profile_cyan_icon_bg">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_profile_2fa_phone"
+                app:tint="@color/profileAccent"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="14dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2-Step Verification"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/profileTextPrimary" />
+
+            <TextView
+                android:id="@+id/tv_2fa_login_user_handle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Confirm it's you"
+                android:textSize="12sp"
+                android:textColor="@color/profileAccent"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="2dp"
+        android:text="Get a verification code from your Google Authenticator or use an 8-digit backup recovery code."
+        android:textColor="@color/profileTextSecondary"
+        android:textSize="12sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"
+        android:background="#1AFFFFFF" />
+
+    <!-- Lockout / Rate Limit Alert Banner -->
+    <TextView
+        android:id="@+id/tv_2fa_login_lockout_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_profile_device_signout_btn"
+        android:padding="10dp"
+        android:gravity="center"
+        android:text="Too many failed attempts. Try again in 60s"
+        android:textColor="@color/profileDanger"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- 6-digit Code or Backup Code Input -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enter 6-digit code or backup code"
+        android:textColor="@color/profileTextPrimary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusTopStart="14dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_2fa_login_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:hint="Code or Backup code"
+            android:inputType="textVisiblePassword"
+            android:letterSpacing="0.1"
+            android:maxLength="12"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/tv_2fa_login_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/profileDanger"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <!-- Security Info Note -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:background="@drawable/bg_profile_highlight_card"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_shield_check"
+            app:tint="@color/profileAccent"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Protected by RFC 6238 TOTP anti-replay &amp; rate limiting."
+            android:textColor="@color/profileTextBody"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel_login_2fa"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:layout_marginEnd="8dp"
+            android:text="Cancel"
+            android:textColor="@color/profileTextSecondary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_submit_login_2fa"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:backgroundTint="@color/profileAccent"
+            android:text="Next"
+            android:textColor="@color/profileTextOnAccent"
+            android:textStyle="bold"
+            app:cornerRadius="14dp" />
+    </LinearLayout>
+
+</LinearLayout>

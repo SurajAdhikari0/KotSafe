@@ -27,7 +27,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Prefs.applyThemeMode(Prefs.getThemeMode(this));
         Utils.enableEdgeToEdge(this);
         super.onCreate(savedInstanceState);
 
@@ -54,7 +53,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         }
         PhysicalSecurityManager psm = PhysicalSecurityManager.getInstance(this);
-        if (psm.isScreenshotProtectionEnabled()) {
+        if (!com.kotsafe.security.BuildConfig.DEBUG && psm.isScreenshotProtectionEnabled()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         }
         if (psm.isKotSafeAppLockEnabled() && !psm.isSessionAuthenticated() && !getClass().getName().endsWith("LockOverlayActivity")) {

@@ -77,11 +77,12 @@ public class GatewayNetworkMonitor {
         mCallback = new ConnectivityManager.NetworkCallback() {
             @Override
             public void onAvailable(@NonNull Network network) {
-                if (mLastNetwork != null && !mLastNetwork.equals(network)) {
-                    Log.i(TAG, "Default network transitioned: " + mLastNetwork + " -> " + network);
+                if (mLastNetwork == null || !mLastNetwork.equals(network)) {
+                    Log.i(TAG, "Network switched/available: " + network);
+                    mLastNetwork = network;
+                    GatewayTelemetry.getInstance().setDeviceIp(null);
                     triggerDebouncedReconnect();
                 }
-                mLastNetwork = network;
             }
 
             @Override
@@ -89,6 +90,7 @@ public class GatewayNetworkMonitor {
                 if (network.equals(mLastNetwork)) {
                     Log.i(TAG, "Current network lost: " + network);
                     mLastNetwork = null;
+                    GatewayTelemetry.getInstance().setDeviceIp(null);
                     triggerDebouncedReconnect();
                 }
             }
@@ -97,7 +99,9 @@ public class GatewayNetworkMonitor {
             public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities capabilities) {
                 if (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) {
                     if (mLastNetwork == null || !mLastNetwork.equals(network)) {
+                        Log.i(TAG, "Network validated: " + network);
                         mLastNetwork = network;
+                        GatewayTelemetry.getInstance().setDeviceIp(null);
                         triggerDebouncedReconnect();
                     }
                 }
@@ -143,6 +147,9 @@ public class GatewayNetworkMonitor {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         boolean clientEnabled = prefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false);
 
+        // Always force refresh the Real Device IP whenever network state changes!
+        GatewayTelemetry.getInstance().fetchDeviceIpAsync(true);
+
         if (!clientEnabled) return;
 
         Log.i(TAG, "🔄 Network switched! Auto-reconnecting Personal Gateway tunnel...");
@@ -163,6 +170,7 @@ public class GatewayNetworkMonitor {
                 try {
                     provider.startRelayLoopback(token, livePort);
                     provider.reconnectTunnel(token);
+                    GatewayTelemetry.getInstance().forceRefreshAllIpsAsync(livePort, null);
                     Log.i(TAG, "Auto-reconnect re-handshake complete on port " + livePort);
                 } catch (Exception e) {
                     Log.e(TAG, "Auto-reconnect failed: " + e.getMessage());

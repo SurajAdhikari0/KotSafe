@@ -81,7 +81,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".activities.LoginActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop" />

@@ -291,6 +291,45 @@ public class SecurityNotificationHub {
     }
 
     // =========================================================================
+    // 2b. New Account Device Login Alert (ID: 4300)
+    // =========================================================================
+    public static final int NOTIF_ID_DEVICE_LOGIN_ALERT = 4300;
+
+    @android.annotation.SuppressLint("MissingPermission")
+    public void postDeviceLoginAlert(String deviceModel, String osVersion, String ipAddress) {
+        if (!canPostNotification()) return;
+
+        Intent openDevicesIntent = new Intent(mContext, MainActivity.class);
+        openDevicesIntent.putExtra("open_connected_devices", true);
+        openDevicesIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(mContext, 5001, openDevicesIntent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+
+        String title = "🚨 New Device Linked: " + (deviceModel != null ? deviceModel : "Device");
+        String desc = "A new device (" + (osVersion != null ? osVersion : "Unknown OS") + ") logged into your KotSafe account."
+                + (ipAddress != null && !ipAddress.isEmpty() ? " IP: " + ipAddress : "")
+                + "\nIf this was not you, tap to review or revoke access instantly.";
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(mContext, CHAN_THREATS)
+                .setSmallIcon(R.drawable.ic_exclamation_triangle_solid)
+                .setContentTitle(title)
+                .setContentText("A new device signed into your KotSafe account.")
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(desc))
+                .setContentIntent(pi)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setColor(ContextCompat.getColor(mContext, R.color.statusError))
+                .setAutoCancel(true)
+                .addAction(R.drawable.ic_search, "Review Devices", pi);
+
+        try {
+            mNotificationManagerCompat.notify(NOTIF_ID_DEVICE_LOGIN_ALERT, b.build());
+        } catch (SecurityException se) {
+            Log.e(TAG, "Notification permission missing: " + se.getMessage());
+        }
+    }
+
+    // =========================================================================
     // 2c. Quarantine Threat Neutralized Alert (ID: 4120)
     // =========================================================================
     public static final int NOTIF_ID_QUARANTINE_ALERT = 4120;

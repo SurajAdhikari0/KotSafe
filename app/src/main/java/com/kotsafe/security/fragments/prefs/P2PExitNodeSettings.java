@@ -86,6 +86,7 @@ import com.kotsafe.security.model.Prefs;
 import com.kotsafe.security.model.backend.BackendProviderFactory;
 import com.kotsafe.security.model.backend.CustomHttpProvider;
 import com.kotsafe.security.p2p.GatewayPreferenceKeys;
+import com.kotsafe.security.p2p.GatewayTelemetry;
 import com.kotsafe.security.p2p.P2PLicenseManager;
 import com.kotsafe.security.p2p.GatewayStatusFormatter;
 import com.kotsafe.security.p2p.SecurePairingBundle;
@@ -123,6 +124,8 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
     private Preference mTelemetryNetwork;
     private Preference mTelemetryBandwidth;
     private Preference mTelemetryTransport;
+    private Preference mTelemetryDeviceIp;
+    private Preference mTelemetryExitIp;
 
     private BackendProvider mActiveBackendProvider;
     private String mDeviceId;
@@ -244,6 +247,37 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
         mTelemetryNetwork = findPreference("personal_gateway_telemetry_network");
         mTelemetryBandwidth = findPreference("personal_gateway_telemetry_bandwidth");
         mTelemetryTransport = findPreference("personal_gateway_telemetry_transport");
+        mTelemetryDeviceIp = findPreference("personal_gateway_telemetry_device_ip");
+        mTelemetryExitIp = findPreference("personal_gateway_telemetry_exit_ip");
+
+        Preference.OnPreferenceClickListener refreshClickListener = preference -> {
+            Context c = getSafeContext();
+            if (c != null) {
+                Toast.makeText(c, "🔄 Refreshing IP & exit node telemetry...", Toast.LENGTH_SHORT).show();
+            }
+            GatewayTelemetry.getInstance().setDeviceIp(null);
+            GatewayTelemetry.getInstance().forceRefreshAllIpsAsync(8095, () -> {
+                FragmentActivity act = getActivity();
+                if (act != null) {
+                    act.runOnUiThread(() -> {
+                        updateLiveStatusUI();
+                        updateTelemetryUI(GatewayTelemetry.getInstance());
+                        Context ctx1 = getSafeContext();
+                        if (ctx1 != null) {
+                            String dev = GatewayTelemetry.getInstance().getDeviceIp();
+                            String ext = GatewayTelemetry.getInstance().getExitNodeIp();
+                            Toast.makeText(ctx1, "✅ Refreshed! Device: " + (dev != null ? dev : "—") + (ext != null ? " • Exit: " + ext : ""), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            return true;
+        };
+
+        Preference clientRefresh = findPreference("personal_gateway_client_refresh_ip");
+        if (clientRefresh != null) clientRefresh.setOnPreferenceClickListener(refreshClickListener);
+        Preference telemRefresh = findPreference("personal_gateway_telemetry_refresh");
+        if (telemRefresh != null) telemRefresh.setOnPreferenceClickListener(refreshClickListener);
 
         mActiveBackendProvider = BackendProviderFactory.getConfigured(requireContext());
 
@@ -251,6 +285,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
         mExitEnabled.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean enabled = (boolean) newValue;
             if (enabled) {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                    com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "Exit Node Hosting");
+                    return false;
+                }
                 boolean consentAgreed = prefs.getBoolean(GatewayPreferenceKeys.HOST_CONSENT_AGREED, false);
                 if (!consentAgreed) {
                     showHostLegalWarningDialog(prefs);
@@ -294,6 +332,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
 
         // Show Pairing QR Code
         mShowPairingQr.setOnPreferenceClickListener(preference -> {
+            if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "Exit Node Pairing");
+                return true;
+            }
             boolean consentAgreed = prefs.getBoolean(GatewayPreferenceKeys.HOST_CONSENT_AGREED, false);
             if (!consentAgreed) {
                 showHostLegalWarningDialog(prefs);
@@ -307,6 +349,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
         mClientEnabled.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean enabled = (boolean) newValue;
             if (enabled) {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                    com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "P2P Client Gateway");
+                    return false;
+                }
                 String pairingBundle = prefs.getString(GatewayPreferenceKeys.PAIRING_BUNDLE, "");
                 String backendToken = prefs.getString(Prefs.PREF_P2P_BACKEND_PAIRING, "");
                 if (!pairingBundle.isEmpty()) {
@@ -340,6 +386,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
 
         // Scan Pairing QR Code
         mScanPairingQr.setOnPreferenceClickListener(preference -> {
+            if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "Pairing Code Scanner");
+                return true;
+            }
             startQrScanFlow();
             return true;
         });
@@ -659,10 +709,21 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
                 P2PExitNodeService.stop(ctx);
             }
         }
+        String effectiveToken = backendToken;
+        String bundleUri = prefs.getString(GatewayPreferenceKeys.PAIRING_BUNDLE, "");
+        if (!bundleUri.isEmpty()) {
+            try {
+                SecurePairingBundle parsed = SecurePairingBundle.parse(bundleUri);
+                if (parsed != null && parsed.room != null && !parsed.room.isEmpty()) {
+                    effectiveToken = "client_" + parsed.room;
+                    prefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, effectiveToken).apply();
+                }
+            } catch (Exception ignored) {}
+        }
         prefs.edit().putBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, true).apply();
         applySocks5Redirection();
-        if (mActiveBackendProvider != null && backendToken != null && !backendToken.isEmpty()) {
-            mActiveBackendProvider.startRelayLoopback(backendToken, 8095);
+        if (mActiveBackendProvider != null && effectiveToken != null && !effectiveToken.isEmpty()) {
+            mActiveBackendProvider.startRelayLoopback(effectiveToken, 8095);
         }
     }
 
@@ -714,7 +775,7 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
             SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(safeContext);
             if (bundle.controlUrl != null && !bundle.controlUrl.isEmpty()) {
                 if (BackendProviderFactory.isRelayEndpoint(bundle.controlUrl)) {
-                    p.edit().putString("personal_gateway_relay_mode", (bundle.controlUrl.contains("trycloudflare.com") || bundle.controlUrl.contains("kotsafe.com")) ? "cloudflare_tunnel" : "direct_vps").apply();
+                    p.edit().putString("personal_gateway_relay_mode", "cloudflare_tunnel").apply();
                 } else {
                     p.edit().putString("personal_gateway_relay_mode", "custom")
                             .putString("personal_gateway_custom_relay_url", bundle.controlUrl)
@@ -748,9 +809,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
                                 com.kotsafe.security.p2p.GatewayProfileManager.saveProfile(safeContext, prof);
                                 com.kotsafe.security.p2p.GatewayProfileManager.setActiveProfile(safeContext, prof);
 
+                                String effectiveClientToken = (bundle != null && bundle.room != null) ? ("client_" + bundle.room) : clientToken;
                                 prefs.edit()
                                         .putString(GatewayPreferenceKeys.PAIRING_BUNDLE, bundle.toQrUri())
-                                        .putString(Prefs.PREF_P2P_BACKEND_PAIRING, clientToken)
+                                        .putString(Prefs.PREF_P2P_BACKEND_PAIRING, effectiveClientToken)
                                         .apply();
 
                                 boolean consentAgreed = prefs.getBoolean(GatewayPreferenceKeys.CLIENT_CONSENT_AGREED, false);
@@ -956,6 +1018,10 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
         if (!cachedUri.isEmpty() && !existingToken.isEmpty()) {
             try {
                 SecurePairingBundle parsed = SecurePairingBundle.parse(cachedUri);
+                if (parsed.controlUrl != null && parsed.controlUrl.contains("130.210.16.110")) {
+                    parsed = new SecurePairingBundle(parsed.room, parsed.pairingSecret, BackendProviderFactory.CLOUDFLARE_TUNNEL_URL, parsed.exitIp);
+                    prefs.edit().putString(GatewayPreferenceKeys.PAIRING_BUNDLE, parsed.toQrUri()).apply();
+                }
                 if (effectiveControl.equals(parsed.controlUrl)) {
                     initialBundle = parsed;
                     hasExistingValidBundle = true;
@@ -995,8 +1061,9 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
             mActiveBackendProvider.createPairingBundle(mDeviceId, new BackendProvider.PairingBundleCallback() {
                 @Override
                 public void onSuccess(String exitToken, SecurePairingBundle bundle) {
+                    String effectiveHostToken = (bundle != null && bundle.room != null) ? ("host_" + bundle.room) : exitToken;
                     prefs.edit()
-                            .putString(Prefs.PREF_P2P_BACKEND_PAIRING, exitToken)
+                            .putString(Prefs.PREF_P2P_BACKEND_PAIRING, effectiveHostToken)
                             .putString(GatewayPreferenceKeys.PAIRING_BUNDLE, bundle.toQrUri())
                             .apply();
 
@@ -1168,6 +1235,19 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
     @Override
     public void onResume() {
         super.onResume();
+        if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+            if (prefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false)) {
+                disableExitNodeHosting(prefs);
+            }
+            if (prefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false)) {
+                disableClientGatewayMode(prefs);
+            }
+            if (mExitEnabled != null) mExitEnabled.setChecked(false);
+            if (mClientEnabled != null) mClientEnabled.setChecked(false);
+            updateLiveStatusUI();
+            return;
+        }
         P2PExitNodeServer.getInstance().setStateListener(this);
         com.kotsafe.security.p2p.GatewayTelemetry.getInstance().addListener(this);
         com.kotsafe.security.p2p.GatewayNetworkMonitor.getInstance().start(requireContext());
@@ -1198,6 +1278,14 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
         mTelemetryCategory.setVisible(clientOn);
         if (!clientOn) return;
 
+        if (mTelemetryDeviceIp != null) {
+            String devIp = telemetry.getDeviceIp();
+            mTelemetryDeviceIp.setSummary((devIp != null && !devIp.isEmpty()) ? devIp : "Detecting...");
+        }
+        if (mTelemetryExitIp != null) {
+            String exitIp = telemetry.getExitNodeIp();
+            mTelemetryExitIp.setSummary((exitIp != null && !exitIp.isEmpty()) ? exitIp : "Awaiting Exit Node IP...");
+        }
         if (mTelemetryHealth != null) {
             mTelemetryHealth.setSummary(telemetry.getHealthSummary());
         }

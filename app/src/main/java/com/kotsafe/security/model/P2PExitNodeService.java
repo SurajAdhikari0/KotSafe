@@ -438,6 +438,10 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
 
             int activeStreams = P2PExitNodeServer.getInstance().getActiveClients();
             long uptime = SystemClock.elapsedRealtime();
+            String hostIp = com.kotsafe.security.p2p.GatewayTelemetry.getInstance().getDeviceIp();
+            if (hostIp == null || hostIp.isEmpty()) {
+                com.kotsafe.security.p2p.GatewayTelemetry.getInstance().fetchDeviceIpAsync(false);
+            }
 
             JSONObject msg = new JSONObject();
             msg.put("type", "telemetry");
@@ -452,8 +456,23 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
             msg.put("streams", activeStreams);
             msg.put("uptime", uptime);
             msg.put("batteryGuard", mBatteryGuardActive);
+            if (hostIp != null && !hostIp.isEmpty()) {
+                msg.put("exitIp", hostIp);
+            }
 
             provider.sendTelemetry(pairingToken, msg);
+
+            // Enterprise cloud database sync for active P2P mesh node
+            com.kotsafe.security.model.CloudSyncManager.getInstance(this).publishP2PNodeState(
+                    pairingToken,
+                    "KotSafe Node (" + (carrier != null && !carrier.isEmpty() ? carrier : "Mobile Mesh") + ")",
+                    "exit_node",
+                    activeStreams > 0 ? "ACTIVE" : "STANDBY",
+                    hostIp != null ? hostIp : "",
+                    8095,
+                    0,
+                    activeStreams
+            );
         } catch (Exception e) {
             Log.w(TAG, "Failed to broadcast telemetry: " + e.getMessage());
         }
@@ -509,11 +528,9 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
             try {
                 com.kotsafe.security.p2p.SecurePairingBundle parsed =
                         com.kotsafe.security.p2p.SecurePairingBundle.parse(bundleUri);
-                if (parsed != null && parsed.room != null) {
-                    if (pairingToken.isEmpty()) {
-                        pairingToken = "host_" + parsed.room;
-                        prefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, pairingToken).apply();
-                    }
+                if (parsed != null && parsed.room != null && !parsed.room.isEmpty()) {
+                    pairingToken = "host_" + parsed.room;
+                    prefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, pairingToken).apply();
                 }
             } catch (Exception ignored) {}
         }

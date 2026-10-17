@@ -1058,6 +1058,14 @@ public class SecurityBlocklistManager {
             Log.w(TAG, "Error syncing IP to native blocklist: " + e.getMessage());
         }
         syncWithCaptureService();
+        if (source != null && !source.startsWith("Mesh:")) {
+            try {
+                CloudSyncManager sync = CloudSyncManager.getInstance(mContext);
+                if (sync != null) {
+                    sync.syncFirewallRule(clean, "IP_BLOCK", "DROP", reason);
+                }
+            } catch (Exception ignored) {}
+        }
         return id;
     }
 
@@ -1080,6 +1088,14 @@ public class SecurityBlocklistManager {
             Log.w(TAG, "Error syncing domain to native blocklist: " + e.getMessage());
         }
         syncWithCaptureService();
+        if (source != null && !source.startsWith("Mesh:")) {
+            try {
+                CloudSyncManager sync = CloudSyncManager.getInstance(mContext);
+                if (sync != null) {
+                    sync.syncFirewallRule(clean, "DOMAIN_BLOCK", "DROP", reason);
+                }
+            } catch (Exception ignored) {}
+        }
         return id;
     }
 

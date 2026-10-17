@@ -494,7 +494,9 @@ public class Prefs {
                 nightMode = androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY;
             }
         }
-        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(nightMode);
+        if (androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode() != nightMode) {
+            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(nightMode);
+        }
     }
 
     public static final String PREF_DETECTION_RULES_ENABLED = "pref_detection_rules_enabled";

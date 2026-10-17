@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "445715318354",
+    "project_id": "kotsafe-9b782",
+    "storage_bucket": "kotsafe-9b782.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445715318354:android:90bc42fa2a94cd14b7818b",
+        "android_client_info": {
+          "package_name": "com.kotsafe.security"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445715318354-fpqvcp959k5bo1dp2nnos00oakj6uj5k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kotsafe.security",
+            "certificate_hash": "83af496dc0c7ce72620606c465ecbbfa89f5e93f"
+          }
+        },
+        {
+          "client_id": "445715318354-rmbe9rc5ethh7ca4lshbam3kvoc4v4k9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kotsafe.security",
+            "certificate_hash": "e7315519b4a7f60cc6fa7e2470366c23fb1195ad"
+          }
+        },
+        {
+          "client_id": "445715318354-kclm14ippdecid0msepip5vl9d0inrg3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKG2K6Ww2ecC8_uubyb_WeXX_7r_k4vcw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445715318354-kclm14ippdecid0msepip5vl9d0inrg3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

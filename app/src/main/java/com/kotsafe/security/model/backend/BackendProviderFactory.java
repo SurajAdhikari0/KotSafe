@@ -31,7 +31,7 @@ public class BackendProviderFactory {
     private static volatile String sCachedKey = null;
 
     public static final String CLOUDFLARE_TUNNEL_URL = "https://relay.kotsafe.com";
-    public static final String DIRECT_VPS_URL = decodeRelayEndpoint();
+    public static final String DIRECT_VPS_URL = CLOUDFLARE_TUNNEL_URL;
     public static final String DEFAULT_CONTROL_URL = CLOUDFLARE_TUNNEL_URL;
 
     public static String getDirectVpsHost() {
@@ -43,11 +43,7 @@ public class BackendProviderFactory {
     }
 
     private static String decodeRelayEndpoint() {
-        try {
-            return new String(android.util.Base64.decode("aHR0cDovLzEzMC4yMTAuMTYuMTEwOjgwODE=", android.util.Base64.DEFAULT), java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            return CLOUDFLARE_TUNNEL_URL;
-        }
+        return CLOUDFLARE_TUNNEL_URL;
     }
 
     public static boolean isRelayEndpoint(String val) {
@@ -65,10 +61,16 @@ public class BackendProviderFactory {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String mode = prefs.getString("personal_gateway_relay_mode", "cloudflare_tunnel");
         if ("direct_vps".equals(mode)) {
-            return DIRECT_VPS_URL;
+            // Auto-migrate legacy direct_vps to cloudflare_tunnel
+            prefs.edit().putString("personal_gateway_relay_mode", "cloudflare_tunnel").apply();
+            return CLOUDFLARE_TUNNEL_URL;
         } else if ("custom".equals(mode)) {
             String custom = prefs.getString("personal_gateway_custom_relay_url", "").trim();
             if (!custom.isEmpty()) {
+                if (custom.contains("130.210.16.110")) {
+                    prefs.edit().putString("personal_gateway_custom_relay_url", CLOUDFLARE_TUNNEL_URL).apply();
+                    return CLOUDFLARE_TUNNEL_URL;
+                }
                 if (!custom.startsWith("http://") && !custom.startsWith("https://")) {
                     custom = "http://" + custom;
                 }

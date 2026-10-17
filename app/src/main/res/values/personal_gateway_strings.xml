@@ -33,15 +33,13 @@
 
     <string name="gateway_relay_category">Relay &amp; Tunnel Infrastructure</string>
     <string name="gateway_relay_mode_title">Relay Connection Mode</string>
-    <string name="gateway_relay_mode_summary">Choose direct high-speed VPS or Cloudflare tunneling</string>
+    <string name="gateway_relay_mode_summary">Cloudflare-protected relay (relay.kotsafe.com) or custom server</string>
     <string-array name="gateway_relay_mode_entries">
         <item>☁️ KotSafe Cloud Relay (relay.kotsafe.com)</item>
-        <item>⚡ Direct IP VPS Relay</item>
         <item>🛠️ Custom Server / Tunnel URL</item>
     </string-array>
     <string-array name="gateway_relay_mode_values">
         <item>cloudflare_tunnel</item>
-        <item>direct_vps</item>
         <item>custom</item>
     </string-array>
     <string name="gateway_custom_relay_url_title">Custom Relay URL</string>

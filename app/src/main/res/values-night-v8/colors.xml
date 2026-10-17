@@ -36,6 +36,8 @@
     <color name="colorActionBar">#121212</color>
     <color name="colorAccent">#00E5FF</color>
     <color name="colorAccentLight">#BCEBE7</color>
+    <color name="authLinkColor">#818CF8</color>
+    <color name="authLinkColorSecondary">#A5B4FC</color>
     <color name="colorBackgroundGray">#1CFFFFFF</color>
     <color name="navViewBackground">#FF202020</color>
     <color name="backgroundColor">#070D1A</color>
@@ -101,11 +103,46 @@
     <color name="bottomNavIndicator">#162E44</color>
 
     <!-- Security Profile (Night Mode) -->
-    <color name="profileSheetBg">#0F172A</color>
-    <color name="profileCardBg">#16202E</color>
-    <color name="profileCardBorder">#2A3C54</color>
-    <color name="profileTierBadgeBg">#162E44</color>
-    <color name="profileTierBadgeFg">#3DDC84</color>
+    <color name="profileSheetBg">#0B0F14</color>
+    <color name="profileCardBg">#141B24</color>
+    <color name="profileCardBorder">#293646</color>
+    <color name="profileTierBadgeBg">#12382E</color>
+    <color name="profileTierBadgeFg">#6EE7B7</color>
+    <color name="profileHeroStart">#172333</color>
+    <color name="profileHeroEnd">#101720</color>
+    <color name="profileTextPrimary">#F8FAFC</color>
+    <color name="profileTextSecondary">#AAB7C8</color>
+    <color name="profileTextTertiary">#D1D9E6</color>
+    <color name="profileTextBody">#C2CDDD</color>
+    <color name="profileTextOnAccent">#052C22</color>
+    <color name="profileAvatarText">#062B22</color>
+    <color name="profileIconMuted">#AAB7C8</color>
+    <color name="profileChevron">#7F90A7</color>
+    <color name="profileAccent">#34D399</color>
+    <color name="profileAccentStrong">#6EE7B7</color>
+    <color name="profileAvatarEnd">#38BDF8</color>
+    <color name="profileVerifiedBg">#34D399</color>
+    <color name="profileVerifiedIcon">#052C22</color>
+    <color name="profileSuccess">#34D399</color>
+    <color name="profileSuccessText">#6EE7B7</color>
+    <color name="profileSuccessMuted">#9ADABF</color>
+    <color name="profileWarning">#FBBF24</color>
+    <color name="profileDanger">#FDA4AF</color>
+    <color name="profileCyanSurface">#102A29</color>
+    <color name="profileCyanBorder">#1D5D50</color>
+    <color name="profileAmberSurface">#2D2513</color>
+    <color name="profileNavySurface">#1A2534</color>
+    <color name="profileNavyBorder">#314258</color>
+    <color name="profileGreenCardBg">#112A25</color>
+    <color name="profileGreenBorder">#21614F</color>
+    <color name="profileGreenPillBg">#12352C</color>
+    <color name="profileSegmentInactive">#293646</color>
+    <color name="profileDangerBg">#2A161B</color>
+    <color name="profileDangerBorder">#6F3240</color>
+    <color name="profileThemeOptionBg">#101720</color>
+    <color name="profileThemeOptionBorder">#314258</color>
+    <color name="profileThemeSelectedBg">#12382E</color>
+    <color name="profileThemeSelectedBorder">#34D399</color>
 
     <!-- KotSafe AI Assistant Chat (Night / Dark Mode) -->
     <color name="aiChatBackground">#0B0F19</color>

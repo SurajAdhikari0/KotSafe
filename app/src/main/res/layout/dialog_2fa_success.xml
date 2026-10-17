@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of KotSafe.
+  ~ Copyright 2026 - KotSafe Cyber Security Project
+  ~ Google 2-Step Verification Success Dialog
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/profile_dialog_bg"
+    android:paddingStart="26dp"
+    android:paddingEnd="26dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="24dp"
+    android:gravity="center_horizontal">
+
+    <!-- Green Google Shield Checkmark Circle -->
+    <FrameLayout
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_profile_pill_green">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_shield_check"
+            app:tint="@color/profileSuccess"
+            android:contentDescription="@null" />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="2-Step Verification is ON"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/profileTextPrimary"
+        android:gravity="center" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Google Authenticator is now protecting your KotSafe account."
+        android:textSize="13sp"
+        android:textColor="@color/profileSuccessText"
+        android:gravity="center" />
+
+    <!-- Google-style Info Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_profile_card"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_profile_2fa_phone"
+                app:tint="@color/profileAccent"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Default Second Step"
+                android:textColor="@color/profileTextPrimary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:lineSpacingExtra="2dp"
+            android:text="When signing in, you will be prompted for a 6-digit code from Google Authenticator to prove it's really you."
+            android:textColor="@color/profileTextBody"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_2fa_success_done"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="22dp"
+        android:backgroundTint="@color/profileAccent"
+        android:text="Done"
+        android:textColor="@color/profileTextOnAccent"
+        android:textStyle="bold"
+        app:cornerRadius="14dp" />
+
+</LinearLayout>

@@ -120,6 +120,17 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
                         .replace(R.id.fragment, new com.kotsafe.security.fragments.prefs.P2PExitNodeSettings(), "p2p_exit_node_settings")
                         .commit();
                 setTitle(R.string.p2p_exit_node_title);
+            } else if ("advanced_developer_settings".equals(targetPref)) {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(this)) {
+                    com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(this, "Advanced & Developer Mode");
+                    finish();
+                } else {
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment, new AdvancedDeveloperSettingsFragment(), "advanced_developer_settings")
+                            .commit();
+                    setTitle("Advanced & Developer Mode");
+                }
             } else {
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -240,6 +251,10 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
             targetFragment = new KotSafeShieldSettingsFragment();
             setTitle("KotSafe Shield");
         } else if(prefKey.equals("advanced_developer_settings")) {
+            if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(this)) {
+                com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(this, "Advanced & Developer Mode");
+                return true;
+            }
             targetFragment = new AdvancedDeveloperSettingsFragment();
             setTitle("Advanced & Developer Mode");
         } else if(prefKey.equals("ai_autonomous_settings")) {
@@ -405,6 +420,15 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
         @Override
         public void onResume() {
             super.onResume();
+
+            Preference devPref = findPreference("advanced_developer_settings");
+            if (devPref != null) {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                    devPref.setSummary("🔒 Sign-in required • Deep packet capture, TLS decryption & Wireshark tools");
+                } else {
+                    devPref.setSummary("Deep packet capture, TLS decryption, Wireshark & developer tools");
+                }
+            }
 
             if(mHasStartedMitmWizard && !MitmAddon.needsSetup(requireContext())) {
                 Log.d(TAG, "mitm setup complete, enabling");

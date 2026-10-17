@@ -461,6 +461,8 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
                 if (getContext() != null) {
                     Toast.makeText(getContext(), "🔄 Refreshing IP & exit node telemetry...", Toast.LENGTH_SHORT).show();
                 }
+                GatewayTelemetry.getInstance().setDeviceIp(null);
+                updateGatewayCardUI();
                 GatewayTelemetry.getInstance().forceRefreshAllIpsAsync(8095, () -> {
                     if (isAdded() && getActivity() != null) {
                         requireActivity().runOnUiThread(() -> {
@@ -528,6 +530,10 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
         if (mCardPersonalGateway != null) {
             AnimUtils.attachSpringTouch(mCardPersonalGateway);
             mCardPersonalGateway.setOnClickListener(v -> {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                    com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "P2P Exit Gateway");
+                    return;
+                }
                 Intent intent = new Intent(requireContext(), SettingsActivity.class);
                 intent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "p2p_exit_node_settings");
                 startActivity(intent);
@@ -1426,19 +1432,8 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
             String exitIp = telem.getExitNodeIp();
             String devIp = telem.getDeviceIp();
 
-            // Guard against stale cellular IP mistakenly stored as exitIp
-            if (devIp != null && !devIp.isEmpty() && devIp.equals(exitIp)) {
-                exitIp = null;
-                telem.setExitNodeIp("");
-            }
-
             if ((exitIp == null || exitIp.isEmpty()) && activeProfile != null && activeProfile.exitIp != null && !activeProfile.exitIp.isEmpty()) {
-                if (devIp == null || !devIp.equals(activeProfile.exitIp)) {
-                    exitIp = activeProfile.exitIp;
-                } else {
-                    activeProfile.exitIp = "";
-                    GatewayProfileManager.saveProfile(ctx, activeProfile);
-                }
+                exitIp = activeProfile.exitIp;
             }
 
             if (exitIp != null && !exitIp.isEmpty()) {

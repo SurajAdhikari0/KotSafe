@@ -89,7 +89,7 @@ public class ActionReceiver extends BroadcastReceiver {
                                 com.kotsafe.security.p2p.SecurePairingBundle.parse(bundle);
                         if (parsed != null && parsed.controlUrl != null && !parsed.controlUrl.isEmpty()) {
                             if (com.kotsafe.security.model.backend.BackendProviderFactory.isRelayEndpoint(parsed.controlUrl)) {
-                                edit.putString("personal_gateway_relay_mode", (parsed.controlUrl.contains("trycloudflare.com") || parsed.controlUrl.contains("kotsafe.com")) ? "cloudflare_tunnel" : "direct_vps");
+                                edit.putString("personal_gateway_relay_mode", "cloudflare_tunnel");
                             } else {
                                 edit.putString("personal_gateway_relay_mode", "custom");
                                 edit.putString("personal_gateway_custom_relay_url", parsed.controlUrl);

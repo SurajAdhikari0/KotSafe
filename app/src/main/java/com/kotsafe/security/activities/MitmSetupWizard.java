@@ -36,6 +36,11 @@ public class MitmSetupWizard extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(this)) {
+            com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(this, "Advanced & Developer Mode");
+            finish();
+            return;
+        }
         setContentView(R.layout.mitm_wizard_activity);
         setTitle(R.string.mitm_setup_wizard);
 

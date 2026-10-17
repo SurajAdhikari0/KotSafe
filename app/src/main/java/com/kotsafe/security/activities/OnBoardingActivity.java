@@ -504,24 +504,11 @@ public class OnBoardingActivity extends AppIntro {
     private void runMainActivity() {
         Prefs.refreshAppVersion(PreferenceManager.getDefaultSharedPreferences(this));
 
-        /*
-         * ── FUTURE CLOUD & IDENTITY AUTHENTICATION FLOW ──────────────────────────
-         * To require user sign-in (Google, GitHub, Microsoft, or Email/Password)
-         * immediately after the welcome onboarding slides, uncomment the block below:
-         *
-         * Intent loginIntent = new Intent(this, LoginActivity.class);
-         * loginIntent.putExtra(LoginActivity.EXTRA_FROM_ONBOARDING, true);
-         * loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-         * startActivity(loginIntent);
-         * finish();
-         * return;
-         * ──────────────────────────────────────────────────────────────────────────
-         */
-
-        Intent intent = new Intent(this, AppPermissionsActivity.class);
-        intent.putExtra(AppPermissionsActivity.EXTRA_IS_FIRST_RUN, true);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        // Mandatory Authentication: New users must authenticate before accessing security services
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        loginIntent.putExtra(LoginActivity.EXTRA_FROM_ONBOARDING, true);
+        loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(loginIntent);
         finish();
     }
 }

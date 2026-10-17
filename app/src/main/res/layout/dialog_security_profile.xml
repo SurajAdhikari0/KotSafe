@@ -1,373 +1,1794 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/profile_dialog_bg"
-    android:padding="22dp">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_profile_sheet_dialog">
 
-    <!-- Top Handle Bar -->
-    <View
-        android:layout_width="40dp"
-        android:layout_height="4dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="14dp"
-        android:background="@drawable/rounded_bg"
-        android:backgroundTint="@color/lightGray"
-        android:alpha="0.4" />
-
-    <!-- Header with Avatar & Tier -->
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
 
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_profile_avatar"
-            app:tint="?attr/colorAccent"
-            android:background="@drawable/pulse_ring"
-            android:padding="8dp"
-            android:contentDescription="@string/security_profile_title" />
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <ViewFlipper
+            android:id="@+id/viewflipper_profile"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="14dp"
-            android:orientation="vertical">
+            android:inAnimation="@android:anim/fade_in"
+            android:outAnimation="@android:anim/fade_out">
 
+            <!-- ================= VIEW 1: MAIN PROFILE SCREEN ================= -->
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/profile_suite_name"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/highContrast" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/rounded_bg"
-                    android:backgroundTint="@color/profileTierBadgeBg"
-                    android:textColor="@color/profileTierBadgeFg"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="2dp"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:text="@string/profile_tier_label" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/profile_admin_role"
-                android:textSize="13sp"
-                android:textColor="@color/lightGray" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Threat Intel Stat Cards -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal">
-
-        <!-- Stat 1 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="6dp"
-            android:background="@drawable/profile_stat_card_bg"
-            android:padding="12dp"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_signatures_count"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorAccent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/profile_signatures_label"
-                android:textSize="10sp"
-                android:gravity="center"
-                android:textColor="@color/lightGray" />
-        </LinearLayout>
-
-        <!-- Stat 2 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginHorizontal="3dp"
-            android:background="@drawable/profile_stat_card_bg"
-            android:padding="12dp"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_firewall_rules_count"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/ok" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/profile_firewall_rules_label"
-                android:textSize="10sp"
-                android:gravity="center"
-                android:textColor="@color/lightGray" />
-        </LinearLayout>
-
-        <!-- Stat 3 -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="6dp"
-            android:background="@drawable/profile_stat_card_bg"
-            android:padding="12dp"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_protection_grade"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/ok" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/profile_protection_label"
-                android:textSize="10sp"
-                android:gravity="center"
-                android:textColor="@color/lightGray" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- About KotSafe Integrated Section in Profile -->
-    <LinearLayout
-        android:id="@+id/card_profile_about"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:background="@drawable/profile_stat_card_bg"
-        android:padding="12dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <FrameLayout
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginEnd="12dp">
-            <View
+                android:id="@+id/layout_profile_main"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/nav_logo_bg" />
-            <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher"
-                android:scaleType="fitCenter"
-                android:contentDescription="@null" />
-        </FrameLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="KotSafe Security"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/highContrast" />
-
-                <TextView
-                    android:id="@+id/profile_about_version"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
+                <!-- Top Handle Bar -->
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="12dp"
                     android:background="@drawable/rounded_bg"
-                    android:backgroundTint="@color/profileTierBadgeBg"
-                    android:textColor="@color/profileTierBadgeFg"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="1dp"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    tools:text="v2.0.1-beta" />
+                    android:backgroundTint="@color/profileNavyBorder" />
+
+                <!-- Header: Profile Title + Close 'X' Button -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:text="Profile"
+                        android:textColor="@color/profileTextPrimary"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <FrameLayout
+                        android:id="@+id/btn_profile_close_x"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/bg_profile_close_btn"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Close"
+                            android:src="@drawable/ic_close"
+                            app:tint="@color/profileIconMuted" />
+                    </FrameLayout>
+                </RelativeLayout>
+
+                <!-- Hero Profile Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_profile_hero_card"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:paddingStart="16dp"
+                    android:paddingTop="22dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="20dp">
+
+                    <!-- Avatar with Glowing Ring and Verified Badge -->
+                    <FrameLayout
+                        android:layout_width="88dp"
+                        android:layout_height="88dp">
+
+                        <View
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
+                            android:background="@drawable/pulse_ring"
+                            android:backgroundTint="@color/profileAccent"
+                            android:alpha="0.25" />
+
+                        <!-- Inner Avatar Circle -->
+                        <FrameLayout
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/bg_profile_avatar_glow">
+
+                            <TextView
+                                android:id="@+id/tv_profile_avatar_initial"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="S"
+                                android:textColor="@color/profileAvatarText"
+                                android:textSize="30sp"
+                                android:textStyle="bold" />
+                        </FrameLayout>
+
+                        <!-- Verified Check Badge -->
+                        <FrameLayout
+                            android:id="@+id/badge_profile_verified"
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:layout_gravity="bottom|end"
+                            android:background="@drawable/bg_profile_verified_badge">
+
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_check_solid"
+                                app:tint="@color/profileVerifiedIcon" />
+                        </FrameLayout>
+                    </FrameLayout>
+
+                    <!-- User Name -->
+                    <TextView
+                        android:id="@+id/tv_profile_user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Suraj Adhikari"
+                        android:textColor="@color/profileTextPrimary"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <!-- User Email -->
+                    <TextView
+                        android:id="@+id/tv_profile_account_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="surajadhikari716@gmail.com"
+                        android:textColor="@color/profileTextSecondary"
+                        android:textSize="13sp" />
+
+                    <!-- Status Pills -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <!-- Pill 1: Cloud Active Sentinel -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_profile_pill_green"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="9dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="9dp"
+                            android:paddingBottom="5dp">
+
+                            <View
+                                android:id="@+id/dot_profile_status"
+                                android:layout_width="6dp"
+                                android:layout_height="6dp"
+                                android:layout_marginEnd="5dp"
+                                android:background="@drawable/rounded_bg"
+                                android:backgroundTint="@color/profileSuccess" />
+
+                            <TextView
+                                android:id="@+id/tv_profile_status_chip"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cloud Active Sentinel"
+                                android:textColor="@color/profileSuccessText"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Pill 2: Local Security Admin -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_profile_pill_blue"
+                            android:paddingStart="9dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="9dp"
+                            android:paddingBottom="5dp"
+                            android:text="Protected locally"
+                            android:textColor="@color/profileAccentStrong"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+
+
+                <!-- Guest Mode Sign In Box (Only shown if unauthenticated) -->
+                <LinearLayout
+                    android:id="@+id/layout_guest_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:orientation="vertical"
+                    android:padding="14dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sign in to unlock full cloud &amp; P2P mesh"
+                        android:textColor="@color/profileTextPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Guest mode only runs local packet filtering."
+                        android:textColor="@color/profileTextSecondary"
+                        android:textSize="11sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_profile_sign_in"
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_profile_primary_cyan_btn"
+                        android:text="Sign In to KotSafe Cloud"
+                        android:textColor="@color/profileTextOnAccent"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+
+                <!-- Account Security Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:text="Account security"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="2 of 5 protections on"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+
+                    <!-- 5-segment bar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_active" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_active" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_inactive" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_inactive" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_inactive" />
+                    </LinearLayout>
+
+                    <!-- 2FA Promo Highlight Box -->
+                    <LinearLayout
+                        android:id="@+id/card_profile_2fa_hero"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_profile_highlight_card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
+
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_profile_2fa_phone"
+                                app:tint="@color/profileAccent" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Add two-factor authentication so a leaked password alone can't unlock your account."
+                            android:textColor="@color/profileTextBody"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/btn_profile_setup_2fa_hero"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/bg_profile_primary_cyan_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:text="Set up"
+                            android:textColor="@color/profileTextOnAccent"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Section: ACCOUNT -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="18dp"
+                    android:letterSpacing="0.1"
+                    android:text="ACCOUNT"
+                    android:textColor="@color/profileTextSecondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Sign-in and recovery Entry Card -->
+                <LinearLayout
+                    android:id="@+id/row_profile_signin_recovery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="13dp">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                        <ImageView
+                            android:layout_width="19dp"
+                            android:layout_height="19dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_lock"
+                            app:tint="@color/profileAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sign-in and recovery"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="Password, 2FA, passkeys and alerts"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_profile_pill_blue"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
+                        android:text="2 OF 5"
+                        android:textColor="@color/profileAccentStrong"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_navigate_next"
+                        app:tint="@color/profileChevron" />
+                </LinearLayout>
+
+                <!-- Connected Devices Entry Card -->
+                <LinearLayout
+                    android:id="@+id/row_profile_connected_devices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="13dp">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_device_phone"
+                            app:tint="@color/profileAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Connected devices"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="Active sessions, protection mode &amp; nodes"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_profile_connected_devices_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_profile_pill_green"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
+                        android:text="1 ACTIVE"
+                        android:textColor="@color/profileSuccessText"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_navigate_next"
+                        app:tint="@color/profileChevron" />
+                </LinearLayout>
+
+                <!-- Threat Intel 3-Card Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:orientation="horizontal">
+
+                    <!-- Stat 1: Malware Signatures -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_card"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingTop="14dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="87,412"
+                            android:textColor="@color/profileAccent"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="Malware signatures"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Stat 2: Active NAC Rules -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_card"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingTop="14dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="14"
+                            android:textColor="@color/profileAccent"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="Active NAC rules"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Stat 3: Protection Posture -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_green_card"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingTop="14dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MAX"
+                            android:textColor="@color/profileSuccessText"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="Protection posture"
+                            android:textColor="@color/profileSuccessMuted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Section: SECURITY MODULES -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="18dp"
+                    android:letterSpacing="0.1"
+                    android:text="SECURITY MODULES"
+                    android:textColor="@color/profileTextSecondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:orientation="vertical">
+
+                    <!-- KotSafe Security Module -->
+                    <LinearLayout
+                        android:id="@+id/card_profile_about"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="13dp">
+
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                            <ImageView
+                                android:layout_width="19dp"
+                                android:layout_height="19dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_shield"
+                                app:tint="@color/profileAccent" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="KotSafe Security"
+                                    android:textColor="@color/profileTextPrimary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/profile_about_version"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:background="@drawable/bg_profile_pill_green"
+                                    android:paddingStart="6dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="6dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="v2.0.5-beta"
+                                    android:textColor="@color/profileSuccessText"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="MITRE matrix, architecture and core engines"
+                                android:textColor="@color/profileTextSecondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_navigate_next"
+                            app:tint="@color/profileChevron" />
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="14dp"
+                        android:background="@color/profileCardBorder" />
+
+                    <!-- Physical Security Module -->
+                    <LinearLayout
+                        android:id="@+id/card_profile_physical_security"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="13dp">
+
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/bg_profile_amber_icon_bg">
+
+                            <ImageView
+                                android:layout_width="19dp"
+                                android:layout_height="19dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_lock"
+                                app:tint="@color/profileWarning" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Physical Security"
+                                android:textColor="@color/profileTextPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Anti-theft, app gate and security locks"
+                                android:textColor="@color/profileTextSecondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_navigate_next"
+                            app:tint="@color/profileChevron" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
+
+                <!-- Section: ENGINES RUNNING (Fully Responsive 2x2 Grid) -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="18dp"
+                    android:letterSpacing="0.1"
+                    android:text="ENGINES RUNNING"
+                    android:textColor="@color/profileTextSecondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Engines Row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <!-- Engine 1 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp">
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_marginEnd="7dp"
+                            android:background="@drawable/bg_profile_status_dot" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="Zero-Trust Engine"
+                            android:textColor="@color/profileTextTertiary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Engine 2 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp">
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_marginEnd="7dp"
+                            android:background="@drawable/bg_profile_status_dot" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="VPN + Sentinels"
+                            android:textColor="@color/profileTextTertiary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Engines Row 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <!-- Engine 3 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp">
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_marginEnd="7dp"
+                            android:background="@drawable/bg_profile_status_dot" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="eBPF Ring Buffer"
+                            android:textColor="@color/profileTextTertiary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Engine 4 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_card"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp">
+
+                        <View
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_marginEnd="7dp"
+                            android:background="@drawable/bg_profile_status_dot" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:text="AI Threat Engine"
+                            android:textColor="@color/profileTextTertiary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Sign Out Button -->
+                <LinearLayout
+                    android:id="@+id/btn_profile_sign_out"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_profile_signout_btn"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_profile_logout" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sign out"
+                        android:textColor="@color/profileDanger"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Bottom Action Buttons: About KotSafe & Done -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/btn_profile_about"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_profile_primary_cyan_btn"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_marginEnd="8dp"
+                            android:src="@drawable/ic_info"
+                            app:tint="@color/profileTextOnAccent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="About KotSafe"
+                            android:textColor="@color/profileTextOnAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn_profile_done"
+                        android:layout_width="110dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/bg_profile_outline_btn"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="Done"
+                        android:textColor="@color/profileTextPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- ================= VIEW 2: SIGN-IN AND RECOVERY SUBPAGE ================= -->
+            <LinearLayout
+                android:id="@+id/layout_profile_recovery"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="About, MITRE Matrix, Architecture &amp; Core Engines"
-                android:textSize="11sp"
-                android:textColor="@color/metricTextSecondary" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="24dp">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_navigate_next"
-            app:tint="@color/lightGray"
-            android:contentDescription="@null" />
-    </LinearLayout>
+                <!-- Header: Back Arrow + Title and Subtitle -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-    <!-- Physical Security & Screen Peek Section in Profile -->
-    <LinearLayout
-        android:id="@+id/card_profile_physical_security"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/profile_stat_card_bg"
-        android:padding="12dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:clickable="true"
-        android:focusable="true">
+                    <FrameLayout
+                        android:id="@+id/btn_profile_back"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_profile_close_btn"
+                        android:clickable="true"
+                        android:focusable="true">
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_lock"
-            app:tint="#FFD54F"
-            android:layout_marginEnd="12dp"
-            android:contentDescription="@null" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Back"
+                            android:src="@drawable/ic_arrow_back"
+                            app:tint="@color/profileIconMuted" />
+                    </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sign-in and recovery"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="How you sign in and get back in"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Protection Level Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:text="Protection level"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="2 of 5 on"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </RelativeLayout>
+
+                    <!-- 5-segment bar -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_active" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_active" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_inactive" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_inactive" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_profile_segment_inactive" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Section: SIGN-IN -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
+                    android:letterSpacing="0.1"
+                    android:text="SIGN-IN"
+                    android:textColor="@color/profileTextSecondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:orientation="vertical">
+
+                    <!-- Password Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="13dp">
+
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                            <ImageView
+                                android:layout_width="19dp"
+                                android:layout_height="19dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_lock"
+                                app:tint="@color/profileAccent" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Password"
+                                android:textColor="@color/profileTextPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="On"
+                                android:textColor="@color/profileSuccessText"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/btn_profile_change_pwd"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_profile_outline_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:text="Change"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/profileCardBorder" />
+
+                    <!-- Two-Factor Authentication Recommended Block -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_profile_highlight_card"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_marginEnd="12dp"
+                                android:background="@drawable/bg_profile_amber_icon_bg">
+
+                                <ImageView
+                                    android:layout_width="19dp"
+                                    android:layout_height="19dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_profile_2fa_phone"
+                                    app:tint="@color/profileWarning" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Two-factor authentication"
+                                    android:textColor="@color/profileTextPrimary"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tv_profile_2fa_status"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="1dp"
+                                    android:text="Off · Recommended"
+                                    android:textColor="@color/profileWarning"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Ask for a code from an authenticator app each time you sign in, so a leaked password alone can't unlock your account."
+                            android:textColor="@color/profileTextTertiary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/btn_profile_setup_2fa"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_profile_primary_cyan_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:text="Set up two-factor"
+                            android:textColor="@color/profileTextOnAccent"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btn_profile_view_backup_codes"
+                            android:layout_width="match_parent"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_profile_outline_btn"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:text="View backup recovery codes"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/profileCardBorder" />
+
+                    <!-- Biometric App Lock Row -->
+                    <LinearLayout
+                        android:id="@+id/row_profile_biometrics"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="13dp">
+
+                        <FrameLayout
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                            <ImageView
+                                android:layout_width="19dp"
+                                android:layout_height="19dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_profile_key"
+                                app:tint="@color/profileAccent" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Biometric app lock"
+                                android:textColor="@color/profileTextPrimary"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tv_profile_biometric_desc"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="Fingerprint or face unlock"
+                                android:textColor="@color/profileTextSecondary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switch_profile_biometrics"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Section: RECOVERY -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
+                    android:letterSpacing="0.1"
+                    android:text="RECOVERY"
+                    android:textColor="@color/profileTextSecondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Recovery Link Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="13dp">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                        <ImageView
+                            android:layout_width="19dp"
+                            android:layout_height="19dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_profile_mail"
+                            app:tint="@color/profileAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Recovery link"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="On · sent to your email"
+                            android:textColor="@color/profileSuccessText"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn_profile_reset_pwd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_profile_outline_btn"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:text="Send link"
+                        android:textColor="@color/profileTextPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Section: ALERTS -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
+                    android:letterSpacing="0.1"
+                    android:text="ALERTS"
+                    android:textColor="@color/profileTextSecondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Login Alerts Row -->
+                <LinearLayout
+                    android:id="@+id/row_profile_security_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="13dp">
+
+                    <FrameLayout
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_profile_cyan_icon_bg">
+
+                        <ImageView
+                            android:layout_width="19dp"
+                            android:layout_height="19dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_profile_bell"
+                            app:tint="@color/profileAccent" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Recent security activity"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="View sign-ins, 2FA, and identity logs"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_profile_pill_green"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
+                        android:text="VIEW LOG"
+                        android:textColor="@color/profileSuccessText"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ================= VIEW 3: CONNECTED DEVICES SUBPAGE ================= -->
+            <LinearLayout
+                android:id="@+id/layout_profile_devices_subpage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Physical Security"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/highContrast" />
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Anti-theft, App Gate &amp; Security Locks"
-                android:textSize="11sp"
-                android:textColor="@color/metricTextSecondary" />
-        </LinearLayout>
+                <!-- Header: Back Arrow + Title and Subtitle -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_navigate_next"
-            app:tint="@color/lightGray"
-            android:contentDescription="@null" />
-    </LinearLayout>
+                    <FrameLayout
+                        android:id="@+id/btn_profile_devices_back"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/bg_profile_close_btn"
+                        android:clickable="true"
+                        android:focusable="true">
 
-    <!-- Security Posture Details -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/profile_stat_card_bg"
-        android:padding="12dp"
-        android:orientation="vertical">
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Back"
+                            android:src="@drawable/ic_arrow_back"
+                            app:tint="@color/profileIconMuted" />
+                    </FrameLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔒 Real-Time Zero-Trust Engine Active"
-            android:textSize="12sp"
-            android:textColor="@color/highContrast" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="🛡️ Dual-Mode (VPN + Passive API Sentinels)"
-            android:textSize="12sp"
-            android:textColor="@color/highContrast" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Connected Devices"
+                            android:textColor="@color/profileTextPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="⚡ High-Performance eBPF / Native Packet Ring Buffer"
-            android:textSize="12sp"
-            android:textColor="@color/highContrast" />
-    </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="1dp"
+                            android:text="Active hardware sessions and protection mode"
+                            android:textColor="@color/profileTextSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
 
-    <!-- Bottom Buttons: Open About and Close -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp">
+                <!-- Status Legend Card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_profile_card"
+                    android:orientation="vertical"
+                    android:padding="12dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_profile_about"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:text="@string/about"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            app:icon="@drawable/ic_info"
-            app:iconTint="#FFFFFF"
-            app:backgroundTint="?attr/colorAccent"
-            app:cornerRadius="14dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.08"
+                        android:text="DEVICE STATUS INDICATORS"
+                        android:textColor="@color/profileTextSecondary"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_profile_close"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="@string/profile_close_btn"
-            android:textColor="@color/highContrast"
-            app:cornerRadius="14dp" />
-    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
 
-</LinearLayout>
+                        <!-- Green Dot: Online -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="7dp"
+                                android:layout_height="7dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="@drawable/bg_profile_status_dot" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Online"
+                                android:textColor="@color/profileSuccessText"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Blue Dot: Mesh Relay -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="7dp"
+                                android:layout_height="7dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="@drawable/bg_profile_status_dot_blue" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mesh Relay"
+                                android:textColor="@color/profileAccentStrong"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Red Dot: Offline -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <View
+                                android:layout_width="7dp"
+                                android:layout_height="7dp"
+                                android:layout_marginEnd="6dp"
+                                android:background="@drawable/bg_profile_status_dot_red" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Offline"
+                                android:textColor="@color/profileDanger"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Section Header: LINKED DEVICES -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:letterSpacing="0.1"
+                        android:text="LINKED DEVICES"
+                        android:textColor="@color/profileTextSecondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_profile_subpage_devices_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_profile_pill_green"
+                        android:letterSpacing="0.05"
+                        android:paddingStart="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="2dp"
+                        android:text="1 ACTIVE"
+                        android:textColor="@color/profileSuccessText"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Device List Container -->
+                <LinearLayout
+                    android:id="@+id/layout_profile_devices_subpage_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical" />
+
+                <!-- Footnote / Guidance -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_profile_highlight_card"
+                    android:orientation="horizontal"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginEnd="10dp"
+                        android:src="@drawable/ic_shield"
+                        app:tint="@color/profileAccent" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:lineSpacingExtra="2dp"
+                        android:text="To revoke an untrusted device, tap 'Sign out'. The cryptographic session token will be revoked across the KotSafe Zero-Trust Mesh instantly."
+                        android:textColor="@color/profileTextSecondary"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ViewFlipper>
+    </androidx.core.widget.NestedScrollView>
+
+</FrameLayout>

@@ -61,6 +61,16 @@ public class AdvancedDeveloperSettingsFragment extends SettingsSubFragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+            com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "Advanced & Developer Mode");
+            if (isAdded() && getParentFragmentManager() != null && getParentFragmentManager().getBackStackEntryCount() > 0) {
+                getParentFragmentManager().popBackStack();
+            } else if (getActivity() != null) {
+                getActivity().finish();
+            }
+            return;
+        }
+
         SwitchPreference localAccessPref = findPreference(com.kotsafe.security.p2p.GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS);
         if (localAccessPref != null) {
             boolean exitActive = PreferenceManager.getDefaultSharedPreferences(requireContext())

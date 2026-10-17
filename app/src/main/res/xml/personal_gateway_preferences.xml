@@ -96,6 +96,12 @@
             app:summary="@string/gateway_client_enabled_summary"
             app:defaultValue="false" />
         <Preference
+            android:key="personal_gateway_client_refresh_ip"
+            app:title="🔄 Refresh IP &amp; Link Status"
+            app:summary="Tap to refresh Real Device IP, Exit IP, and latency"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+        <Preference
             android:key="personal_gateway_scan_pairing_qr"
             app:title="@string/gateway_scan_pairing_title"
             app:summary="@string/gateway_scan_pairing_summary" />
@@ -141,6 +147,22 @@
         android:key="personal_gateway_telemetry_category"
         app:title="Exit Node Live Telemetry"
         app:iconSpaceReserved="true">
+        <Preference
+            android:key="personal_gateway_telemetry_refresh"
+            app:title="🔄 Refresh IPs &amp; Telemetry"
+            app:summary="Tap to re-query Real Device IP, Exit Node IP, and latency"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_telemetry_device_ip"
+            app:title="📱 Real Device IP (Direct)"
+            app:summary="Detecting..."
+            app:iconSpaceReserved="true" />
+        <Preference
+            android:key="personal_gateway_telemetry_exit_ip"
+            app:title="🌐 Exit Node Public IP"
+            app:summary="Awaiting Exit Node IP..."
+            app:iconSpaceReserved="true" />
         <Preference
             android:key="personal_gateway_telemetry_health"
             app:title="Exit Node Health"

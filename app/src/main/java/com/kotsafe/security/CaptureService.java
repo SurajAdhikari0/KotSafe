@@ -601,13 +601,13 @@ public class CaptureService extends VpnService implements Runnable {
                     String backendToken = mPrefs.getString(Prefs.PREF_P2P_BACKEND_PAIRING, "");
                     boolean killSwitch = mPrefs.getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.KILL_SWITCH, true);
 
-                    if (backendToken.isEmpty() && isGatewayClient) {
+                    if (isGatewayClient) {
                         String bundleUri = mPrefs.getString(com.kotsafe.security.p2p.GatewayPreferenceKeys.PAIRING_BUNDLE, "");
                         if (!bundleUri.isEmpty()) {
                             try {
                                 com.kotsafe.security.p2p.SecurePairingBundle parsed =
                                         com.kotsafe.security.p2p.SecurePairingBundle.parse(bundleUri);
-                                if (parsed != null && parsed.room != null) {
+                                if (parsed != null && parsed.room != null && !parsed.room.isEmpty()) {
                                     backendToken = "client_" + parsed.room;
                                     mPrefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, backendToken).apply();
                                 }

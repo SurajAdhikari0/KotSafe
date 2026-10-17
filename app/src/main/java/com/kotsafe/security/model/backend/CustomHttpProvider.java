@@ -770,6 +770,10 @@ public class CustomHttpProvider implements BackendProvider {
                         long uptime = msg.optLong("uptime", 0);
                         String netType = msg.optString("networkType", "");
                         String carrier = msg.optString("carrier", "");
+                        String exitIp = msg.optString("exitIp", "");
+                        if (!exitIp.isEmpty() && exitIp.matches("^[0-9a-fA-F:.]+$")) {
+                            com.kotsafe.security.p2p.GatewayTelemetry.getInstance().setExitNodeIp(exitIp);
+                        }
                         com.kotsafe.security.p2p.GatewayTelemetry.getInstance().update(
                                 battery, charging, plug, ssid, signal, streams, uptime, netType, carrier
                         );
@@ -814,6 +818,19 @@ public class CustomHttpProvider implements BackendProvider {
                     case "error": {
                         String errMsg = msg.optString("message", "unknown_error");
                         Log.w(TAG, "Relay error: " + errMsg);
+                        if ("unknown_or_expired_token".equals(errMsg)) {
+                            com.kotsafe.security.p2p.TunnelCipher cipher = sTunnelCipher;
+                            if (cipher != null && cipher.getRoom() != null && !cipher.getRoom().isEmpty()) {
+                                String roomToken = (this.isHost ? "host_" : "client_") + cipher.getRoom();
+                                if (!token.equals(roomToken)) {
+                                    Log.i(TAG, "Self-healing: Reconnecting relay with room token: " + redactToken(roomToken));
+                                    sScheduler.schedule(() -> {
+                                        link(roomToken, this.isHost, listener);
+                                    }, 300, TimeUnit.MILLISECONDS);
+                                    return;
+                                }
+                            }
+                        }
                         if (!"unknown_message_type".equals(errMsg)) {
                             CandidateListener l = listener;
                             if (l != null) l.onError(errMsg);
@@ -1247,9 +1264,9 @@ public class CustomHttpProvider implements BackendProvider {
                         return;
                     }
                     JSONObject json = new JSONObject(r.body().string());
-                    String exitToken = json.optString("exitToken", "");
                     String room = json.optString("room", "");
                     String secret = json.optString("pairingSecret", "");
+                    String exitToken = (room != null && !room.isEmpty()) ? ("host_" + room) : json.optString("exitToken", "");
                     JSONObject qr = json.optJSONObject("qr");
                     String controlUrl = httpBase();
                     if (controlUrl == null || controlUrl.isEmpty()) {
@@ -1299,8 +1316,8 @@ public class CustomHttpProvider implements BackendProvider {
                         return;
                     }
                     JSONObject json = new JSONObject(r.body().string());
-                    String clientToken = json.getString("clientToken");
-                    long expiresIn = json.optLong("expiresInSeconds", 600);
+                    String clientToken = (bundle.room != null && !bundle.room.isEmpty()) ? ("client_" + bundle.room) : json.optString("clientToken", "");
+                    long expiresIn = json.optLong("expiresInSeconds", 86400);
                     configureCipher(bundle.room, bundle.pairingSecret);
                     callback.onSuccess(clientToken, expiresIn);
                 } catch (Exception e) {
