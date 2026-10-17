@@ -467,3 +467,587 @@
     transition: none;
   }
 }
+
+/* ==========================================================================
+   KotSafe Desktop Enterprise Auth & Connected Devices Additions
+   ========================================================================== */
+
+/* Mode Switcher Tabs */
+.desktop-auth-tabs {
+  display: flex;
+  padding: 4px;
+  margin-bottom: 20px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.desktop-tab {
+  flex: 1;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.desktop-tab:hover {
+  color: var(--text-primary);
+}
+
+.desktop-tab--active {
+  color: var(--color-accent-green);
+  background: var(--color-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Input Fields with Eye Toggle */
+.desktop-form-group {
+  margin-bottom: 16px;
+}
+
+.desktop-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.desktop-input-wrapper input {
+  padding-right: 42px;
+}
+
+.desktop-password-toggle {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.16s ease;
+}
+
+.desktop-password-toggle:hover {
+  color: var(--color-accent-cyan);
+}
+
+.desktop-password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Auth Options (Remember Me + Forgot Password) */
+.desktop-form-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 14px 0 18px;
+  font-size: 12px;
+}
+
+.desktop-remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.desktop-remember-me input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-accent-green);
+  cursor: pointer;
+}
+
+.desktop-link-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-accent-cyan);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: opacity 0.16s ease;
+}
+
+.desktop-link-btn:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Google Sign In Button */
+.desktop-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border-bright) !important;
+  border-radius: 11px;
+  background: var(--color-card) !important;
+  color: var(--text-primary) !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.desktop-google-btn:hover:not(:disabled) {
+  background: var(--color-card-hover) !important;
+  border-color: var(--color-accent-cyan) !important;
+}
+
+.desktop-google-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* User Account Header Banner in Protected Workspace */
+.desktop-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px 6px 8px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.desktop-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1d4ed8, #059669);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  border: 2px solid var(--color-accent-green);
+}
+
+.desktop-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-user-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.desktop-user-email {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.desktop-verified-badge {
+  font-size: 9.5px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--color-accent-green-bg);
+  color: var(--color-accent-green);
+  border: 1px solid var(--color-accent-green-border);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* ==========================================================================
+   Connected Devices Section
+   ========================================================================== */
+
+.desktop-devices-container {
+  width: min(1120px, 100%);
+  margin: 36px auto 0;
+}
+
+.desktop-devices-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.desktop-devices-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.desktop-devices-title-group h2 {
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.desktop-live-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: var(--color-accent-green-bg);
+  border: 1px solid var(--color-accent-green-border);
+  border-radius: 999px;
+  color: var(--color-accent-green);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.desktop-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent-green);
+  box-shadow: 0 0 8px var(--color-accent-green);
+  animation: pulseGreen 2s infinite ease-in-out;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.desktop-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.desktop-refresh-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--color-accent-cyan);
+}
+
+.desktop-devices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.desktop-device-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.desktop-device-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-bright);
+  box-shadow: var(--shadow-md);
+}
+
+.desktop-device-card.is-current {
+  border-color: var(--color-accent-green-border);
+  background: linear-gradient(175deg, rgba(61, 220, 132, 0.05) 0%, var(--color-card) 60%);
+  box-shadow: 0 4px 20px rgba(61, 220, 132, 0.08);
+}
+
+.desktop-device-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.desktop-device-icon-box {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-neutral);
+}
+
+.desktop-device-icon-box.is-online {
+  border-color: var(--color-accent-green-border);
+  background: var(--color-accent-green-bg);
+  color: var(--color-accent-green);
+}
+
+.desktop-device-icon-box svg {
+  width: 22px;
+  height: 22px;
+}
+
+.desktop-device-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.desktop-device-model-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.desktop-device-model {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.desktop-this-device-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--color-accent-green);
+  color: var(--text-inverse);
+}
+
+.desktop-device-os {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.desktop-device-telemetry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 11.5px;
+}
+
+.desktop-telemetry-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.desktop-telemetry-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.desktop-telemetry-value {
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.desktop-telemetry-value.is-online {
+  color: var(--color-accent-green);
+}
+
+.desktop-telemetry-value.is-revoked {
+  color: var(--color-danger);
+}
+
+.desktop-device-card-footer {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.desktop-heartbeat-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.desktop-revoke-btn {
+  padding: 5px 12px;
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: 8px;
+  color: var(--color-danger);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.desktop-revoke-btn:hover:not(:disabled) {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.desktop-current-active-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Security Hero Posture Card */
+.desktop-hero-posture {
+  width: min(1120px, 100%);
+  margin: 0 auto 32px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(61, 220, 132, 0.08) 0%, rgba(56, 168, 255, 0.08) 100%), var(--color-card);
+  border: 1px solid var(--color-accent-green-border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.desktop-posture-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.desktop-posture-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--color-accent-green-bg);
+  border: 1px solid var(--color-accent-green-border);
+  color: var(--color-accent-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px rgba(61, 220, 132, 0.25);
+}
+
+.desktop-posture-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.desktop-posture-text h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.desktop-posture-text p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.desktop-posture-metrics {
+  display: flex;
+  gap: 24px;
+}
+
+.desktop-metric-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.desktop-metric-num {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-accent-cyan);
+}
+
+.desktop-metric-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Modals */
+.desktop-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 13, 26, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.desktop-modal-card {
+  width: min(440px, 100%);
+  padding: 28px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-bright);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.desktop-modal-card h3 {
+  font-size: 18px;
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.desktop-modal-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.desktop-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
