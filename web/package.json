@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "server": "node server/licenseBackend.js"
+    "server": "node server/licenseBackend.js",
+    "desktop": "chromium --user-data-dir=\"$HOME/.config/kotsafe-desktop\" --app=\"http://localhost:3000/?desktop\" --window-size=1280,850"
   },
   "dependencies": {
     "firebase": "^13.0.0",
