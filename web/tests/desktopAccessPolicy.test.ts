@@ -10,9 +10,9 @@ describe('desktop access policy', () => {
     expect(desktopCapabilitiesFor('signed_out')).toEqual([])
   })
 
-  it('limits guest sessions to hosting an exit node', () => {
-    expect(desktopCapabilitiesFor('guest')).toEqual(['guest_exit_node'])
-    expect(canUseDesktopCapability('guest', 'guest_exit_node')).toBe(true)
+  it('restricts guest sessions to preview-only: cannot host exit node or enable features', () => {
+    expect(desktopCapabilitiesFor('guest')).toEqual([])
+    expect(canUseDesktopCapability('guest', 'guest_exit_node')).toBe(false)
     expect(canUseDesktopCapability('guest', 'client_mode')).toBe(false)
     expect(canUseDesktopCapability('guest', 'security_settings')).toBe(false)
     expect(canUseDesktopCapability('guest', 'mesh_pairing')).toBe(false)

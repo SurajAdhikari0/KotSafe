@@ -22,7 +22,4 @@ native desktop host and the KotSafe backend.
 
 ## Guest policy
 
-`beginGuestSession` may expose only the local exit-node host capability.
-`client_mode`, mesh pairing, cloud synchronization, and security settings must
-be rejected by the native host until a verified session exists. The renderer's
-`accessPolicy.ts` mirrors this rule for the UI; it is not the enforcement layer.
+`beginGuestSession` provides a full read-only preview of the entire UI, but privileged operations (including exit-node hosting, client VPN, mesh pairing, cloud synchronization, and security settings) cannot work and are disabled until an authenticated session exists.

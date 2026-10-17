@@ -173,48 +173,75 @@ async function sha256Hex(text: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// ============================================================================
-// Feature Card
-// ============================================================================
-interface FeatureCardProps {
-  title: string;
-  description: string;
-  locked?: boolean;
-}
-
-function FeatureCard({ title, description, locked = false }: FeatureCardProps): React.ReactElement {
-  return (
-    <article className={`desktop-feature-card ${locked ? 'is-locked' : ''}`}>
-      <div className="desktop-feature-icon" aria-hidden="true">
-        {locked ? <LockIcon /> : <ShieldIcon />}
-      </div>
-      <div>
-        <h3>{title}</h3>
-        <p>{description}</p>
-      </div>
-      {locked && <span className="desktop-locked-label">Sign in required</span>}
-    </article>
-  );
-}
 
 // ============================================================================
-// Authenticated Workspace (with Connected Devices Dashboard)
+// Desktop Workspace (Universal: Authenticated & Guest Full UI Preview)
 // ============================================================================
-interface AuthenticatedWorkspaceProps {
-  user: User;
+interface DesktopWorkspaceProps {
+  user: User | null;
+  isGuest?: boolean;
   onSignOut: () => Promise<void>;
+  onExitGuest?: () => void;
   onNotice: (notice: Notice) => void;
 }
 
-function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWorkspaceProps): React.ReactElement {
+function DesktopWorkspace({
+  user,
+  isGuest = false,
+  onSignOut,
+  onExitGuest,
+  onNotice,
+}: DesktopWorkspaceProps): React.ReactElement {
   const [devices, setDevices] = useState<ConnectedDevice[]>([]);
-  const [isLoadingDevices, setIsLoadingDevices] = useState(true);
+  const [isLoadingDevices, setIsLoadingDevices] = useState(!isGuest);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
   const [deviceToRevoke, setDeviceToRevoke] = useState<ConnectedDevice | null>(null);
+  const [guestModalReason, setGuestModalReason] = useState<string | null>(null);
+  const [isExitNodeHosting, setIsExitNodeHosting] = useState(false);
 
-  // Subscribe in real-time to all devices registered under the single user account in Firestore
+  // Sample devices shown in Guest Preview Mode
+  const guestSampleDevices: ConnectedDevice[] = [
+    {
+      deviceId: 'guest-workstation-local',
+      ownerUid: 'guest',
+      model: 'KotSafe Desktop Sentinel (This Workstation)',
+      deviceType: 'desktop',
+      osVersion: 'Linux Workstation (x86_64)',
+      appVersion: '1.0.0-PREVIEW',
+      statusType: 'ONLINE',
+      isOnline: true,
+      lastHeartbeat: Date.now(),
+      threatScore: 98,
+      isProtected: true,
+      isCurrentDevice: true,
+      meshStatus: 'PREVIEW ONLY',
+    },
+    {
+      deviceId: 'guest-paired-android',
+      ownerUid: 'guest',
+      model: 'OPPO CPH2061 (Android Smartphone)',
+      deviceType: 'android',
+      osVersion: 'Android 12 (SDK 31)',
+      appVersion: '1.0.0',
+      statusType: 'ONLINE',
+      isOnline: true,
+      lastHeartbeat: Date.now() - 120000,
+      threatScore: 95,
+      isProtected: true,
+      isCurrentDevice: false,
+      meshStatus: 'SAMPLE PEER',
+    },
+  ];
+
+  // Subscribe in real-time to all devices registered under the user account in Firestore
   useEffect(() => {
+    if (isGuest || !user) {
+      setDevices(guestSampleDevices);
+      setIsLoadingDevices(false);
+      return;
+    }
+
     setIsLoadingDevices(true);
     const unsubscribe = subscribeToUserDevices(
       user.uid,
@@ -231,10 +258,10 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
     return () => {
       unsubscribe();
     };
-  }, [user.uid]);
+  }, [user?.uid, isGuest]);
 
   const handleRevokeConfirm = async () => {
-    if (!deviceToRevoke) return;
+    if (!deviceToRevoke || !user) return;
     setRevokingDeviceId(deviceToRevoke.deviceId);
     try {
       await revokeDeviceSession(user.uid, deviceToRevoke.deviceId);
@@ -248,14 +275,36 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
   };
 
   const activeCount = devices.filter(d => d.isOnline).length;
-  const userInitial = (user.displayName || user.email || 'K').charAt(0).toUpperCase();
+  const userInitial = isGuest ? 'G' : (user?.displayName || user?.email || 'K').charAt(0).toUpperCase();
 
   return (
     <main className="desktop-workspace" data-testid="authenticated-workspace">
+      {/* Guest Mode Banner across the top */}
+      {isGuest && (
+        <div className="desktop-guest-banner" role="alert">
+          <div className="desktop-guest-banner-text">
+            <ShieldIcon />
+            <div>
+              <strong>Guest Preview Mode Active:</strong> You can explore the full KotSafe Sentinel interface in read-only mode. Hosting an exit node, client tunnels, and security policy modifications require an authenticated KotSafe account.
+            </div>
+          </div>
+          <button
+            type="button"
+            className="desktop-primary-button"
+            style={{ width: 'auto', padding: '8px 16px', fontSize: '12px' }}
+            onClick={onExitGuest}
+          >
+            Sign In to Enable All Features
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <section className="desktop-workspace-header">
         <div>
-          <span className="desktop-eyebrow">Zero-Trust Sentinel Mesh</span>
+          <span className="desktop-eyebrow">
+            {isGuest ? 'Guest Exploration Mode' : 'Zero-Trust Sentinel Mesh'}
+          </span>
           <h1>KotSafe Desktop Workstation</h1>
           <p>Multi-Device Sentinel Dashboard & Protected P2P Relay Node.</p>
         </div>
@@ -265,25 +314,42 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
             <div className="desktop-user-avatar">{userInitial}</div>
             <div className="desktop-user-info">
               <span className="desktop-user-name">
-                {user.displayName || user.email?.split('@')[0] || 'KotSafe User'}
-                <span className="desktop-verified-badge">VERIFIED</span>
+                {isGuest ? 'Guest Explorer' : user?.displayName || user?.email?.split('@')[0] || 'KotSafe User'}
+                {isGuest ? (
+                  <span className="desktop-guest-badge">PREVIEW ONLY</span>
+                ) : (
+                  <span className="desktop-verified-badge">VERIFIED</span>
+                )}
               </span>
-              <span className="desktop-user-email">{user.email}</span>
+              <span className="desktop-user-email">
+                {isGuest ? 'guest@kotsafe.local (Unverified)' : user?.email}
+              </span>
             </div>
           </div>
 
-          <button
-            type="button"
-            className="desktop-secondary-button"
-            onClick={async () => {
-              setIsSigningOut(true);
-              await onSignOut();
-              setIsSigningOut(false);
-            }}
-            disabled={isSigningOut}
-          >
-            {isSigningOut ? 'Signing out…' : 'Sign out'}
-          </button>
+          {isGuest ? (
+            <button
+              type="button"
+              className="desktop-primary-button"
+              style={{ width: 'auto', padding: '8px 16px', fontSize: '13px' }}
+              onClick={onExitGuest}
+            >
+              Back to Sign In
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="desktop-secondary-button"
+              onClick={async () => {
+                setIsSigningOut(true);
+                await onSignOut();
+                setIsSigningOut(false);
+              }}
+              disabled={isSigningOut}
+            >
+              {isSigningOut ? 'Signing out…' : 'Sign out'}
+            </button>
+          )}
         </div>
       </section>
 
@@ -294,21 +360,92 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
             <ShieldIcon />
           </div>
           <div className="desktop-posture-text">
-            <h3>TOTAL DEFENSE ACTIVE · MESH PROTECTED</h3>
-            <p>Hardware authenticated with Firebase Cloud Sentinel · All communications encrypted.</p>
+            <h3>
+              {isGuest
+                ? 'SENTINEL WORKSTATION · PREVIEW MODE'
+                : 'TOTAL DEFENSE ACTIVE · MESH PROTECTED'}
+            </h3>
+            <p>
+              {isGuest
+                ? 'Interface preview active · Interactive actions and exit node hosting are restricted to authenticated accounts.'
+                : 'Hardware authenticated with Firebase Cloud Sentinel · All communications encrypted.'}
+            </p>
           </div>
         </div>
 
         <div className="desktop-posture-metrics">
           <div className="desktop-metric-box">
-            <span className="desktop-metric-num">100/100</span>
+            <span className="desktop-metric-num">98/100</span>
             <span className="desktop-metric-label">Threat Score</span>
           </div>
           <div className="desktop-metric-box">
-            <span className="desktop-metric-num" style={{ color: 'var(--color-accent-green)' }}>
-              {activeCount}
+            <span
+              className="desktop-metric-num"
+              style={{ color: isGuest ? '#fbbf24' : 'var(--color-accent-green)' }}
+            >
+              {isGuest ? `${activeCount} (Demo)` : activeCount}
             </span>
             <span className="desktop-metric-label">Devices Online</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Exit Node Hosting Card (Notice: Disabled as Guest) */}
+      <section style={{ width: 'min(1120px, 100%)', margin: '28px auto 0' }}>
+        <div className={`desktop-exit-card ${isGuest ? 'is-guest-locked' : ''}`}>
+          <div
+            className={`desktop-feature-icon ${
+              isGuest ? '' : isExitNodeHosting ? 'desktop-feature-icon--active' : ''
+            }`}
+          >
+            <ShieldIcon />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '17px', margin: 0 }}>Host Local Exit Node (P2P Relay)</h2>
+              {isGuest && (
+                <span className="desktop-guest-badge" style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.4)' }}>
+                  DISABLED FOR GUESTS
+                </span>
+              )}
+            </div>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Share this computer's connection with an authenticated KotSafe device over encrypted WireGuard tunnel.
+            </p>
+            {isGuest && (
+              <div className="desktop-exit-lock-notice">
+                <LockIcon />
+                Hosting an exit node cannot work as guest. Please sign in to activate exit node relay.
+              </div>
+            )}
+          </div>
+          <div>
+            {isGuest ? (
+              <button
+                type="button"
+                className="desktop-feature-btn-locked"
+                onClick={() => setGuestModalReason('exit_node')}
+              >
+                <LockIcon /> Host Exit Node (Sign In Required)
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={isExitNodeHosting ? 'desktop-secondary-button' : 'desktop-primary-button'}
+                style={{ width: 'auto', minWidth: '130px' }}
+                onClick={() => {
+                  setIsExitNodeHosting(!isExitNodeHosting);
+                  onNotice({
+                    kind: 'info',
+                    message: !isExitNodeHosting
+                      ? 'Local exit node relay started on port 51820.'
+                      : 'Local exit node stopped.',
+                  });
+                }}
+              >
+                {isExitNodeHosting ? 'Stop Exit Node' : 'Start Exit Node'}
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -324,7 +461,9 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
             </span>
           </div>
           <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            Real-time Firestore Sync (`users/{user.uid.substring(0, 8)}…/devices`)
+            {isGuest
+              ? 'Read-Only Device Fleet Preview'
+              : `Real-time Firestore Sync (users/${user?.uid.substring(0, 8)}…/devices)`}
           </span>
         </div>
 
@@ -415,6 +554,14 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
                       <span className="desktop-current-active-tag">
                         <ShieldIcon /> Current Sentinel
                       </span>
+                    ) : isGuest ? (
+                      <button
+                        type="button"
+                        className="desktop-feature-btn-locked"
+                        onClick={() => setGuestModalReason('devices')}
+                      >
+                        <LockIcon /> Sign Out Device
+                      </button>
                     ) : (
                       <button
                         type="button"
@@ -435,13 +582,141 @@ function AuthenticatedWorkspace({ user, onSignOut, onNotice }: AuthenticatedWork
 
       {/* Core Desktop Feature Grid */}
       <section className="desktop-feature-grid" aria-label="Desktop capabilities" style={{ marginTop: '36px' }}>
-        <FeatureCard title="P2P Client Mode" description="Tunnel desktop traffic securely through your paired Android phone or VPS." />
-        <FeatureCard title="DNS & Firewall Shield" description="Synchronize real-time threat blocklists across your entire device mesh." />
-        <FeatureCard title="Multi-Factor 2FA Suite" description="Protected with Google Authenticator and single-use backup recovery codes." />
-        <FeatureCard title="Security Activity Feed" description="Audit logs of all sign-ins, IP bindings, and posture updates." />
+        <article className={`desktop-feature-card ${isGuest ? 'is-locked' : ''}`}>
+          <div className="desktop-feature-icon" aria-hidden="true">
+            {isGuest ? <LockIcon /> : <ShieldIcon />}
+          </div>
+          <div>
+            <h3>P2P Client Mode</h3>
+            <p>Tunnel desktop traffic securely through your paired Android phone or VPS.</p>
+          </div>
+          {isGuest ? (
+            <button
+              type="button"
+              className="desktop-feature-btn-locked"
+              onClick={() => setGuestModalReason('client_mode')}
+            >
+              <LockIcon /> Enable Client Tunnel (Sign In)
+            </button>
+          ) : (
+            <span className="desktop-verified-badge" style={{ alignSelf: 'flex-start' }}>ACTIVE</span>
+          )}
+        </article>
+
+        <article className={`desktop-feature-card ${isGuest ? 'is-locked' : ''}`}>
+          <div className="desktop-feature-icon" aria-hidden="true">
+            {isGuest ? <LockIcon /> : <ShieldIcon />}
+          </div>
+          <div>
+            <h3>DNS & Firewall Shield</h3>
+            <p>Synchronize real-time threat blocklists across your entire device mesh.</p>
+          </div>
+          {isGuest ? (
+            <button
+              type="button"
+              className="desktop-feature-btn-locked"
+              onClick={() => setGuestModalReason('firewall')}
+            >
+              <LockIcon /> Edit Firewall Rules (Sign In)
+            </button>
+          ) : (
+            <span className="desktop-verified-badge" style={{ alignSelf: 'flex-start' }}>SHIELDED</span>
+          )}
+        </article>
+
+        <article className={`desktop-feature-card ${isGuest ? 'is-locked' : ''}`}>
+          <div className="desktop-feature-icon" aria-hidden="true">
+            {isGuest ? <LockIcon /> : <ShieldIcon />}
+          </div>
+          <div>
+            <h3>Multi-Factor 2FA Suite</h3>
+            <p>Protected with Google Authenticator and single-use backup recovery codes.</p>
+          </div>
+          {isGuest ? (
+            <button
+              type="button"
+              className="desktop-feature-btn-locked"
+              onClick={() => setGuestModalReason('2fa')}
+            >
+              <LockIcon /> Manage 2FA (Sign In)
+            </button>
+          ) : (
+            <span className="desktop-verified-badge" style={{ alignSelf: 'flex-start' }}>ENABLED</span>
+          )}
+        </article>
+
+        <article className={`desktop-feature-card ${isGuest ? 'is-locked' : ''}`}>
+          <div className="desktop-feature-icon" aria-hidden="true">
+            {isGuest ? <LockIcon /> : <ShieldIcon />}
+          </div>
+          <div>
+            <h3>Security Activity Feed</h3>
+            <p>Audit logs of all sign-ins, IP bindings, and posture updates.</p>
+          </div>
+          {isGuest ? (
+            <button
+              type="button"
+              className="desktop-feature-btn-locked"
+              onClick={() => setGuestModalReason('audit')}
+            >
+              <LockIcon /> View Full Logs (Sign In)
+            </button>
+          ) : (
+            <span className="desktop-verified-badge" style={{ alignSelf: 'flex-start' }}>SYNCED</span>
+          )}
+        </article>
       </section>
 
-      {/* Revoke Confirmation Modal */}
+      {/* Guest Lock Auth Modal */}
+      {guestModalReason && (
+        <div className="desktop-modal-backdrop" role="dialog" aria-modal="true">
+          <div className="desktop-modal-card">
+            <div
+              className="desktop-feature-icon"
+              style={{
+                margin: '0 0 16px',
+                background: 'rgba(245, 158, 11, 0.15)',
+                color: '#fbbf24',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+              }}
+            >
+              <LockIcon />
+            </div>
+            <h3>
+              {guestModalReason === 'exit_node'
+                ? 'Exit Node Hosting Disabled for Guests'
+                : 'KotSafe Account Required'}
+            </h3>
+            <p>
+              {guestModalReason === 'exit_node'
+                ? 'Hosting an exit node cannot work as guest. To prevent unauthenticated relay traffic and ensure cryptographic attribution, exit node hosting requires an authenticated KotSafe account.'
+                : 'You are currently exploring KotSafe Sentinel in Guest Preview Mode. Enabling client tunnels, modifying firewall policies, and managing device fleets require authentication.'}
+            </p>
+            <div className="desktop-modal-actions">
+              <button
+                type="button"
+                className="desktop-secondary-button"
+                onClick={() => setGuestModalReason(null)}
+              >
+                Continue Previewing
+              </button>
+              <button
+                type="button"
+                className="desktop-primary-button"
+                style={{ width: 'auto' }}
+                onClick={() => {
+                  setGuestModalReason(null);
+                  if (onExitGuest) onExitGuest();
+                }}
+              >
+                Sign In / Register Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revoke Confirmation Modal (Authenticated Only) */}
       {deviceToRevoke && (
         <div className="desktop-modal-backdrop" role="dialog" aria-modal="true">
           <div className="desktop-modal-card">
@@ -760,51 +1035,16 @@ export function DesktopApp(): React.ReactElement {
     );
   }
 
-  // Authenticated State
-  if (user) {
+  // Authenticated or Guest Mode State (Universal Workspace View)
+  if (user || isGuestMode) {
     return (
-      <AuthenticatedWorkspace
+      <DesktopWorkspace
         user={user}
+        isGuest={isGuestMode && !user}
         onSignOut={handleSignOut}
+        onExitGuest={() => setIsGuestMode(false)}
         onNotice={setNotice}
       />
-    );
-  }
-
-  // Guest Mode State
-  if (isGuestMode) {
-    return (
-      <main className="desktop-workspace">
-        <section className="desktop-workspace-header">
-          <div>
-            <span className="desktop-eyebrow">Guest Mode</span>
-            <h1>Exit Node Host Only</h1>
-            <p>Guest access is isolated to hosting a local exit node. Client mode and settings require authentication.</p>
-          </div>
-          <button type="button" className="desktop-secondary-button" onClick={() => setIsGuestMode(false)}>
-            Back to Sign In
-          </button>
-        </section>
-        <section className="desktop-guest-grid">
-          <div className="desktop-exit-card">
-            <div className="desktop-feature-icon desktop-feature-icon--active">
-              <ShieldIcon />
-            </div>
-            <div>
-              <span className="desktop-status-dot">Guest Mode Active</span>
-              <h2>Hosting Local Exit Node</h2>
-              <p>Share this computer's connection with an authenticated KotSafe device.</p>
-            </div>
-            <button type="button" className="desktop-primary-button">Running</button>
-          </div>
-          <div className="desktop-feature-grid">
-            <FeatureCard title="Client mode" description="Connect this computer through a KotSafe exit node." locked />
-            <FeatureCard title="Security settings" description="Manage firewall, DNS, and device policy." locked />
-            <FeatureCard title="Connected devices" description="Track all active mesh devices in real-time." locked />
-            <FeatureCard title="Cloud sync" description="Back up settings and receive account updates." locked />
-          </div>
-        </section>
-      </main>
     );
   }
 
@@ -978,8 +1218,8 @@ export function DesktopApp(): React.ReactElement {
         {/* Guest Mode Section */}
         <div className="desktop-guest-section">
           <div>
-            <h3>Need to host an exit node only?</h3>
-            <p>Guest mode has no client routing, device sync, or settings access.</p>
+            <h3>Want to preview the interface?</h3>
+            <p>Explore the full desktop UI in read-only guest mode. Enabling features & exit node hosting require an account.</p>
           </div>
           <button
             type="button"
@@ -987,7 +1227,7 @@ export function DesktopApp(): React.ReactElement {
             onClick={() => setIsGuestMode(true)}
             disabled={isSubmitting}
           >
-            Continue as Guest
+            Explore as Guest
           </button>
         </div>
 

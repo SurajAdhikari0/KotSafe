@@ -17,7 +17,7 @@ export type DesktopCapability =
 const capabilitiesByMode: Record<DesktopAccessMode, ReadonlySet<DesktopCapability>> = {
   loading: new Set(),
   signed_out: new Set(),
-  guest: new Set(['guest_exit_node']),
+  guest: new Set(), // Guest is preview-only: cannot enable exit node hosting or other features
   authenticated: new Set([
     'guest_exit_node',
     'client_mode',
@@ -41,7 +41,7 @@ export function canUseDesktopCapability(
 export function accessModeLabel(accessMode: DesktopAccessMode): string {
   switch (accessMode) {
     case 'guest':
-      return 'Guest · Exit Node only';
+      return 'Guest (Preview Only · Sign in required to enable)';
     case 'authenticated':
       return 'Signed in';
     case 'signed_out':

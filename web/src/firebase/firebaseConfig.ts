@@ -4,7 +4,7 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCKG2K6Ww2ecC8_uubyb_WeXX_7r_k4vcw",
-  authDomain: "kotsafe-9b782.firebaseapp.com",
+  authDomain: "auth.kotsafe.com",
   projectId: "kotsafe-9b782",
   storageBucket: "kotsafe-9b782.firebasestorage.app",
   messagingSenderId: "445715318354",
