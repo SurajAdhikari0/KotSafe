@@ -171,13 +171,16 @@ public class SecurityNotificationHub {
     }
 
     public boolean canPostNotification() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.POST_NOTIFICATIONS)
-                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
+        if (mNotificationManagerCompat != null && !mNotificationManagerCompat.areNotificationsEnabled()) {
+            return false;
         }
-        return mNotificationManagerCompat.areNotificationsEnabled();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            boolean hasRuntime = ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.POST_NOTIFICATIONS)
+                    == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            boolean enabledInSystem = (mNotificationManagerCompat != null && mNotificationManagerCompat.areNotificationsEnabled());
+            return hasRuntime || enabledInSystem;
+        }
+        return mNotificationManagerCompat != null && mNotificationManagerCompat.areNotificationsEnabled();
     }
 
     @android.annotation.SuppressLint("MissingPermission")
@@ -371,6 +374,60 @@ public class SecurityNotificationHub {
             Log.i(TAG, "Quarantine notification posted for " + fileName);
         } catch (Exception e) {
             Log.e(TAG, "Failed to post quarantine notification: " + e.getMessage());
+        }
+    }
+
+    // =========================================================================
+    // 2d. Remote Mobile SOC Incident Alert (ID: 4130)
+    // =========================================================================
+    public static final int NOTIF_ID_REMOTE_SOC_ALERT = 4130;
+
+    @android.annotation.SuppressLint("MissingPermission")
+    public void postRemoteSocThreatAlert(String workstationName, String workstationId, String title, String description) {
+        if (!canPostNotification()) return;
+        try {
+            Intent quarantineIntent = new Intent(mContext, com.kotsafe.security.receivers.RemoteSocActionReceiver.class);
+            quarantineIntent.setAction(com.kotsafe.security.receivers.RemoteSocActionReceiver.ACTION_QUARANTINE);
+            quarantineIntent.putExtra(com.kotsafe.security.receivers.RemoteSocActionReceiver.EXTRA_TARGET_DEVICE_ID, workstationId);
+            quarantineIntent.putExtra(com.kotsafe.security.receivers.RemoteSocActionReceiver.EXTRA_WORKSTATION_NAME, workstationName);
+            PendingIntent quarantinePi = PendingIntent.getBroadcast(
+                    mContext,
+                    4131,
+                    quarantineIntent,
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+            );
+
+            Intent dismissIntent = new Intent(mContext, com.kotsafe.security.receivers.RemoteSocActionReceiver.class);
+            dismissIntent.setAction(com.kotsafe.security.receivers.RemoteSocActionReceiver.ACTION_DISMISS);
+            PendingIntent dismissPi = PendingIntent.getBroadcast(
+                    mContext,
+                    4132,
+                    dismissIntent,
+                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+            );
+
+            NotificationCompat.Builder b = new NotificationCompat.Builder(mContext, CHAN_THREATS)
+                    .setSmallIcon(R.drawable.ic_exclamation_triangle_solid)
+                    .setContentTitle("🚨 Remote Threat: " + (workstationName != null ? workstationName : "Workstation"))
+                    .setContentText(title != null ? title : "Suspicious activity detected on workstation")
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(
+                            "Workstation Sentinel Incident:\n" +
+                            "• Host: " + (workstationName != null ? workstationName : "Workstation") + "\n" +
+                            "• Incident: " + title + "\n" +
+                            "• Details: " + description + "\n\n" +
+                            "Tap 'Quarantine' to instantly sever this machine from the network."
+                    ))
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setCategory(NotificationCompat.CATEGORY_ALARM)
+                    .setColor(ContextCompat.getColor(mContext, R.color.statusError))
+                    .setAutoCancel(true)
+                    .addAction(R.drawable.ic_shield, "🔒 Quarantine Workstation", quarantinePi)
+                    .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Dismiss", dismissPi);
+
+            mNotificationManagerCompat.notify(NOTIF_ID_REMOTE_SOC_ALERT, b.build());
+            Log.i(TAG, "Remote SOC notification posted for workstation: " + workstationName);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed posting remote SOC alert: " + e.getMessage());
         }
     }
 

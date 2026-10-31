@@ -229,318 +229,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/collector_info_layout" />
 
-        <!-- P2P Exit Node / Personal Gateway Live Card -->
-        <LinearLayout
-            android:id="@+id/card_personal_gateway"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginHorizontal="16dp"
-            android:padding="14dp"
-            android:background="@drawable/card_workbench_item_bg"
-            android:orientation="vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:visibility="gone"
-            tools:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/interface_info"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <!-- Top Row: Icon + Title/Device + Status Badge -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:id="@+id/gateway_card_icon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_pref_p2p" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/gateway_card_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PERSONAL GATEWAY"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.06"
-                        android:textColor="#38BDF8" />
-
-                    <TextView
-                        android:id="@+id/gateway_card_node_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Exit Node"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/cardWorkbenchText" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/gateway_card_badge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🟢 CONNECTED"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#00E676"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:background="@drawable/badge_pill_proto" />
-
-                <!-- Small Refresh Icon for Quick IP & Telemetry Reload -->
-                <ImageView
-                    android:id="@+id/gateway_card_btn_refresh"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginStart="8dp"
-                    android:padding="6dp"
-                    android:background="@drawable/ks_bg_btn_circle"
-                    android:src="@drawable/ic_refresh"
-                    app:tint="#38BDF8"
-                    android:contentDescription="Refresh IP address"
-                    android:clickable="true"
-                    android:focusable="true" />
-            </LinearLayout>
-
-            <!-- Middle Row: Egress IP & Routing Info -->
-            <LinearLayout
-                android:id="@+id/gateway_card_ip_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/gateway_card_ip_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🛡️ Exit Node IP: "
-                    android:textSize="12sp"
-                    android:textColor="@color/cardWorkbenchSubtext" />
-
-                <TextView
-                    android:id="@+id/gateway_card_ip_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text="Awaiting Exit Node IP..."
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="#00E676" />
-
-                <TextView
-                    android:id="@+id/gateway_card_transport_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:singleLine="true"
-                    android:text="• Cloudflare"
-                    android:textSize="11sp"
-                    android:textColor="@color/cardWorkbenchSubtext" />
-            </LinearLayout>
-
-            <!-- Real Device IP (SIM / Wi-Fi) Row -->
-            <LinearLayout
-                android:id="@+id/gateway_card_device_ip_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/gateway_card_device_ip_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📱 Real Device IP (SIM/Wi-Fi): "
-                    android:textSize="11sp"
-                    android:textColor="@color/cardWorkbenchSubtext" />
-
-                <TextView
-                    android:id="@+id/gateway_card_device_ip_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:singleLine="true"
-                    android:text="Detecting..."
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:textColor="#38BDF8" />
-            </LinearLayout>
-
-            <!-- Live Telemetry Badges Row (Ping, Battery, Wi-Fi) -->
-            <LinearLayout
-                android:id="@+id/gateway_card_telemetry_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/gateway_card_ping"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="⚡ 60 ms"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:textColor="#38BDF8"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="2dp"
-                    android:background="@drawable/posture_pill_bg" />
-
-                <TextView
-                    android:id="@+id/gateway_card_battery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:text="🔋 100%"
-                    android:textSize="11sp"
-                    android:textColor="@color/cardWorkbenchSubtext"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="2dp"
-                    android:background="@drawable/posture_pill_bg" />
-
-                <TextView
-                    android:id="@+id/gateway_card_network"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:text="📶 Wi-Fi"
-                    android:textSize="11sp"
-                    android:textColor="@color/cardWorkbenchSubtext"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="2dp"
-                    android:background="@drawable/posture_pill_bg"
-                    android:ellipsize="end"
-                    android:singleLine="true" />
-            </LinearLayout>
-
-            <!-- 30-50s Inactivity / Stall Warning Banner -->
-            <LinearLayout
-                android:id="@+id/gateway_card_alert_banner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:padding="10dp"
-                android:background="@drawable/card_alert_warning_bg"
-                android:orientation="vertical"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:src="@drawable/ic_warning"
-                        app:tint="#F59E0B" />
-
-                    <TextView
-                        android:id="@+id/gateway_card_alert_title"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/p2p_inactive_alert_title"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="#F59E0B" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/gateway_card_alert_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/p2p_inactive_alert_desc"
-                    android:textSize="11sp"
-                    android:textColor="#E2E8F0" />
-
-                <!-- Action Buttons: Keep Waiting vs Disconnect -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/gateway_btn_wait"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:gravity="center"
-                        android:paddingVertical="7dp"
-                        android:paddingHorizontal="4dp"
-                        android:background="@drawable/posture_pill_bg"
-                        android:text="@string/p2p_inactive_btn_wait"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:textColor="#38BDF8"
-                        android:clickable="true"
-                        android:focusable="true" />
-
-                    <TextView
-                        android:id="@+id/gateway_btn_disconnect"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        android:gravity="center"
-                        android:paddingVertical="7dp"
-                        android:paddingHorizontal="4dp"
-                        android:background="@drawable/posture_pill_bg"
-                        android:text="@string/p2p_inactive_btn_disconnect"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:textColor="#EF4444"
-                        android:clickable="true"
-                        android:focusable="true" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Subtext note & chevron -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/gateway_card_status_msg"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Traffic routed securely via remote exit node. Tap to configure."
-                    android:textSize="11sp"
-                    android:textColor="@color/cardWorkbenchSubtext" />
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_navigate_next"
-                    app:tint="@color/cardWorkbenchSubtext" />
-            </LinearLayout>
-        </LinearLayout>
-
-
         <LinearLayout
             android:id="@+id/card_btn_one_tap_harden"
             android:layout_width="match_parent"
@@ -671,9 +359,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:paddingHorizontal="16dp"
-            app:layout_constraintTop_toBottomOf="@id/card_personal_gateway"
+            app:layout_goneMarginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/interface_info"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -1125,11 +814,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="18dp"
-            android:paddingHorizontal="16dp"
             android:visibility="gone"
             tools:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/card_personal_gateway"
+            android:layout_marginTop="16dp"
+            android:paddingHorizontal="16dp"
+            app:layout_goneMarginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/quick_workbenches_section"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -1530,6 +1220,450 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- P2P Encrypted Mesh &amp; Exit Gateway Section (Between Antivirus/Workbenches &amp; Quick Settings) -->
+        <LinearLayout
+            android:id="@+id/p2p_mesh_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="18dp"
+            android:paddingHorizontal="16dp"
+            app:layout_goneMarginTop="18dp"
+            app:layout_constraintTop_toBottomOf="@id/live_telemetry_section"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Interactive Section Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="P2P ENCRYPTED MESH"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorHint"
+                    android:letterSpacing="0.08" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="ZERO-TRUST GATEWAY"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/p2pAccent"
+                    android:background="@drawable/badge_pill_proto"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:background="@color/cardWorkbenchBorder" />
+            </LinearLayout>
+
+            <!-- P2P Main Card Container -->
+            <LinearLayout
+                android:id="@+id/card_personal_gateway"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:background="@drawable/card_p2p_mesh_bg"
+                android:orientation="vertical"
+                android:clickable="true"
+                android:focusable="true">
+
+                <!-- Top Row: Icon + Header/Node Name + Status Badge + Refresh -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/gateway_card_icon"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:src="@drawable/ic_pref_p2p" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/gateway_card_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PERSONAL GATEWAY (P2P MESH)"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.06"
+                            android:textColor="@color/p2pAccent" />
+
+                        <TextView
+                            android:id="@+id/gateway_card_node_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Decentralized Exit Gateway"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/gateway_card_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚪ STANDBY"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="#38BDF8"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="4dp"
+                        android:background="@drawable/badge_pill_proto" />
+
+                    <ImageView
+                        android:id="@+id/gateway_card_btn_refresh"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="8dp"
+                        android:padding="6dp"
+                        android:background="@drawable/ks_bg_btn_circle"
+                        android:src="@drawable/ic_refresh"
+                        app:tint="@color/p2pAccent"
+                        android:contentDescription="Refresh telemetry"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+
+                <!-- Inactivity / Stall Warning Alert Banner -->
+                <LinearLayout
+                    android:id="@+id/gateway_card_alert_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:padding="10dp"
+                    android:background="@drawable/card_alert_warning_bg"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_warning"
+                            app:tint="#F59E0B" />
+
+                        <TextView
+                            android:id="@+id/gateway_card_alert_title"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="@string/p2p_inactive_alert_title"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#F59E0B" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/gateway_card_alert_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/p2p_inactive_alert_desc"
+                        android:textSize="11sp"
+                        android:textColor="#E2E8F0" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/gateway_btn_wait"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:gravity="center"
+                            android:paddingVertical="7dp"
+                            android:paddingHorizontal="4dp"
+                            android:background="@drawable/posture_pill_bg"
+                            android:text="@string/p2p_inactive_btn_wait"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#38BDF8"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/gateway_btn_disconnect"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:gravity="center"
+                            android:paddingVertical="7dp"
+                            android:paddingHorizontal="4dp"
+                            android:background="@drawable/posture_pill_bg"
+                            android:text="@string/p2p_inactive_btn_disconnect"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:textColor="#EF4444"
+                            android:clickable="true"
+                            android:focusable="true" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Live Route / IP Address Row -->
+                <LinearLayout
+                    android:id="@+id/gateway_card_ip_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/gateway_card_ip_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛡️ Exit Node IP: "
+                        android:textSize="12sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_ip_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="Awaiting Exit Node IP..."
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#00E676" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_transport_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:singleLine="true"
+                        android:text="• Cloudflare"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <!-- Real Device IP Row -->
+                <LinearLayout
+                    android:id="@+id/gateway_card_device_ip_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/gateway_card_device_ip_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📱 Device IP: "
+                        android:textSize="12sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_device_ip_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:text="Detecting..."
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#38BDF8" />
+                </LinearLayout>
+
+                <!-- High-Tech Metrics Chips Row (Ping / Battery / Network / Security) -->
+                <LinearLayout
+                    android:id="@+id/gateway_card_telemetry_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/gateway_card_ping"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Direct P2P"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext"
+                        android:paddingHorizontal="7dp"
+                        android:paddingVertical="3dp"
+                        android:background="@drawable/bg_p2p_chip" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_battery"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="🔋 100%"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext"
+                        android:paddingHorizontal="7dp"
+                        android:paddingVertical="3dp"
+                        android:background="@drawable/bg_p2p_chip"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/gateway_card_network"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="📶 Wi-Fi"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext"
+                        android:paddingHorizontal="7dp"
+                        android:paddingVertical="3dp"
+                        android:background="@drawable/bg_p2p_chip"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="🔒 Zero-Trust Egress"
+                        android:textSize="11sp"
+                        android:textColor="@color/p2pAccent"
+                        android:paddingHorizontal="7dp"
+                        android:paddingVertical="3dp"
+                        android:background="@drawable/bg_p2p_chip" />
+                </LinearLayout>
+
+                <!-- Subtext description &amp; Chevron -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/gateway_card_status_msg"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Route traffic securely via remote exit node or host an egress gateway."
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="6dp"
+                        android:src="@drawable/ic_navigate_next"
+                        app:tint="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <!-- Action Buttons: Open Hub &amp; Scan QR -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/btn_p2p_configure"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="10dp"
+                        android:background="@drawable/bg_p2p_action_btn"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_settings"
+                            app:tint="@color/p2pAccent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="P2P SETTINGS"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.04"
+                            android:textColor="@color/p2pAccent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btn_p2p_pair_qr"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="5dp"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="10dp"
+                        android:background="@drawable/bg_p2p_action_btn"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_bottom_scan"
+                            app:tint="@color/p2pAccent" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:text="PAIR PEER (QR)"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.04"
+                            android:textColor="@color/p2pAccent" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- Quick Settings Section (Visible in Ready State) -->
         <LinearLayout
             android:id="@+id/quick_settings"
@@ -1540,7 +1674,7 @@
             android:layout_marginHorizontal="16dp"
             android:padding="14dp"
             android:background="@drawable/card_modern_bg"
-            app:layout_constraintTop_toBottomOf="@id/quick_workbenches_section"
+            app:layout_constraintTop_toBottomOf="@id/p2p_mesh_section"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 

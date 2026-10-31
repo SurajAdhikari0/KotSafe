@@ -62,6 +62,8 @@ import com.kotsafe.security.fragments.AppsToggles;
 import com.kotsafe.security.model.AppDescriptor;
 import com.kotsafe.security.p2p.GatewayPreferenceKeys;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 public class P2PAppRoutingActivity extends BaseActivity {
@@ -71,7 +73,7 @@ public class P2PAppRoutingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(R.string.gateway_select_apps_title);
-        setContentView(R.layout.fragment_activity);
+        setContentView(R.layout.activity_p2p_app_routing);
         displayBackAction();
 
         if (savedInstanceState != null) {
@@ -84,6 +86,35 @@ public class P2PAppRoutingActivity extends BaseActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment, mFragment)
                 .commit();
+
+        setupPresetChips();
+    }
+
+    private void setupPresetChips() {
+        findViewById(R.id.chip_browsers).setOnClickListener(v -> {
+            int count = mFragment.applyPreset(P2PAppRoutingFragment.PresetCategory.BROWSERS);
+            Toast.makeText(this, "🌐 Enabled " + count + " browser app(s) for P2P Tunnel", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.chip_work).setOnClickListener(v -> {
+            int count = mFragment.applyPreset(P2PAppRoutingFragment.PresetCategory.WORK);
+            Toast.makeText(this, "💼 Enabled " + count + " work app(s) for P2P Tunnel", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.chip_finance).setOnClickListener(v -> {
+            int count = mFragment.applyPreset(P2PAppRoutingFragment.PresetCategory.FINANCE);
+            Toast.makeText(this, "🏦 Enabled " + count + " banking/finance app(s) for P2P Tunnel", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.chip_streaming).setOnClickListener(v -> {
+            int count = mFragment.applyPreset(P2PAppRoutingFragment.PresetCategory.STREAMING);
+            Toast.makeText(this, "🚀 Enabled " + count + " media/streaming app(s) for P2P Tunnel", Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.chip_clear).setOnClickListener(v -> {
+            mFragment.applyPreset(P2PAppRoutingFragment.PresetCategory.CLEAR);
+            Toast.makeText(this, "✖️ Cleared app routing (All traffic routed through P2P)", Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
@@ -96,6 +127,10 @@ public class P2PAppRoutingActivity extends BaseActivity {
         private static final String TAG = "P2PAppRouting";
         private final Set<String> mSelectedApps = new ArraySet<>();
         private @Nullable SharedPreferences mPrefs;
+
+        public enum PresetCategory {
+            BROWSERS, WORK, FINANCE, STREAMING, CLEAR
+        }
 
         @Override
         public void onAttach(@NonNull Context context) {
@@ -120,6 +155,77 @@ public class P2PAppRoutingActivity extends BaseActivity {
         @Override
         protected Set<String> getCheckedApps() {
             return mSelectedApps;
+        }
+
+        public int applyPreset(PresetCategory category) {
+            if (mAdapter == null) return 0;
+            List<AppDescriptor> all = mAdapter.getAllApps();
+            if (all == null || all.isEmpty()) return 0;
+
+            int addedCount = 0;
+            if (category == PresetCategory.CLEAR) {
+                mSelectedApps.clear();
+            } else {
+                for (AppDescriptor app : all) {
+                    if (matchesCategory(app, category)) {
+                        if (mSelectedApps.add(app.getPackageName())) {
+                            addedCount++;
+                        }
+                    }
+                }
+            }
+
+            Log.d(TAG, "Applied preset " + category + ", total selected apps: " + mSelectedApps.size());
+
+            if (mPrefs != null) {
+                mPrefs.edit()
+                        .putStringSet(GatewayPreferenceKeys.SELECTED_APPS, mSelectedApps)
+                        .apply();
+            }
+
+            mAdapter.setCheckedItems(mSelectedApps);
+
+            if (CaptureService.isServiceActive() && getContext() != null) {
+                Toast.makeText(getContext(), "P2P App Routing updated. Restart VPN Capture to apply.", Toast.LENGTH_SHORT).show();
+            }
+            return addedCount;
+        }
+
+        private static boolean matchesCategory(AppDescriptor app, PresetCategory category) {
+            if (app == null) return false;
+            String pkg = (app.getPackageName() != null) ? app.getPackageName().toLowerCase(Locale.ROOT) : "";
+            String name = (app.getName() != null) ? app.getName().toLowerCase(Locale.ROOT) : "";
+
+            switch (category) {
+                case BROWSERS:
+                    return pkg.contains("chrome") || pkg.contains("firefox") || pkg.contains("browser")
+                            || pkg.contains("opera") || pkg.contains("brave") || pkg.contains("edge")
+                            || pkg.contains("duckduckgo") || pkg.contains("vivaldi") || pkg.contains("torproject")
+                            || name.contains("browser");
+
+                case WORK:
+                    return pkg.contains("slack") || pkg.contains("teams") || pkg.contains("zoom")
+                            || pkg.contains("android.gm") || pkg.contains("outlook") || pkg.contains("notion")
+                            || pkg.contains("jira") || pkg.contains("docs") || pkg.contains("sheets")
+                            || pkg.contains("office") || pkg.contains("trello") || pkg.contains("asana")
+                            || pkg.contains("webex") || pkg.contains("cisco");
+
+                case FINANCE:
+                    return pkg.contains("paypal") || pkg.contains("revolut") || pkg.contains("cash")
+                            || pkg.contains("chase") || pkg.contains("binance") || pkg.contains("coinbase")
+                            || pkg.contains("wallet") || pkg.contains("bank") || pkg.contains("paytm")
+                            || pkg.contains("phonepe") || name.contains("bank") || name.contains("finance")
+                            || name.contains("wallet");
+
+                case STREAMING:
+                    return pkg.contains("youtube") || pkg.contains("netflix") || pkg.contains("spotify")
+                            || pkg.contains("twitch") || pkg.contains("disney") || pkg.contains("primevideo")
+                            || pkg.contains("soundcloud") || name.contains("stream") || name.contains("music")
+                            || name.contains("video");
+
+                default:
+                    return false;
+            }
         }
 
         @Override

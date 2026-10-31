@@ -855,6 +855,7 @@
     <string name="file_hashes">File Hashes</string>
     <string name="file_hashes_desc">Cryptographic hashes of installed applications, split APKs, and hidden background services</string>
     <string name="antivirus_scan">Antivirus Scan</string>
+    <string name="threat_shield_tile_label">KotSafe Defense</string>
     <string name="antivirus_scan_desc">Scan network traffic, visited URLs, contacted IPs, app binaries, and hidden services against threat intelligence</string>
     <string name="threat_intel_apis">Threat Intelligence APIs</string>
     <string name="threat_intel_apis_desc">Configure VirusTotal and AlienVault OTX API keys for automated threat lookups</string>

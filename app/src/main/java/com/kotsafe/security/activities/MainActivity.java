@@ -314,6 +314,14 @@ public class MainActivity extends BaseActivity {
                 } else if (itemId == R.id.nav_bottom_scan) {
                     startActivity(new Intent(MainActivity.this, AntivirusScanActivity.class));
                     return false;
+                } else if (itemId == R.id.nav_bottom_p2p) {
+                    if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(MainActivity.this)) {
+                        com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(MainActivity.this, "P2P Exit Gateway");
+                        return false;
+                    }
+                    Intent intent = new Intent(MainActivity.this, P2PHubActivity.class);
+                    startActivity(intent);
+                    return false;
                 } else if (itemId == R.id.nav_bottom_settings) {
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                     return false;
@@ -372,6 +380,11 @@ public class MainActivity extends BaseActivity {
             } else /* STOPPED -> STOPPED */
                 appStateReady();
         });
+
+        // Prompt OEM Background Battery Exemption for persistent VPN/Mesh tunnels
+        if (mPager != null) {
+            mPager.postDelayed(() -> com.kotsafe.security.utils.OemOptimizationHelper.showBatteryExemptionDialog(this), 1200);
+        }
     }
 
     @Override
@@ -477,6 +490,7 @@ public class MainActivity extends BaseActivity {
             com.kotsafe.security.model.CloudSyncManager.getInstance(this).startCommandListener();
             com.kotsafe.security.model.CloudSyncManager.getInstance(this).startNewDeviceLoginListener();
             com.kotsafe.security.model.CloudSyncManager.getInstance(this).startCrossDeviceRuleSyncListener();
+            com.kotsafe.security.model.CloudSyncManager.getInstance(this).startRemoteSocAlertListener();
         }
 
         if (getIntent() != null && "connections".equals(getIntent().getStringExtra("open_tab"))) {

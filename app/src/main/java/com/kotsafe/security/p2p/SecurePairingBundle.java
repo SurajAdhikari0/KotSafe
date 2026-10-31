@@ -40,12 +40,19 @@ public final class SecurePairingBundle {
     public final String pairingSecret;
     public final String controlUrl;
     public final String exitIp;
+    public final String userId;
+    public final String email;
+    public final String authToken;
 
     public SecurePairingBundle(String room, String pairingSecret, String controlUrl) {
-        this(room, pairingSecret, controlUrl, null);
+        this(room, pairingSecret, controlUrl, null, null, null, null);
     }
 
     public SecurePairingBundle(String room, String pairingSecret, String controlUrl, String exitIp) {
+        this(room, pairingSecret, controlUrl, exitIp, null, null, null);
+    }
+
+    public SecurePairingBundle(String room, String pairingSecret, String controlUrl, String exitIp, String userId, String email, String authToken) {
         if (!isRoom(room)) throw new IllegalArgumentException("invalid room");
         if (!isSecret(pairingSecret)) throw new IllegalArgumentException("invalid pairing secret");
         if (controlUrl != null && controlUrl.contains("130.210.16.110")) {
@@ -58,6 +65,9 @@ public final class SecurePairingBundle {
         this.pairingSecret = pairingSecret;
         this.controlUrl = controlUrl;
         this.exitIp = exitIp;
+        this.userId = userId;
+        this.email = email;
+        this.authToken = authToken;
     }
 
     public String toQrUri() {
@@ -65,6 +75,15 @@ public final class SecurePairingBundle {
                 + "&control=" + encode(controlUrl);
         if (exitIp != null && !exitIp.isEmpty()) {
             uri += "&exitIp=" + encode(exitIp);
+        }
+        if (userId != null && !userId.isEmpty()) {
+            uri += "&uid=" + encode(userId);
+        }
+        if (email != null && !email.isEmpty()) {
+            uri += "&email=" + encode(email);
+        }
+        if (authToken != null && !authToken.isEmpty()) {
+            uri += "&token=" + encode(authToken);
         }
         return uri;
     }
@@ -80,7 +99,15 @@ public final class SecurePairingBundle {
             if (pair.length == 2) values.put(decode(pair[0]), decode(pair[1]));
         }
         if (!"2".equals(values.get("v"))) throw new IllegalArgumentException("unsupported pairing version");
-        return new SecurePairingBundle(values.get("room"), values.get("secret"), values.get("control"), values.get("exitIp"));
+        return new SecurePairingBundle(
+                values.get("room"),
+                values.get("secret"),
+                values.get("control"),
+                values.get("exitIp"),
+                values.get("uid"),
+                values.get("email"),
+                values.get("token")
+        );
     }
 
     private static boolean isRoom(String value) {

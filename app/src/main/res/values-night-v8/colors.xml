@@ -1,71 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Tab bar adaptive colors (overridden for Night Mode) -->
-    <color name="tabBarBg">#0D1A2E</color>
-    <color name="tabBarDivider">#1E2D42</color>
+    <color name="tabBarBg">#060D1A</color>
+    <color name="tabBarDivider">#162438</color>
     <color name="tabTextSelected">#FFFFFF</color>
     <color name="tabTextUnselected">#7A94B0</color>
     <color name="tabSwitchTint">#7A94B0</color>
-    <color name="tabIndicatorColor">#3DDC84</color>
-    <color name="tacticalGreen">#3DDC84</color>
-    <color name="tacticalBlue">#38A8FF</color>
-    <color name="tacticalAmber">#F5B942</color>
-    <color name="tapToStartBg">#1A3DDC84</color>
-    <color name="tapToStartFg">#3DDC84</color>
+    <color name="tabIndicatorColor">#00E5FF</color>
+    <color name="tacticalGreen">#10B981</color>
+    <color name="tacticalBlue">#00E5FF</color>
+    <color name="tacticalAmber">#F59E0B</color>
+    <color name="tapToStartBg">#1A00E5FF</color>
+    <color name="tapToStartFg">#00E5FF</color>
 
     <!-- Nav drawer (Night Mode) -->
-    <color name="drawerItemSelectedBg">#2E1065</color>
-    <color name="drawerItemSelectedText">#A78BFA</color>
-    <color name="drawerSeparatorColor">#1E2D42</color>
+    <color name="drawerItemSelectedBg">#14243E</color>
+    <color name="drawerItemSelectedText">#00E5FF</color>
+    <color name="drawerSeparatorColor">#162438</color>
     <color name="drawerGroupLabelColor">#7A94B0</color>
 
     <!-- Activity Timeline (Night Mode) -->
-    <color name="timelineSurface">#0A0F1D</color>
-    <color name="timelinePanelBg">#111827</color>
-    <color name="timelineCardBg">#0F172A</color>
-    <color name="timelineBorder">#334155</color>
+    <color name="timelineSurface">#040814</color>
+    <color name="timelinePanelBg">#070E1C</color>
+    <color name="timelineCardBg">#091222</color>
+    <color name="timelineBorder">#1E3352</color>
     <color name="timelineTextPrimary">#F8FAFC</color>
     <color name="timelineTextSecondary">#CBD5E1</color>
-    <color name="cardBgSecondary">#161B22</color>
+    <color name="cardBgSecondary">#0B1628</color>
 
     <color name="colorTab">#00E5FF</color>
     <color name="colorTabText">#94A3B8</color>
     <color name="colorTabTextSelected">#00E5FF</color>
-    <color name="colorPrimary">#6C52AB</color>
-    <color name="colorPrimaryDark">#24144D</color>
-    <color name="colorActionBar">#121212</color>
+    <color name="colorPrimary">#00E5FF</color>
+    <color name="colorPrimaryDark">#040814</color>
+    <color name="colorActionBar">#040814</color>
     <color name="colorAccent">#00E5FF</color>
     <color name="colorAccentLight">#BCEBE7</color>
-    <color name="authLinkColor">#818CF8</color>
-    <color name="authLinkColorSecondary">#A5B4FC</color>
+    <color name="authLinkColor">#00E5FF</color>
+    <color name="authLinkColorSecondary">#38BDF8</color>
     <color name="colorBackgroundGray">#1CFFFFFF</color>
-    <color name="navViewBackground">#FF202020</color>
-    <color name="backgroundColor">#070D1A</color>
+    <color name="navViewBackground">#060D1A</color>
+    <color name="backgroundColor">#040814</color>
     <color name="drawerItemColor">#F8FAFC</color>
     <color name="highContrast">#FFFFFF</color>
-    <color name="cardBorder">#1C2A45</color>
-    <color name="appBadgeBg">#616161</color>
-    <color name="appBadgeText">#FFFFFF</color>
-    <color name="cardBackground">#0E1729</color>
-    <color name="card_background">#0E1729</color>
-    <color name="cardBorderSubtle">#1C2A45</color>
+    <color name="cardBorder">#162846</color>
+    <color name="appBadgeBg">#1E293B</color>
+    <color name="appBadgeText">#00E5FF</color>
+    <color name="cardBackground">#091222</color>
+    <color name="card_background">#091222</color>
+    <color name="cardBorderSubtle">#162846</color>
 
     <!-- Tactical Guardian Workbench Cards (Night Mode) -->
-    <color name="cardWorkbenchBg">#0E1729</color>
-    <color name="cardWorkbenchBorder">#1C2A45</color>
+    <color name="cardWorkbenchBg">#091222</color>
+    <color name="cardWorkbenchBorder">#162846</color>
     <color name="cardWorkbenchText">#E6EEFA</color>
     <color name="cardWorkbenchSubtext">#8A9BBA</color>
 
+    <!-- P2P Section Colors (Night Mode) -->
+    <color name="p2pCardBorder">#1D4468</color>
+    <color name="p2pChipBg">#0B1626</color>
+    <color name="p2pChipBorder">#16324D</color>
+    <color name="p2pAccent">#38BDF8</color>
+
     <!-- Posture Bar Pills (Night Mode) -->
-    <color name="posturePillBg">#0E1729</color>
-    <color name="posturePillBorder">#1C2A45</color>
+    <color name="posturePillBg">#091222</color>
+    <color name="posturePillBorder">#162846</color>
 
     <!-- Tactical Guardian Status Circle (Night Mode) -->
-    <color name="statusCircleGradStart">#0E1729</color>
-    <color name="statusCircleGradMid">#070D1A</color>
-    <color name="statusCircleGradEnd">#040810</color>
-    <color name="statusCircleStroke">#3DDC84</color>
-    <color name="statusCircleText">#3DDC84</color>
+    <color name="statusCircleGradStart">#091222</color>
+    <color name="statusCircleGradMid">#060D1A</color>
+    <color name="statusCircleGradEnd">#040814</color>
+    <color name="statusCircleStroke">#00E5FF</color>
+    <color name="statusCircleText">#00E5FF</color>
 
     <color name="badgeActiveBg">#163824</color>
     <color name="badgeActiveFg">#4ADE80</color>

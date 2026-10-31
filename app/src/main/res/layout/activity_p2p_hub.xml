@@ -1,0 +1,691 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:background="@color/colorActionBar"
+            android:theme="@style/AppBarOverlay"
+            app:popupTheme="@style/PopupOverlay"
+            app:title="P2P Mesh &amp; Gateway"
+            app:titleTextColor="@android:color/white">
+
+            <!-- Top-Right Full Settings Button -->
+            <ImageView
+                android:id="@+id/btn_action_full_settings"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="12dp"
+                android:padding="8dp"
+                android:background="@drawable/ks_bg_btn_circle"
+                android:src="@drawable/ic_settings"
+                app:tint="@android:color/white"
+                android:contentDescription="Full Settings"
+                android:clickable="true"
+                android:focusable="true" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/p2p_hub_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="40dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="14dp">
+
+            <!-- Header Hero Banner -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp"
+                android:background="@drawable/card_p2p_mesh_bg">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:src="@drawable/ic_pref_p2p" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="P2P ENCRYPTED MESH"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06"
+                        android:textColor="@color/p2pAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Zero-Knowledge Personal Gateway"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchText" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Direct peer tunnel • No server interception"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Mode Switcher Tabs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/tab_host_mode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingVertical="10dp"
+                    android:background="@drawable/bg_tab_p2p_active"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/tv_tab_host_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🌐 Share Internet (Host)"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/p2pAccent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tab_client_mode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingVertical="10dp"
+                    android:background="@drawable/bg_tab_p2p_inactive"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/tv_tab_client_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛡️ Route Traffic (Connect)"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ================= HOST MODE CONTAINER ================= -->
+            <LinearLayout
+                android:id="@+id/container_host_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="14dp">
+
+                <!-- Host Toggle Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="@color/cardBorderSubtle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Host Exit Node"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/cardWorkbenchText" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Allow paired devices to route internet through this device"
+                                android:textSize="11sp"
+                                android:textColor="@color/cardWorkbenchSubtext" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switch_host_enable"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Live QR Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="@color/cardBorderSubtle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:gravity="center_horizontal">
+
+                        <!-- Top Title & Badge -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="PAIRING QR CODE"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.08"
+                                android:textColor="@color/p2pAccent" />
+
+                            <TextView
+                                android:id="@+id/tv_host_status_badge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🟢 READY TO PAIR"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:textColor="#00E676"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="4dp"
+                                android:background="@drawable/badge_pill_proto" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Scan this QR code from your traveling phone or laptop to pair and route traffic instantly."
+                            android:textSize="12sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+
+                        <!-- High-Contrast White Background for Scannable QR -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="@android:color/white">
+
+                            <ImageView
+                                android:id="@+id/iv_host_qr"
+                                android:layout_width="200dp"
+                                android:layout_height="200dp"
+                                android:layout_margin="12dp"
+                                android:scaleType="fitCenter"
+                                android:contentDescription="Pairing QR Code" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:id="@+id/tv_host_room_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText"
+                            tools:text="Room: room_sr2" />
+
+                        <!-- Action Buttons: Copy Link & Regenerate Key -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/btn_copy_qr_link"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="4dp"
+                                android:gravity="center"
+                                android:paddingVertical="8dp"
+                                android:background="@drawable/bg_p2p_action_btn"
+                                android:text="📋 Copy Link"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/p2pAccent"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView
+                                android:id="@+id/btn_regenerate_qr"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="4dp"
+                                android:gravity="center"
+                                android:paddingVertical="8dp"
+                                android:background="@drawable/bg_p2p_action_btn"
+                                android:text="🔄 New Key"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/p2pAccent"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+
+                        <!-- Connected Clients Count Row -->
+                        <TextView
+                            android:id="@+id/tv_active_clients_count"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:text="Active Connected Devices: 0"
+                            android:textSize="11sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- ================= CLIENT MODE CONTAINER ================= -->
+            <LinearLayout
+                android:id="@+id/container_client_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="14dp"
+                android:visibility="gone">
+
+                <!-- Client Toggle Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="@color/cardBorderSubtle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Route via Peer Gateway"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/cardWorkbenchText" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Route all internet traffic through your trusted exit node"
+                                android:textSize="11sp"
+                                android:textColor="@color/cardWorkbenchSubtext" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switch_client_enable"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 1-Tap Scan QR Card -->
+                <LinearLayout
+                    android:id="@+id/btn_client_scan_qr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/card_p2p_mesh_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_bottom_scan"
+                        app:tint="@color/p2pAccent" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Scan QR Code to Pair"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Open camera scanner to read host QR code"
+                            android:textSize="11sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_navigate_next"
+                        app:tint="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <!-- 1-Tap Paste Code Card -->
+                <LinearLayout
+                    android:id="@+id/btn_client_paste_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/card_workbench_item_bg"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_bottom_settings"
+                        app:tint="@color/p2pAccent" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Paste Connection Code / Key"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Manually enter or paste kotsafe-gateway link"
+                            android:textSize="11sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_navigate_next"
+                        app:tint="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <!-- Active Gateway Status Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_client_active_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="@color/cardBorderSubtle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="CONFIGURED EXIT NODE"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.08"
+                                android:textColor="@color/p2pAccent" />
+
+                            <TextView
+                                android:id="@+id/tv_client_status_badge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="⚪ STANDBY"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:textColor="#38BDF8"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="4dp"
+                                android:background="@drawable/badge_pill_proto" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_client_node_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="No paired exit node"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/cardWorkbenchText" />
+
+                        <TextView
+                            android:id="@+id/tv_client_node_telemetry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Scan a pairing QR code to configure your first exit gateway"
+                            android:textSize="11sp"
+                            android:textColor="@color/cardWorkbenchSubtext" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- ================= QUICK UTILITIES ================= -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="P2P TOOLS &amp; CONTROLS"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="?android:attr/textColorHint" />
+
+            <!-- App Routing Card -->
+            <LinearLayout
+                android:id="@+id/btn_hub_app_routing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp"
+                android:background="@drawable/card_workbench_item_bg"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_apps"
+                    app:tint="#60A5FA" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Per-App P2P Routing"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchText" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Choose which apps tunnel through the exit gateway"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_navigate_next"
+                    app:tint="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+
+            <!-- Advanced Settings Card -->
+            <LinearLayout
+                android:id="@+id/btn_hub_advanced_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp"
+                android:background="@drawable/card_workbench_item_bg"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_settings"
+                    app:tint="@color/p2pAccent" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Advanced P2P Settings"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/cardWorkbenchText" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UPnP, custom relays, ports &amp; security policies"
+                        android:textSize="11sp"
+                        android:textColor="@color/cardWorkbenchSubtext" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_navigate_next"
+                    app:tint="@color/cardWorkbenchSubtext" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -437,6 +437,26 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Companion flow: a signed-in phone approves a short-lived TV QR link. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_link_tv"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:minHeight="48dp"
+                android:text="Connect a KotSafe TV"
+                android:textAllCaps="false"
+                android:textColor="@color/authLinkColor"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_shield"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconTint="@color/authLinkColor"
+                app:strokeColor="@color/authLinkColor"
+                app:strokeWidth="1dp"
+                app:cornerRadius="14dp" />
+
             <!-- Continue as Guest / Offline Mode -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/tv_skip_guest"

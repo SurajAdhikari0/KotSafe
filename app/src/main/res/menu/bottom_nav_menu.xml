@@ -16,6 +16,11 @@
         android:title="@string/nav_antivirus" />
 
     <item
+        android:id="@+id/nav_bottom_p2p"
+        android:icon="@drawable/ic_bottom_p2p"
+        android:title="P2P" />
+
+    <item
         android:id="@+id/nav_bottom_settings"
         android:icon="@drawable/ic_bottom_settings"
         android:title="@string/title_activity_settings" />

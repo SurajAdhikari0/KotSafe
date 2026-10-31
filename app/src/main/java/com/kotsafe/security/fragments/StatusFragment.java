@@ -540,6 +540,34 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
             });
         }
 
+        View btnP2pConfigure = view.findViewById(R.id.btn_p2p_configure);
+        if (btnP2pConfigure != null) {
+            AnimUtils.attachSpringTouch(btnP2pConfigure);
+            btnP2pConfigure.setOnClickListener(v -> {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                    com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "P2P Exit Gateway");
+                    return;
+                }
+                Intent intent = new Intent(requireContext(), SettingsActivity.class);
+                intent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "p2p_exit_node_settings");
+                startActivity(intent);
+            });
+        }
+
+        View btnP2pPairQr = view.findViewById(R.id.btn_p2p_pair_qr);
+        if (btnP2pPairQr != null) {
+            AnimUtils.attachSpringTouch(btnP2pPairQr);
+            btnP2pPairQr.setOnClickListener(v -> {
+                if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+                    com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "P2P Exit Gateway");
+                    return;
+                }
+                Intent intent = new Intent(requireContext(), SettingsActivity.class);
+                intent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "p2p_exit_node_settings");
+                startActivity(intent);
+            });
+        }
+
         // Register for updates
         MitmReceiver.observeStatus(this, status -> refreshDecryptionStatus());
         CaptureService.observeStats(this, this::onStatsUpdate);
@@ -1363,13 +1391,28 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
         boolean exitOn = prefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false);
         GatewayProfile activeProfile = GatewayProfileManager.getActiveProfile(ctx);
 
-        if (!clientOn && !exitOn) {
-            mCardPersonalGateway.setVisibility(View.GONE);
-            return;
-        }
-
         mCardPersonalGateway.setVisibility(View.VISIBLE);
         GatewayTelemetry telem = GatewayTelemetry.getInstance();
+
+        if (!clientOn && !exitOn) {
+            if (mGatewayCardAlertBanner != null) mGatewayCardAlertBanner.setVisibility(View.GONE);
+            mGatewayCardHeader.setText("PERSONAL GATEWAY (P2P MESH)");
+            if (activeProfile != null && activeProfile.name != null && !activeProfile.name.isEmpty()) {
+                mGatewayCardNodeName.setText(activeProfile.name);
+                mGatewayCardBadge.setText("⚪ PAIRED (STANDBY)");
+                mGatewayCardBadge.setTextColor(Color.parseColor("#94A3B8"));
+                mGatewayCardStatusMsg.setText("Paired exit node ready • Tap to activate Personal Gateway.");
+            } else {
+                mGatewayCardNodeName.setText("Decentralized Exit Gateway");
+                mGatewayCardBadge.setText("⚪ STANDBY");
+                mGatewayCardBadge.setTextColor(Color.parseColor("#38BDF8"));
+                mGatewayCardStatusMsg.setText("Route traffic securely via remote exit node or host an egress gateway.");
+            }
+            if (mGatewayCardIpRow != null) mGatewayCardIpRow.setVisibility(View.GONE);
+            if (mGatewayCardDeviceIpRow != null) mGatewayCardDeviceIpRow.setVisibility(View.GONE);
+            if (mGatewayCardTelemetryRow != null) mGatewayCardTelemetryRow.setVisibility(View.VISIBLE);
+            return;
+        }
 
         if (exitOn) {
             if (mGatewayCardAlertBanner != null) mGatewayCardAlertBanner.setVisibility(View.GONE);

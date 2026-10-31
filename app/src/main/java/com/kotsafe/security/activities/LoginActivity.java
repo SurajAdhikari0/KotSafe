@@ -261,7 +261,13 @@ public class LoginActivity extends BaseActivity {
             });
         }
 
-        // 8. Protection Status Pill Information Dialog
+        // 8. Phone companion flow: scans and approves a short-lived TV sign-in QR code.
+        View linkTv = findViewById(R.id.btn_link_tv);
+        if (linkTv != null) {
+            linkTv.setOnClickListener(v -> startActivity(new Intent(this, TvLinkActivity.class)));
+        }
+
+        // 9. Protection Status Pill Information Dialog
         if (mLayoutProtectionStatus != null) {
             mLayoutProtectionStatus.setOnClickListener(v -> showProtectionInfoDialog());
         }

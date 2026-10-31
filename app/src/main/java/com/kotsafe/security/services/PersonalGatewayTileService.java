@@ -75,6 +75,18 @@ public class PersonalGatewayTileService extends TileService {
             Toast.makeText(ctx, "Personal Gateway tunnel active", Toast.LENGTH_SHORT).show();
         }
 
+        if (com.kotsafe.security.CaptureService.isServiceActive()) {
+            com.kotsafe.security.model.CaptureSettings settings = com.kotsafe.security.CaptureService.getCaptureSettings();
+            if (settings != null) {
+                com.kotsafe.security.CaptureService.stopService();
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    android.content.Intent intent = new android.content.Intent(ctx, com.kotsafe.security.CaptureService.class);
+                    intent.putExtra("settings", settings);
+                    androidx.core.content.ContextCompat.startForegroundService(ctx, intent);
+                }, 500);
+            }
+        }
+
         updateTileState();
     }
 

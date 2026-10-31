@@ -117,6 +117,12 @@
     <color name="cardWorkbenchText">#14213D</color>
     <color name="cardWorkbenchSubtext">#5E6678</color>
 
+    <!-- P2P Section Colors (Day Mode) -->
+    <color name="p2pCardBorder">#BAE6FD</color>
+    <color name="p2pChipBg">#F0F9FF</color>
+    <color name="p2pChipBorder">#BAE6FD</color>
+    <color name="p2pAccent">#0284C7</color>
+
     <!-- Posture Bar Pills (Day Mode) -->
     <color name="posturePillBg">#FFFCF6</color>
     <color name="posturePillBorder">#DDD6C6</color>

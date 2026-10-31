@@ -384,12 +384,8 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
             return true;
         });
 
-        // Scan Pairing QR Code
+        // Scan Pairing QR Code (1-Tap Cross-Device Authentication & Mesh Pair)
         mScanPairingQr.setOnPreferenceClickListener(preference -> {
-            if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
-                com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "Pairing Code Scanner");
-                return true;
-            }
             startQrScanFlow();
             return true;
         });
@@ -770,6 +766,14 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
 
         try {
             SecurePairingBundle bundle = SecurePairingBundle.parse(raw);
+            if (bundle.email != null && !bundle.email.isEmpty()) {
+                com.kotsafe.security.model.KotSafeUserManager.saveAuthenticatedSession(safeContext, bundle.userId, bundle.email);
+                Toast.makeText(safeContext, "✨ Linked to " + bundle.email + "!", Toast.LENGTH_SHORT).show();
+            } else if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(safeContext)
+                    && !com.kotsafe.security.model.KotSafeUserManager.isGuestMode(safeContext)) {
+                com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(getActivity(), "Pairing Code Scanner");
+                return;
+            }
             Toast.makeText(safeContext, "Pairing with " + bundle.room + "...", Toast.LENGTH_SHORT).show();
 
             SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(safeContext);

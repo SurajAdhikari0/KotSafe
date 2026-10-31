@@ -158,6 +158,16 @@ public class ActionReceiver extends BroadcastReceiver {
             return;
         }
 
+        if ("com.kotsafe.security.SIMULATE_SOC_ALERT".equals(action)) {
+            com.kotsafe.security.model.SecurityNotificationHub.getInstance(context).postRemoteSocThreatAlert(
+                    "Kali Linux Workstation",
+                    "desktop_sentinel_01",
+                    "C2 Cobalt Strike Beacon Detected",
+                    "Process 'powershell.exe' (PID 4812) initiated unauthorized outbound beacon to 185.220.101.5:443"
+            );
+            return;
+        }
+
         String unblock_app = intent.getStringExtra(EXTRA_UNBLOCK_APP);
 
         if((unblock_app != null) && !unblock_app.isEmpty()) {

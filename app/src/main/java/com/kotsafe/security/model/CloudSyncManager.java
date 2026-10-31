@@ -61,7 +61,9 @@ public class CloudSyncManager {
     private ListenerRegistration mCommandListener;
     private ListenerRegistration mDeviceLoginListener;
     private ListenerRegistration mRulesListener;
+    private ListenerRegistration mRemoteSocListener;
     private long mLoginListenerStartTime = 0;
+    private long mSocListenerStartTime = 0;
 
     private static volatile CloudSyncManager sInstance;
     private final Context mContext;
@@ -495,8 +497,18 @@ public class CloudSyncManager {
     }
 
     /**
-     * Send remote defense command to target device (e.g. REMOTE_ARM, REMOTE_DISARM, REMOTE_SCAN, REMOTE_KILL_SWITCH)
+     * Send remote defense command to target device (e.g. REMOTE_ARM, REMOTE_DISARM, REMOTE_SCAN, REMOTE_KILL_SWITCH, ISOLATE_WORKSTATION)
      */
+    public void dispatchRemoteDefenseCommand(String targetDeviceId, String command, Runnable onSuccess, java.util.function.Consumer<String> onFailure) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user != null ? user.getUid() : "";
+        sendRemoteDefenseCommand(uid, targetDeviceId, command, onSuccess, onFailure);
+    }
+
+    public void sendRemoteDefenseCommand(String targetDeviceId, String command, Runnable onSuccess, java.util.function.Consumer<String> onFailure) {
+        dispatchRemoteDefenseCommand(targetDeviceId, command, onSuccess, onFailure);
+    }
+
     public void sendRemoteDefenseCommand(String uid, String targetDeviceId, String command, Runnable onSuccess, java.util.function.Consumer<String> onFailure) {
         mExecutor.execute(() -> {
             FirebaseFirestore db = getDb();
@@ -672,6 +684,60 @@ public class CloudSyncManager {
                                 String ip = doc.getString("publicIp");
                                 SecurityNotificationHub.getInstance(mContext)
                                         .postDeviceLoginAlert(model, os, ip);
+                            }
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Listen for remote security events emitted by enrolled workstations (Desktop EDR)
+     * and present actionable quarantine push notifications to the mobile operator.
+     */
+    public synchronized void startRemoteSocAlertListener() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseFirestore db = getDb();
+        if (user == null || db == null) return;
+        if (mRemoteSocListener != null) return; // Already listening
+
+        String uid = user.getUid();
+        String myDeviceId = getDeviceId();
+        mSocListenerStartTime = System.currentTimeMillis();
+
+        mRemoteSocListener = db.collection(COL_USERS).document(uid)
+                .collection(COL_SECURITY_EVENTS)
+                .whereEqualTo("status", "ACTIVE")
+                .addSnapshotListener((querySnapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "SOC alert listener error: " + e.getMessage());
+                        return;
+                    }
+                    if (querySnapshots == null) return;
+
+                    for (DocumentChange dc : querySnapshots.getDocumentChanges()) {
+                        if (dc.getType() == DocumentChange.Type.ADDED) {
+                            DocumentSnapshot doc = dc.getDocument();
+                            String sourceDeviceId = doc.getString("sourceDeviceId");
+                            if (myDeviceId.equals(sourceDeviceId)) continue;
+
+                            String severity = doc.getString("severity");
+                            if ("HIGH".equalsIgnoreCase(severity) || "CRITICAL".equalsIgnoreCase(severity)) {
+                                Timestamp ts = doc.getTimestamp("timestamp");
+                                long eventTime = ts != null ? ts.toDate().getTime() : 0;
+                                if (eventTime > 0 && eventTime < (mSocListenerStartTime - 60_000L)) {
+                                    continue; // Skip stale historical events
+                                }
+
+                                String workstationName = doc.getString("sourceModel");
+                                String title = doc.getString("title");
+                                String description = doc.getString("description");
+                                SecurityNotificationHub.getInstance(mContext)
+                                        .postRemoteSocThreatAlert(
+                                                workstationName != null ? workstationName : "KotSafe Workstation",
+                                                sourceDeviceId != null ? sourceDeviceId : "",
+                                                title != null ? title : "Suspicious EDR Anomaly",
+                                                description != null ? description : "Threat detected by Desktop Sentinel"
+                                        );
                             }
                         }
                     }

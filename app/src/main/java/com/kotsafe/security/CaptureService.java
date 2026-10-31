@@ -838,6 +838,8 @@ public class CaptureService extends VpnService implements Runnable {
             // Port mappings are loaded in resolveHosts() to allow domain resolution
 
             try {
+                // Enterprise Zero-Trust Lockdown: enforce blocking TUN interface to prevent plaintext packet leaks
+                builder.setBlocking(true);
                 mParcelFileDescriptor = builder.setSession(CaptureService.VpnSessionName).establish();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                     if (mUnderlyingNetwork != null) {

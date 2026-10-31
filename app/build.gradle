@@ -16,6 +16,9 @@ android {
         targetSdk 34
         versionCode 97
         versionName "2.0.5"
+        // The TV never receives a phone password or ID token. It uses this HTTPS relay only
+        // for a short-lived, user-approved device-link exchange.
+        buildConfigField "String", "TV_AUTH_BASE_URL", "\"https://relay.kotsafe.com\""
 
         // only include full translations
         // NOTE: keep in sync with locales_config.xml

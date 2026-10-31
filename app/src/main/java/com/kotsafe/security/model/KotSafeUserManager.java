@@ -131,6 +131,17 @@ public class KotSafeUserManager {
         prefs.edit().putBoolean(KEY_GUEST_MODE, active).apply();
     }
 
+    public static void saveAuthenticatedSession(Context context, String uid, String email) {
+        if (context == null || email == null || email.trim().isEmpty()) return;
+        SharedPreferences prefs = context.getSharedPreferences(LoginActivity.PREF_AUTH, Context.MODE_PRIVATE);
+        prefs.edit()
+                .putString(LoginActivity.KEY_LOGGED_IN_EMAIL, email.trim())
+                .putString(LoginActivity.KEY_LOGGED_IN_UID, uid != null ? uid.trim() : ("uid_" + System.currentTimeMillis()))
+                .putBoolean(KEY_GUEST_MODE, false)
+                .apply();
+        Log.i("KotSafeUserManager", "Saved authenticated session for " + email);
+    }
+
     public static boolean isUserAuthenticated(Context context) {
         if (context == null) return false;
         try {

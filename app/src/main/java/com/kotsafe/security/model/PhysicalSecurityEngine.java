@@ -67,7 +67,8 @@ public class PhysicalSecurityEngine {
 
     public static PhysicalSecurityReport evaluate(Context context) {
         PhysicalSecurityReport report = new PhysicalSecurityReport();
-        if (context == null) return report;
+        if (context == null)
+            return report;
 
         int score = 100;
 
@@ -78,8 +79,8 @@ public class PhysicalSecurityEngine {
             if (batteryStatus != null) {
                 int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
                 report.isUsbConnected = (chargePlug == BatteryManager.BATTERY_PLUGGED_USB);
-                report.isCharging = (chargePlug == BatteryManager.BATTERY_PLUGGED_AC 
-                        || chargePlug == BatteryManager.BATTERY_PLUGGED_USB 
+                report.isCharging = (chargePlug == BatteryManager.BATTERY_PLUGGED_AC
+                        || chargePlug == BatteryManager.BATTERY_PLUGGED_USB
                         || chargePlug == BatteryManager.BATTERY_PLUGGED_WIRELESS);
             }
 
@@ -89,7 +90,8 @@ public class PhysicalSecurityEngine {
 
             if (report.isAdbOverUsbEnabled) {
                 score -= 20;
-                report.physicalWarnings.add("USB Debugging (ADB) is enabled. High risk of Juice-Jacking via untrusted ports.");
+                report.physicalWarnings
+                        .add("USB Debugging (ADB) is enabled. High risk of Juice-Jacking via untrusted ports.");
                 report.remediationActions.add("Disable USB Debugging in Developer Options when not in use.");
             } else {
                 report.positiveProtections.add("USB Debugging disabled (Juice-Jacking protected)");
@@ -105,7 +107,8 @@ public class PhysicalSecurityEngine {
                 int[] deviceIds = im.getInputDeviceIds();
                 for (int id : deviceIds) {
                     InputDevice device = im.getInputDevice(id);
-                    if (device == null || device.isVirtual()) continue;
+                    if (device == null || device.isVirtual())
+                        continue;
 
                     int sources = device.getSources();
                     boolean isKeyboard = (sources & InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD;
@@ -123,8 +126,8 @@ public class PhysicalSecurityEngine {
 
                 if (report.isExternalKeyboardAttached) {
                     score -= 25;
-                    report.physicalWarnings.add("External physical keyboard/HID detected (" 
-                            + String.join(", ", report.attachedUsbDevices) 
+                    report.physicalWarnings.add("External physical keyboard/HID detected ("
+                            + String.join(", ", report.attachedUsbDevices)
                             + "). Verify it is not a BadUSB/Rubber Ducky keystroke injector.");
                     report.remediationActions.add("Disconnect any unfamiliar USB dongles or OTG adapters immediately.");
                 } else {
@@ -146,7 +149,8 @@ public class PhysicalSecurityEngine {
                     report.positiveProtections.add("Standard Trusted Execution Environment (TEE) Keystore active");
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // 4. Physical Screen Lock & Biometric Protection
         try {
@@ -155,13 +159,16 @@ public class PhysicalSecurityEngine {
                 report.isScreenLockSecured = km.isDeviceSecure();
                 if (!report.isScreenLockSecured) {
                     score -= 30;
-                    report.physicalWarnings.add("No PIN, Pattern, or Biometric lock configured. Device is vulnerable to physical takeover.");
-                    report.remediationActions.add("Configure a strong alphanumeric PIN or biometric lock in Security settings.");
+                    report.physicalWarnings.add(
+                            "No PIN, Pattern, or Biometric lock configured. Device is vulnerable to physical takeover.");
+                    report.remediationActions
+                            .add("Configure a strong alphanumeric PIN or biometric lock in Security settings.");
                 } else {
                     report.positiveProtections.add("Hardware-backed screen lock & biometrics active");
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // 5. Storage Hardware Encryption
         try {
@@ -169,16 +176,19 @@ public class PhysicalSecurityEngine {
             if (dpm != null) {
                 int status = dpm.getStorageEncryptionStatus();
                 report.isDeviceEncrypted = (status == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE
-                        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && status == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER));
+                        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                                && status == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER));
                 if (!report.isDeviceEncrypted) {
                     score -= 20;
-                    report.physicalWarnings.add("Device storage is unencrypted. Physical flash chips can be extracted and read.");
+                    report.physicalWarnings
+                            .add("Device storage is unencrypted. Physical flash chips can be extracted and read.");
                     report.remediationActions.add("Enable File-Based Encryption (FBE) in Android settings.");
                 } else {
                     report.positiveProtections.add("File-Based Hardware Storage Encryption active");
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // 6. SIM Card Swap / Absence
         try {
@@ -201,7 +211,8 @@ public class PhysicalSecurityEngine {
                         break;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // 7. Bootloader Lock / Verified Boot State Check
         try {
@@ -210,19 +221,25 @@ public class PhysicalSecurityEngine {
             if ("orange".equalsIgnoreCase(bootState) || "0".equals(flashLocked)) {
                 report.isBootloaderLocked = false;
                 score -= 30;
-                report.physicalWarnings.add("Unlocked bootloader detected (verified boot orange). Tampered firmware can bypass Android security.");
+                report.physicalWarnings.add(
+                        "Unlocked bootloader detected (verified boot orange). Tampered firmware can bypass Android security.");
                 report.remediationActions.add("Relock device bootloader using OEM fastboot tool.");
             } else {
                 report.positiveProtections.add("Verified Boot verified green & bootloader locked");
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         // Normalize Score & Grade
         report.physicalScore = Math.max(0, Math.min(100, score));
-        if (report.physicalScore >= 90) report.physicalGrade = "SECURE";
-        else if (report.physicalScore >= 75) report.physicalGrade = "MODERATE";
-        else if (report.physicalScore >= 50) report.physicalGrade = "HIGH_RISK";
-        else report.physicalGrade = "CRITICAL";
+        if (report.physicalScore >= 90)
+            report.physicalGrade = "SECURE";
+        else if (report.physicalScore >= 75)
+            report.physicalGrade = "MODERATE";
+        else if (report.physicalScore >= 50)
+            report.physicalGrade = "HIGH_RISK";
+        else
+            report.physicalGrade = "CRITICAL";
 
         return report;
     }

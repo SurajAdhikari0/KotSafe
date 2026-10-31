@@ -473,6 +473,21 @@ public class NetworkSecurityMonitor {
                             packageName != null ? packageName : (appName != null ? appName : "Network")
                     );
                 } catch (Exception ignored) {}
+
+                // Offline AI Threat Anomaly Predictor: Auto-sinkhole confirmed hostile DGA/C2 indicators
+                if (hr.isMalicious) {
+                    try {
+                        if (domain != null && !domain.isEmpty()) {
+                            SecurityBlocklistManager.getInstance(mContext).blockDomain(
+                                    domain, "AI Anomaly Predictor (DGA/Entropy): " + details, "AI_ANOMALY");
+                        } else if (ip != null && !ip.isEmpty()) {
+                            SecurityBlocklistManager.getInstance(mContext).blockIp(
+                                    ip, "AI Anomaly Predictor: " + details, "AI_ANOMALY");
+                        }
+                    } catch (Exception e) {
+                        Log.w(TAG, "Failed auto-sinkholing AI anomaly: " + e.getMessage());
+                    }
+                }
             }
 
             final String enrichDomain = domain;
