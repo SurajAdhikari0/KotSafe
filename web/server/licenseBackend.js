@@ -20,12 +20,26 @@
 
 import http from 'node:http';
 import crypto from 'node:crypto';
+import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8080;
-const SALT = process.env.LICENSE_SALT || 'kotsafe-salt-2026';
+const SALT = process.env.LICENSE_SALT || (process.env.NODE_ENV === 'production'
+  ? (() => { throw new Error('FATAL: LICENSE_SALT environment variable is required in production.'); })()
+  : 'kotsafe-dev-salt-2026');
 
 // In-memory license registry and device seat tracker
 const registeredLicenses = new Map([
+  [
+    'KOT-PRO-ABCD1234-EF56',
+    {
+      plan: 'pro',
+      maxSeats: 6,
+      expiresAt: new Date(Date.now() + 365 * 86400000).toISOString(),
+      activeDevices: new Set(),
+      status: 'active',
+    },
+  ],
   [
     'KOT-PRO-DEMO1234-ABCD',
     {
@@ -81,6 +95,12 @@ const registeredLicenses = new Map([
 // IP rate limiter: 5 requests per minute
 const rateLimitMap = new Map();
 
+// Short-lived, single-use phone-to-TV pairing sessions. Production deployments with more than
+// one relay instance must back this map with Redis/Firestore using the same TTL and atomic
+// claim semantics; it is intentionally never exposed through a read endpoint.
+const TV_LINK_TTL_MS = 10 * 60 * 1000;
+const tvLinkSessions = new Map();
+
 function isRateLimited(ip) {
   const now = Date.now();
   const windowMs = 60 * 1000;
@@ -94,13 +114,96 @@ function isRateLimited(ip) {
   return false;
 }
 
-const DEFAULT_PRIVATE_KEY_PEM = `-----BEGIN PRIVATE KEY-----
-MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgyWnDYzJ+OLnHdm+8
-XjD+BthgPXY8olsqfFEkmDeZ7L+hRANCAAR+c5I5pUWGHZoDam0lpP+bmfRYlzQ5
-0zZMK96/NGosYithppS7D4LYhYJGtY8WlFr/5/vpOoj8ENc9QtrrVbP2
------END PRIVATE KEY-----`;
+function cleanupTvLinkSessions() {
+  const now = Date.now();
+  for (const [sessionId, session] of tvLinkSessions.entries()) {
+    if (session.expiresAt <= now) tvLinkSessions.delete(sessionId);
+  }
+}
 
-const PRIVATE_KEY_PEM = process.env.LICENSE_PRIVATE_KEY || DEFAULT_PRIVATE_KEY_PEM;
+function randomUrlToken(byteLength) {
+  return crypto.randomBytes(byteLength).toString('base64url');
+}
+
+function hashSecret(secret) {
+  return crypto.createHash('sha256').update(secret, 'utf8').digest();
+}
+
+function hasMatchingDeviceCode(session, suppliedCode) {
+  if (typeof suppliedCode !== 'string' || suppliedCode.length < 16) return false;
+  const suppliedHash = hashSecret(suppliedCode);
+  return suppliedHash.length === session.deviceCodeHash.length
+    && crypto.timingSafeEqual(suppliedHash, session.deviceCodeHash);
+}
+
+function toDisplayCode() {
+  const raw = crypto.randomBytes(5).toString('hex').toUpperCase();
+  return `${raw.slice(0, 5)}-${raw.slice(5)}`;
+}
+
+function safeDeviceName(value) {
+  return String(value || 'KotSafe TV').replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, 80) || 'KotSafe TV';
+}
+
+function getFirebaseAdminAuth() {
+  if (getApps().length === 0) {
+    const suppliedServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    if (suppliedServiceAccount) {
+      initializeApp({ credential: cert(JSON.parse(suppliedServiceAccount)) });
+    } else {
+      // Cloud Run/Functions uses Application Default Credentials. Local deployment must set
+      // GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_SERVICE_ACCOUNT_JSON; never ship either to an app.
+      initializeApp({ credential: applicationDefault() });
+    }
+  }
+  return getAuth();
+}
+
+function getEntitlement(decodedToken) {
+  const rawTier = String(decodedToken.kotsafePlan || decodedToken.plan || 'none').trim().toUpperCase();
+  const tier = rawTier === 'ENTERPRISE' ? 'ENTERPRISE' : rawTier === 'PRO' ? 'PRO' : 'NONE';
+  const rawExpiry = decodedToken.licenseExpiresAt;
+  let entitlementExpiresAt = 0;
+  if (typeof rawExpiry === 'number' || typeof rawExpiry === 'string') {
+    const parsed = Number(rawExpiry);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      entitlementExpiresAt = parsed < 100000000000 ? parsed * 1000 : parsed;
+    }
+  }
+  const unexpired = entitlementExpiresAt === 0 || Date.now() < entitlementExpiresAt;
+  const explicitP2p = decodedToken.p2p === true || decodedToken.p2pEntitled === true;
+  return {
+    tier,
+    entitlementExpiresAt,
+    p2pEntitled: unexpired && (explicitP2p || tier === 'PRO' || tier === 'ENTERPRISE'),
+  };
+}
+
+function readBearerToken(header) {
+  if (typeof header !== 'string') return '';
+  const match = /^Bearer\s+(.+)$/i.exec(header);
+  return match ? match[1].trim() : '';
+}
+
+let ephemeralDevPrivateKey = null;
+
+function getPrivateKeyPem() {
+  if (process.env.LICENSE_PRIVATE_KEY) {
+    return process.env.LICENSE_PRIVATE_KEY;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: LICENSE_PRIVATE_KEY environment variable is required in production.');
+  }
+  if (!ephemeralDevPrivateKey) {
+    console.warn('[KotSafe Backend] NOTICE: LICENSE_PRIVATE_KEY not set. Using ephemeral in-memory ECDSA key for local development.');
+    const { privateKey } = crypto.generateKeyPairSync('ec', {
+      namedCurve: 'prime256v1',
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    });
+    ephemeralDevPrivateKey = privateKey;
+  }
+  return ephemeralDevPrivateKey;
+}
 
 function computeSignature(payload, deviceId) {
   const expires = payload.expiresAt || '';
@@ -112,7 +215,7 @@ function computeSignature(payload, deviceId) {
     const signer = crypto.createSign('SHA256');
     signer.update(canonical);
     // IEEE-P1363 produces 64-byte raw signature (128 hex chars) natively verifiable by Web Crypto API
-    return signer.sign({ key: PRIVATE_KEY_PEM, dsaEncoding: 'ieee-p1363' }).toString('hex').toUpperCase();
+    return signer.sign({ key: getPrivateKeyPem(), dsaEncoding: 'ieee-p1363' }).toString('hex').toUpperCase();
   } catch (err) {
     console.warn('[KotSafe Backend] ECDSA signing failed, falling back to HMAC:', err);
     return crypto.createHmac('sha256', SALT).update(canonical).digest('hex').toUpperCase();
@@ -124,7 +227,7 @@ function sendJson(res, statusCode, data, headers = {}) {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Client-Version',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Client-Version, Authorization',
     ...headers,
   });
   res.end(JSON.stringify(data));
@@ -135,7 +238,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Client-Version',
+      'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Client-Version, Authorization',
     });
     return res.end();
   }
@@ -175,7 +278,7 @@ const server = http.createServer((req, res) => {
     }
   });
 
-  req.on('end', () => {
+  req.on('end', async () => {
     if (bodyTooLarge) return;
     let body = {};
     try {
@@ -188,6 +291,91 @@ const server = http.createServer((req, res) => {
     }
 
     const { key, deviceId } = body;
+
+    // Phone-first TV link. The QR contains only a random, short-lived device code; the phone
+    // must additionally present a verified Firebase ID token. The TV receives a one-time custom
+    // token after approval, never the phone's password, Firebase ID token, or licence key.
+    if (req.url === '/v1/tv-auth/start' && req.method === 'POST') {
+      cleanupTvLinkSessions();
+      const sessionId = randomUrlToken(24);
+      const deviceCode = randomUrlToken(32);
+      const expiresAt = Date.now() + TV_LINK_TTL_MS;
+      tvLinkSessions.set(sessionId, {
+        deviceCodeHash: hashSecret(deviceCode),
+        deviceName: safeDeviceName(body.deviceName),
+        expiresAt,
+        approved: false,
+      });
+      const linkUri = `kotsafe://tv-auth?sid=${encodeURIComponent(sessionId)}&code=${encodeURIComponent(deviceCode)}`;
+      return sendJson(res, 201, {
+        sessionId,
+        deviceCode,
+        displayCode: toDisplayCode(),
+        linkUri,
+        expiresAt,
+        pollIntervalSeconds: 4,
+      });
+    }
+
+    if (req.url === '/v1/tv-auth/approve' && req.method === 'POST') {
+      cleanupTvLinkSessions();
+      const session = tvLinkSessions.get(body.sessionId);
+      if (!session || !hasMatchingDeviceCode(session, body.deviceCode)) {
+        return sendJson(res, 404, { error: 'TV link not found or expired' });
+      }
+      const idToken = readBearerToken(req.headers.authorization);
+      if (!idToken) return sendJson(res, 401, { error: 'KotSafe account sign-in is required' });
+      try {
+        const decoded = await getFirebaseAdminAuth().verifyIdToken(idToken, true);
+        if (session.approved && session.uid !== decoded.uid) {
+          return sendJson(res, 409, { error: 'This TV link was already approved by another account' });
+        }
+        const entitlement = getEntitlement(decoded);
+        session.approved = true;
+        session.uid = decoded.uid;
+        session.email = typeof decoded.email === 'string' ? decoded.email : '';
+        session.tier = entitlement.tier;
+        session.p2pEntitled = entitlement.p2pEntitled;
+        session.entitlementExpiresAt = entitlement.entitlementExpiresAt;
+        return sendJson(res, 200, {
+          message: `${session.deviceName} approved. Return to your TV to finish signing in.`,
+          p2pEntitled: session.p2pEntitled,
+        });
+      } catch (error) {
+        console.warn('[KotSafe TV Auth] Firebase token verification failed:', error?.message || error);
+        return sendJson(res, 401, { error: 'Your KotSafe sign-in could not be verified' });
+      }
+    }
+
+    if (req.url === '/v1/tv-auth/exchange' && req.method === 'POST') {
+      cleanupTvLinkSessions();
+      const session = tvLinkSessions.get(body.sessionId);
+      if (!session || !hasMatchingDeviceCode(session, body.deviceCode)) {
+        return sendJson(res, 404, { error: 'TV link not found or expired' });
+      }
+      if (!session.approved) {
+        return sendJson(res, 428, { error: 'authorization_pending', message: 'Waiting for phone approval' });
+      }
+      try {
+        const customClaims = {
+          kotsafePlan: session.tier,
+          p2p: session.p2pEntitled,
+        };
+        if (session.entitlementExpiresAt > 0) customClaims.licenseExpiresAt = session.entitlementExpiresAt;
+        const customToken = await getFirebaseAdminAuth().createCustomToken(session.uid, customClaims);
+        tvLinkSessions.delete(body.sessionId); // One exchange only.
+        return sendJson(res, 200, {
+          customToken,
+          email: session.email,
+          tier: session.tier,
+          p2pEntitled: session.p2pEntitled,
+          entitlementExpiresAt: session.entitlementExpiresAt,
+        });
+      } catch (error) {
+        console.error('[KotSafe TV Auth] Could not mint TV custom token:', error?.message || error);
+        return sendJson(res, 503, { error: 'KotSafe TV sign-in service is not configured' });
+      }
+    }
 
     // 1. POST /license/activate
     if (req.url === '/license/activate' && req.method === 'POST') {
@@ -204,28 +392,30 @@ const server = http.createServer((req, res) => {
 
       const lic = registeredLicenses.get(key.toUpperCase());
       if (!lic) {
-        // Also allow dynamically structured keys that start with KOT-
-        if (key.startsWith('KOT-PRO-') || key.startsWith('KOT-ENT-')) {
-          const plan = key.includes('ENT') ? 'enterprise' : 'pro';
-          const maxSeats = plan === 'enterprise' ? 25 : 6;
-          const expiresAt = new Date(Date.now() + 365 * 86400000).toISOString();
-          const dynamicLic = {
-            plan,
-            maxSeats,
-            expiresAt,
-            activeDevices: new Set([deviceId]),
-            status: 'active',
-          };
-          registeredLicenses.set(key.toUpperCase(), dynamicLic);
+        // Dynamic demo key generation is strictly forbidden in production and only allowed when explicitly enabled
+        if (process.env.NODE_ENV !== 'production' && process.env.ALLOW_DYNAMIC_DEMO_KEYS === 'true') {
+          if (key.startsWith('KOT-PRO-') || key.startsWith('KOT-ENT-')) {
+            const plan = key.includes('ENT') ? 'enterprise' : 'pro';
+            const maxSeats = plan === 'enterprise' ? 25 : 6;
+            const expiresAt = new Date(Date.now() + 365 * 86400000).toISOString();
+            const dynamicLic = {
+              plan,
+              maxSeats,
+              expiresAt,
+              activeDevices: new Set([deviceId]),
+              status: 'active',
+            };
+            registeredLicenses.set(key.toUpperCase(), dynamicLic);
 
-          const payload = {
-            status: 'active',
-            plan,
-            expiresAt,
-            seats: { used: 1, max: maxSeats },
-          };
-          const signature = computeSignature(payload, deviceId);
-          return sendJson(res, 200, { ...payload, signature, serverTime: Date.now() });
+            const payload = {
+              status: 'active',
+              plan,
+              expiresAt,
+              seats: { used: 1, max: maxSeats },
+            };
+            const signature = computeSignature(payload, deviceId);
+            return sendJson(res, 200, { ...payload, signature, serverTime: Date.now() });
+          }
         }
 
         return sendJson(res, 404, {

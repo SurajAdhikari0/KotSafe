@@ -27,7 +27,9 @@ service cloud.firestore {
       // User can create/update their own profile
       allow create: if isOwner(userId) &&
         request.resource.data.uid == userId &&
-        request.resource.data.keys().hasAll(['uid', 'email', 'createdAt', 'isActive']);
+        request.resource.data.keys().hasAll(['uid', 'email', 'createdAt', 'isActive']) &&
+        (!('role' in request.resource.data) || request.resource.data.role == 'user') &&
+        (!('tier' in request.resource.data) || request.resource.data.tier == 'freemium');
 
       allow update: if isOwner(userId) &&
         // Prevent normal users from escalating their role or tier
