@@ -98,10 +98,10 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
     private TextView mTvTimezoneAdvisoryText;
     private View mBtnFixTimezone;
 
-    // Utilities
+    // Utilities & Info
     private View mBtnHubAppRouting;
     private View mBtnHubAdvancedSettings;
-    private View mBtnActionFullSettings;
+    private View mBtnActionP2pInfo;
 
     private SharedPreferences mPrefs;
     private SecurePairingBundle mHostBundle;
@@ -201,7 +201,7 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
 
         mBtnHubAppRouting = findViewById(R.id.btn_hub_app_routing);
         mBtnHubAdvancedSettings = findViewById(R.id.btn_hub_advanced_settings);
-        mBtnActionFullSettings = findViewById(R.id.btn_action_full_settings);
+        mBtnActionP2pInfo = findViewById(R.id.btn_action_p2p_info);
     }
 
     private void setupModeSwitcher() {
@@ -748,15 +748,16 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
             startActivity(new Intent(this, P2PAppRoutingActivity.class));
         });
 
-        View.OnClickListener openFullSettings = v -> {
+        mBtnHubAdvancedSettings.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
             intent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "p2p_exit_node_settings");
             startActivity(intent);
-        };
+        });
 
-        mBtnHubAdvancedSettings.setOnClickListener(openFullSettings);
-        if (mBtnActionFullSettings != null) {
-            mBtnActionFullSettings.setOnClickListener(openFullSettings);
+        if (mBtnActionP2pInfo != null) {
+            mBtnActionP2pInfo.setOnClickListener(v -> {
+                com.kotsafe.security.p2p.P2PInfoDialog.show(this);
+            });
         }
     }
 

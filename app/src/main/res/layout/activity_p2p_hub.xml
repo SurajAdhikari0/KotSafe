@@ -23,18 +23,18 @@
             app:title="P2P Mesh &amp; Gateway"
             app:titleTextColor="@android:color/white">
 
-            <!-- Top-Right Full Settings Button -->
+            <!-- Top-Right P2P Security Guide & Architecture Button -->
             <ImageView
-                android:id="@+id/btn_action_full_settings"
+                android:id="@+id/btn_action_p2p_info"
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="12dp"
                 android:padding="8dp"
                 android:background="@drawable/bg_toolbar_circle_btn"
-                android:src="@drawable/ic_bottom_settings"
+                android:src="@drawable/ic_info"
                 app:tint="@android:color/white"
-                android:contentDescription="Full Settings"
+                android:contentDescription="P2P Architecture &amp; Security Guide"
                 android:clickable="true"
                 android:focusable="true" />
         </androidx.appcompat.widget.Toolbar>
