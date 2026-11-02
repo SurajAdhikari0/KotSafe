@@ -132,14 +132,16 @@ public class CustomHttpProvider implements BackendProvider {
     }
 
     public static void ensureCipherConfigured(Context context) {
-        if (sTunnelCipher != null || context == null) return;
+        if (context == null) return;
         try {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String bundleUri = prefs.getString(com.kotsafe.security.p2p.GatewayPreferenceKeys.PAIRING_BUNDLE, "");
             if (!bundleUri.isEmpty()) {
                 com.kotsafe.security.p2p.SecurePairingBundle bundle =
                         com.kotsafe.security.p2p.SecurePairingBundle.parse(bundleUri);
-                configureCipher(bundle.room, bundle.pairingSecret);
+                if (sTunnelCipher == null || !bundle.room.equals(sTunnelCipher.getRoom())) {
+                    configureCipher(bundle.room, bundle.pairingSecret);
+                }
             }
         } catch (Exception ignored) {}
     }

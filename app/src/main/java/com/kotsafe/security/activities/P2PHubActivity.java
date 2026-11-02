@@ -285,6 +285,10 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
                     .setMessage("Generating a new pairing key will disconnect all currently paired devices until they scan the new QR code. Proceed?")
                     .setPositiveButton("Regenerate", (dialog, which) -> {
                         loadOrGenerateHostBundle(true);
+                        if (mPrefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false)) {
+                            P2PExitNodeService.stop(this);
+                            P2PExitNodeService.start(this);
+                        }
                         Toast.makeText(this, "✨ Fresh pairing key & QR generated!", Toast.LENGTH_SHORT).show();
                     })
                     .setNegativeButton("Cancel", null)
@@ -334,6 +338,10 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
                     .apply();
         }
 
+        if (mHostBundle != null) {
+            CustomHttpProvider.configureCipher(mHostBundle.room, mHostBundle.pairingSecret);
+        }
+
         if (mTvHostRoomId != null) {
             mTvHostRoomId.setText("Room: " + mHostBundle.room);
         }
@@ -349,6 +357,9 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
         if (mPrefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false)) {
             mPrefs.edit().putBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false).apply();
             disableSocks5Redirection();
+        }
+        if (mHostBundle != null) {
+            CustomHttpProvider.configureCipher(mHostBundle.room, mHostBundle.pairingSecret);
         }
         checkBatteryOptimizationsForExitNode();
         P2PExitNodeService.start(this);

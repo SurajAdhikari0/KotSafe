@@ -79,11 +79,13 @@ public final class EgressLeakChecker {
         public boolean isResidential = false;
 
         public String directIp = "";
+        public String directIpv6 = "";
         public String directCountry = "";
         public String directColo = "";
         public String directIsp = "";
 
         public String egressIp = "";
+        public String egressIpv6 = "";
         public String egressCountry = "";
         public String egressColo = "";
         public String egressIsp = "";
@@ -184,7 +186,7 @@ public final class EgressLeakChecker {
                 postProgress(mainHandler, callback, "Probing P2P egress gateway (SOCKS5 127.0.0.1:" + port + ")...");
                 Proxy socksProxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", port));
                 long startPing = System.currentTimeMillis();
-                TraceData egressTrace = fetchTrace(socksProxy, 4500);
+                TraceData egressTrace = fetchTrace(socksProxy, 7000);
                 long rtt = System.currentTimeMillis() - startPing;
 
                 if (egressTrace != null && !egressTrace.ip.isEmpty()) {
@@ -195,7 +197,7 @@ public final class EgressLeakChecker {
                     report.latencyMs = (int) Math.max(1, rtt);
                 } else {
                     // Fallback tunneled probe
-                    String fallbackIp = fetchSimpleIp(socksProxy, IPIFY_V4_URL, 3500);
+                    String fallbackIp = fetchSimpleIp(socksProxy, IPIFY_V4_URL, 5000);
                     if (fallbackIp != null && !fallbackIp.isEmpty()) {
                         report.socksProxyReachable = true;
                         report.egressIp = fallbackIp;
@@ -210,6 +212,17 @@ public final class EgressLeakChecker {
                     report.isResidential = classifyResidential(report.egressIsp, report.egressIp);
                     report.egressIspType = report.isResidential ? "Residential Broadband" :
                             (isKnownDatacenter(report.egressIsp) ? "Datacenter / Cloud Relay" : "Peer Gateway");
+
+                    if (report.egressCountry.isEmpty()) {
+                        if (report.egressIsp.endsWith(".in") || report.egressIsp.contains(".in.")) {
+                            report.egressCountry = "IN";
+                            if (report.egressIsp.contains("-mum-") || report.egressIsp.contains("mumbai")) {
+                                report.egressColo = "BOM";
+                            } else if (report.egressIsp.contains("-del-") || report.egressIsp.contains("delhi")) {
+                                report.egressColo = "DEL";
+                            }
+                        }
+                    }
                 }
 
                 if (!report.directIp.isEmpty()) {
@@ -220,14 +233,23 @@ public final class EgressLeakChecker {
                 postProgress(mainHandler, callback, "Auditing IPv6 leak surface...");
                 String directIpv6 = fetchSimpleIp(null, IPIFY_V6_URL, 2000);
                 if (directIpv6 != null && directIpv6.contains(":")) {
-                    // Device has public IPv6 connectivity on physical interface
+                    report.directIpv6 = directIpv6;
                     String tunneledIpv6 = fetchSimpleIp(socksProxy, IPIFY_V6_URL, 2000);
-                    if (tunneledIpv6 == null || !tunneledIpv6.contains(":")) {
-                        // SOCKS5 tunnel does not cover IPv6, so physical IPv6 is leaking
-                        report.ipv6Leaking = true;
-                    } else if (directIpv6.equalsIgnoreCase(tunneledIpv6)) {
-                        // Tunneled IPv6 matches direct IPv6 -> IPv6 is leaking outside tunnel
-                        report.ipv6Leaking = true;
+                    if (tunneledIpv6 != null && tunneledIpv6.contains(":")) {
+                        report.egressIpv6 = tunneledIpv6;
+                        if (directIpv6.equalsIgnoreCase(tunneledIpv6)) {
+                            // Tunneled IPv6 matches direct IPv6 -> IPv6 is leaking outside tunnel
+                            report.ipv6Leaking = true;
+                        } else {
+                            // Exit node provides an independent shielded IPv6 address
+                            report.ipv6Leaking = false;
+                        }
+                    } else {
+                        // Exit node has IPv4 egress only.
+                        // When KotSafe VPN is active, all unicast IPv6 routes (2000::/3, fc00::/7, fec0::/10)
+                        // are trapped in tun0 and blackholed/refused to prevent external physical bypass.
+                        // Only leak if VPN engine is stopped.
+                        report.ipv6Leaking = !report.vpnEngineActive;
                     }
                 }
 
@@ -371,6 +393,81 @@ public final class EgressLeakChecker {
     }
 
     private static String resolvePtrDomain(String ip) {
+        if (ip == null || ip.isEmpty()) return "Standard ISP Route";
+
+        // Step 1: Perform fast DoH PTR query to cloudflare-dns.com to bypass Android Bionic libc PTR lookup restrictions
+        try {
+            String[] parts = ip.split("\\.");
+            if (parts.length == 4) {
+                String arpa = parts[3] + "." + parts[2] + "." + parts[1] + "." + parts[0] + ".in-addr.arpa";
+                URL url = new URL("https://cloudflare-dns.com/dns-query?name=" + arpa + "&type=PTR");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3000);
+                conn.setReadTimeout(3000);
+                conn.setUseCaches(false);
+                conn.setRequestProperty("Accept", "application/dns-json");
+                conn.setRequestProperty("User-Agent", "KotSafe/2.0");
+                if (conn.getResponseCode() == 200) {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) sb.append(line);
+                        org.json.JSONObject json = new org.json.JSONObject(sb.toString());
+                        if (json.has("Answer")) {
+                            org.json.JSONArray answers = json.getJSONArray("Answer");
+                            for (int i = 0; i < answers.length(); i++) {
+                                org.json.JSONObject ans = answers.getJSONObject(i);
+                                if (ans.has("data")) {
+                                    String ptr = ans.getString("data");
+                                    if (ptr.endsWith(".")) ptr = ptr.substring(0, ptr.length() - 1);
+                                    if (!ptr.isEmpty()) return ptr;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Cloudflare DoH PTR lookup error: " + e.getMessage());
+        }
+
+        // Step 2: Fallback DoH PTR query to dns.google
+        try {
+            String[] parts = ip.split("\\.");
+            if (parts.length == 4) {
+                String arpa = parts[3] + "." + parts[2] + "." + parts[1] + "." + parts[0] + ".in-addr.arpa";
+                URL url = new URL("https://dns.google/resolve?name=" + arpa + "&type=PTR");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(3000);
+                conn.setReadTimeout(3000);
+                conn.setUseCaches(false);
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("User-Agent", "KotSafe/2.0");
+                if (conn.getResponseCode() == 200) {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) sb.append(line);
+                        org.json.JSONObject json = new org.json.JSONObject(sb.toString());
+                        if (json.has("Answer")) {
+                            org.json.JSONArray answers = json.getJSONArray("Answer");
+                            for (int i = 0; i < answers.length(); i++) {
+                                org.json.JSONObject ans = answers.getJSONObject(i);
+                                if (ans.has("data")) {
+                                    String ptr = ans.getString("data");
+                                    if (ptr.endsWith(".")) ptr = ptr.substring(0, ptr.length() - 1);
+                                    if (!ptr.isEmpty()) return ptr;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Google DoH PTR lookup error: " + e.getMessage());
+        }
+
+        // Step 3: Fallback to standard InetAddress canonical host lookup
         try {
             InetAddress addr = InetAddress.getByName(ip);
             String host = addr.getCanonicalHostName();

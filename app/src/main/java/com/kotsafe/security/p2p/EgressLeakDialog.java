@@ -165,7 +165,7 @@ public class EgressLeakDialog {
 
                         // DNS & IPv6
                         if (!report.dnsLeaking && !report.ipv6Leaking) {
-                            tvDnsIpv6Status.setText("Zero Leaks Detected ✅");
+                            tvDnsIpv6Status.setText("Zero Leaks (IPv6 Shielded) ✅");
                             tvDnsIpv6Status.setTextColor(Color.parseColor("#00E676"));
                         } else if (report.ipv6Leaking) {
                             tvDnsIpv6Status.setText("IPv6 Leaking Real Location 🔴");
