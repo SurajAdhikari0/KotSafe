@@ -1011,6 +1011,10 @@ public class CaptureService extends VpnService implements Runnable {
             com.kotsafe.security.engine.KotEngineBridge.getInstance().destroy();
         } catch (Exception ignored) {}
 
+        try {
+            stopClientGatewayLoopback();
+        } catch (Exception ignored) {}
+
         if (mNotificationManager != null) {
             mNotificationManager.destroy();
         }
@@ -1233,6 +1237,13 @@ public class CaptureService extends VpnService implements Runnable {
             service.mSocks5Address = address != null ? address : "";
             service.mSocks5Port = port;
             service.mSocks5Enabled = (address != null && !address.isEmpty() && port > 0);
+
+            if (service.mSocks5Enabled && service.mSocks5Port == 8095) {
+                service.ensureClientGatewayLoopbackRunning();
+            } else if (!service.mSocks5Enabled) {
+                service.stopClientGatewayLoopback();
+            }
+
             try {
                 com.kotsafe.security.engine.KotEngineBridge.getInstance().setSocks5Proxy(
                         service.mSocks5Enabled ? address : null,
@@ -1242,6 +1253,58 @@ public class CaptureService extends VpnService implements Runnable {
                 Log.w(TAG, "Failed to dynamically update SOCKS5 proxy: " + t.getMessage());
             }
         }
+    }
+
+    public void ensureClientGatewayLoopbackRunning() {
+        new Thread(() -> {
+            try {
+                com.kotsafe.security.model.BackendProvider provider =
+                        com.kotsafe.security.model.backend.BackendProviderFactory.getConfigured(this);
+                String backendToken = mPrefs.getString(Prefs.PREF_P2P_BACKEND_PAIRING, "");
+                String bundleUri = mPrefs.getString(com.kotsafe.security.p2p.GatewayPreferenceKeys.PAIRING_BUNDLE, "");
+
+                com.kotsafe.security.p2p.GatewayProfile activeProf =
+                        com.kotsafe.security.p2p.GatewayProfileManager.getActiveProfile(this);
+                if (activeProf != null && activeProf.pairingBundle != null && !activeProf.pairingBundle.isEmpty()) {
+                    bundleUri = activeProf.pairingBundle;
+                }
+
+                if (bundleUri != null && !bundleUri.isEmpty()) {
+                    try {
+                        com.kotsafe.security.p2p.SecurePairingBundle parsed =
+                                com.kotsafe.security.p2p.SecurePairingBundle.parse(bundleUri);
+                        if (parsed != null && parsed.room != null && !parsed.room.isEmpty()) {
+                            backendToken = "client_" + parsed.room;
+                            mPrefs.edit().putString(Prefs.PREF_P2P_BACKEND_PAIRING, backendToken).apply();
+                            com.kotsafe.security.model.backend.CustomHttpProvider.configureCipher(parsed.room, parsed.pairingSecret);
+                        }
+                    } catch (Exception ignored) {}
+                }
+
+                if (provider != null && backendToken != null && !backendToken.isEmpty()) {
+                    com.kotsafe.security.model.backend.CustomHttpProvider.ensureCipherConfigured(this);
+                    int targetPort = mSocks5Port > 0 ? mSocks5Port : 8095;
+                    provider.startRelayLoopback(backendToken, targetPort);
+                    Log.i(TAG, "Personal Gateway relay loopback actively running on port " + targetPort + " for token=" + backendToken);
+                }
+            } catch (Throwable t) {
+                Log.w(TAG, "Failed to start gateway loopback: " + t.getMessage());
+            }
+        }, "KotSafe-CaptureServiceGatewayLoopback").start();
+    }
+
+    public void stopClientGatewayLoopback() {
+        new Thread(() -> {
+            try {
+                com.kotsafe.security.model.BackendProvider provider =
+                        com.kotsafe.security.model.backend.BackendProviderFactory.getConfigured(this);
+                if (provider != null) {
+                    provider.stopRelayLoopback();
+                }
+            } catch (Throwable t) {
+                Log.w(TAG, "Failed to stop gateway loopback: " + t.getMessage());
+            }
+        }, "KotSafe-CaptureServiceStopGatewayLoopback").start();
     }
 
     public static MitmReceiver.Status getMitmProxyStatus() {

@@ -118,10 +118,21 @@ public class GatewayProfileManager {
     public static synchronized void setActiveProfile(Context context, GatewayProfile profile) {
         if (context == null || profile == null) return;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String token = profile.token;
+        if (profile.pairingBundle != null && !profile.pairingBundle.isEmpty()) {
+            try {
+                SecurePairingBundle parsed = SecurePairingBundle.parse(profile.pairingBundle);
+                if (parsed != null && parsed.room != null && !parsed.room.isEmpty()) {
+                    token = "client_" + parsed.room;
+                    profile.token = token;
+                    com.kotsafe.security.model.backend.CustomHttpProvider.configureCipher(parsed.room, parsed.pairingSecret);
+                }
+            } catch (Exception ignored) {}
+        }
         prefs.edit()
                 .putString(PREF_KEY_ACTIVE_PROFILE_ID, profile.id)
                 .putString(GatewayPreferenceKeys.PAIRING_BUNDLE, profile.pairingBundle)
-                .putString(Prefs.PREF_P2P_BACKEND_PAIRING, profile.token)
+                .putString(Prefs.PREF_P2P_BACKEND_PAIRING, token)
                 .apply();
     }
 
@@ -129,12 +140,24 @@ public class GatewayProfileManager {
         if (context == null) return null;
         List<GatewayProfile> list = getProfiles(context);
         String activeId = getActiveProfileId(context);
+        GatewayProfile active = null;
         for (GatewayProfile p : list) {
             if (p.id.equals(activeId)) {
-                return p;
+                active = p;
+                break;
             }
         }
-        return list.isEmpty() ? null : list.get(0);
+        if (active == null && !list.isEmpty()) {
+            active = list.get(0);
+        }
+        if (active != null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            String curBundle = prefs.getString(GatewayPreferenceKeys.PAIRING_BUNDLE, "");
+            if (active.pairingBundle != null && !active.pairingBundle.isEmpty() && !active.pairingBundle.equals(curBundle)) {
+                setActiveProfile(context, active);
+            }
+        }
+        return active;
     }
 
     public static String getActiveProfileId(Context context) {

@@ -105,6 +105,7 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
 
     private SharedPreferences mPrefs;
     private SecurePairingBundle mHostBundle;
+    private BackendProvider mActiveBackendProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,7 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
         setContentView(R.layout.activity_p2p_hub);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mActiveBackendProvider = BackendProviderFactory.getConfigured(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
@@ -144,6 +146,9 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
     protected void onResume() {
         super.onResume();
         GatewayTelemetry.getInstance().addListener(this);
+        if (mPrefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false)) {
+            ensureClientRelayLoopbackRunning();
+        }
         updateHostUI();
         updateClientUI();
         updateTelemetryUI();
@@ -440,6 +445,7 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
 
         if (mBtnClientCheckLeak != null) {
             mBtnClientCheckLeak.setOnClickListener(v -> {
+                ensureClientRelayLoopbackRunning();
                 EgressLeakDialog.show(this, 8095, () -> {
                     mPrefs.edit().putBoolean(GatewayPreferenceKeys.KILL_SWITCH, true).apply();
                     if (mSwitchClientKillSwitch != null) mSwitchClientKillSwitch.setChecked(true);
@@ -581,18 +587,21 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
             P2PExitNodeService.stop(this);
         }
         mPrefs.edit().putBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, true).apply();
+        ensureClientRelayLoopbackRunning();
         applySocks5Redirection();
         Toast.makeText(this, "🛡️ Connected to P2P Exit Gateway!", Toast.LENGTH_SHORT).show();
     }
 
     private void disableClientMode() {
         mPrefs.edit().putBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false).apply();
+        stopClientRelayLoopback();
         disableSocks5Redirection();
         Toast.makeText(this, "P2P Gateway disconnected.", Toast.LENGTH_SHORT).show();
     }
 
     private void applySocks5Redirection() {
         mPrefs.edit().putBoolean(Prefs.PREF_SOCKS5_ENABLED_KEY, true).apply();
+        ensureClientRelayLoopbackRunning();
         if (CaptureService.isServiceActive()) {
             CaptureService.updateSocks5Proxy("127.0.0.1", 8095);
         }
@@ -600,9 +609,62 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
 
     private void disableSocks5Redirection() {
         mPrefs.edit().putBoolean(Prefs.PREF_SOCKS5_ENABLED_KEY, false).apply();
+        stopClientRelayLoopback();
         if (CaptureService.isServiceActive()) {
             CaptureService.updateSocks5Proxy(null, 0);
         }
+    }
+
+    private void ensureClientRelayLoopbackRunning() {
+        new Thread(() -> {
+            try {
+                GatewayProfile activeProf = GatewayProfileManager.getActiveProfile(this);
+                String bundleUri = mPrefs.getString(GatewayPreferenceKeys.PAIRING_BUNDLE, "");
+                if (activeProf != null && activeProf.pairingBundle != null && !activeProf.pairingBundle.isEmpty()) {
+                    bundleUri = activeProf.pairingBundle;
+                }
+                String backendToken = "";
+                if (bundleUri != null && !bundleUri.isEmpty()) {
+                    try {
+                        SecurePairingBundle parsed = SecurePairingBundle.parse(bundleUri);
+                        if (parsed != null && parsed.room != null && !parsed.room.isEmpty()) {
+                            backendToken = "client_" + parsed.room;
+                            mPrefs.edit()
+                                    .putString(GatewayPreferenceKeys.PAIRING_BUNDLE, bundleUri)
+                                    .putString(Prefs.PREF_P2P_BACKEND_PAIRING, backendToken)
+                                    .apply();
+                            CustomHttpProvider.configureCipher(parsed.room, parsed.pairingSecret);
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (backendToken.isEmpty()) {
+                    backendToken = mPrefs.getString(Prefs.PREF_P2P_BACKEND_PAIRING, "");
+                }
+                if (mActiveBackendProvider == null) {
+                    mActiveBackendProvider = BackendProviderFactory.getConfigured(this);
+                }
+                if (mActiveBackendProvider != null && !backendToken.isEmpty()) {
+                    CustomHttpProvider.ensureCipherConfigured(this);
+                    mActiveBackendProvider.startRelayLoopback(backendToken, 8095);
+                    Log.i(TAG, "Personal Gateway client loopback actively running on 8095 for " + backendToken);
+                }
+            } catch (Throwable t) {
+                Log.w(TAG, "ensureClientRelayLoopbackRunning error: " + t.getMessage());
+            }
+        }, "KotSafe-ClientRelayLoopback").start();
+    }
+
+    private void stopClientRelayLoopback() {
+        new Thread(() -> {
+            try {
+                if (mActiveBackendProvider != null) {
+                    mActiveBackendProvider.stopRelayLoopback();
+                } else {
+                    BackendProvider bp = BackendProviderFactory.getConfigured(this);
+                    if (bp != null) bp.stopRelayLoopback();
+                }
+            } catch (Throwable ignored) {}
+        }, "KotSafe-StopClientLoopback").start();
     }
 
     private void showClientLegalWarningDialog() {
