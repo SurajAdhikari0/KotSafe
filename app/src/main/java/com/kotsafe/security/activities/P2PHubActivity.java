@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -88,6 +92,11 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
     private View mBtnClientCheckLeak;
     private SwitchCompat mSwitchClientKillSwitch;
     private SwitchCompat mSwitchClientLocalLan;
+
+    // Timezone Sentinel
+    private View mCardTimezoneAdvisory;
+    private TextView mTvTimezoneAdvisoryText;
+    private View mBtnFixTimezone;
 
     // Utilities
     private View mBtnHubAppRouting;
@@ -185,6 +194,10 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
         mBtnClientCheckLeak = findViewById(R.id.btn_client_check_leak);
         mSwitchClientKillSwitch = findViewById(R.id.switch_client_kill_switch);
         mSwitchClientLocalLan = findViewById(R.id.switch_client_local_lan);
+
+        mCardTimezoneAdvisory = findViewById(R.id.card_timezone_advisory);
+        mTvTimezoneAdvisoryText = findViewById(R.id.tv_timezone_advisory_text);
+        mBtnFixTimezone = findViewById(R.id.btn_fix_timezone);
 
         mBtnHubAppRouting = findViewById(R.id.btn_hub_app_routing);
         mBtnHubAdvancedSettings = findViewById(R.id.btn_hub_advanced_settings);
@@ -332,8 +345,27 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
             mPrefs.edit().putBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false).apply();
             disableSocks5Redirection();
         }
+        checkBatteryOptimizationsForExitNode();
         P2PExitNodeService.start(this);
         Toast.makeText(this, "🚀 Exit Node hosting activated!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkBatteryOptimizationsForExitNode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    try {
+                        Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                        startActivity(intent);
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
     }
 
     private void disableHostMode() {
@@ -624,6 +656,28 @@ public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Lis
         if (mSwitchClientLocalLan != null) {
             mSwitchClientLocalLan.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false));
         }
+
+        if (mCardTimezoneAdvisory != null) {
+            if (clientOn) {
+                String exitCountry = mPrefs.getString("p2p_last_egress_country", "IN");
+                com.kotsafe.security.p2p.TimezoneSentinel.TimezoneAudit tzAudit =
+                        com.kotsafe.security.p2p.TimezoneSentinel.auditTimezone(exitCountry);
+                if (tzAudit.isMismatch) {
+                    mCardTimezoneAdvisory.setVisibility(View.VISIBLE);
+                    if (mTvTimezoneAdvisoryText != null) {
+                        mTvTimezoneAdvisoryText.setText(tzAudit.advisoryText);
+                    }
+                    if (mBtnFixTimezone != null) {
+                        mBtnFixTimezone.setOnClickListener(v -> com.kotsafe.security.p2p.TimezoneSentinel.openDateSettings(this));
+                    }
+                } else {
+                    mCardTimezoneAdvisory.setVisibility(View.GONE);
+                }
+            } else {
+                mCardTimezoneAdvisory.setVisibility(View.GONE);
+            }
+        }
+
         updateTelemetryUI();
     }
 

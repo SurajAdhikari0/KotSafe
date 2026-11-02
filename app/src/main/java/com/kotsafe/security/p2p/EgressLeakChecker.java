@@ -75,6 +75,7 @@ public final class EgressLeakChecker {
         public boolean ipLeaking = false;
         public boolean dnsLeaking = false;
         public boolean ipv6Leaking = false;
+        public boolean webrtcLeaking = false;
         public boolean isResidential = false;
 
         public String directIp = "";
@@ -87,7 +88,9 @@ public final class EgressLeakChecker {
         public String egressColo = "";
         public String egressIsp = "";
         public String egressIspType = "Unknown";
+        public String webrtcStunIp = "";
 
+        public TimezoneSentinel.TimezoneAudit timezoneAudit = null;
         public String targetExitIp = "";
         public int latencyMs = -1;
         public String timestamp = "";
@@ -112,6 +115,8 @@ public final class EgressLeakChecker {
                 return "P2P TUNNEL SHIELDED (CLOUD / RELAY)";
             } else if (ipLeaking) {
                 return "CRITICAL: DIRECT IP LEAK DETECTED";
+            } else if (webrtcLeaking) {
+                return "WEBRTC REAL-IP LEAK DETECTED";
             } else if (!vpnEngineActive) {
                 return "VPN ENGINE STOPPED (LEAK RISK)";
             } else {
@@ -126,6 +131,8 @@ public final class EgressLeakChecker {
                 return "Your physical IP is masked through the exit gateway. Services see the remote peer node.";
             } else if (ipLeaking) {
                 return "Web traffic is exiting via your local Wi-Fi / Mobile network. Your actual physical location is exposed.";
+            } else if (webrtcLeaking) {
+                return "WebRTC STUN query exposed your physical IP (" + webrtcStunIp + ") to external servers. WebRTC shield required.";
             } else if (!vpnEngineActive) {
                 return "The P2P tunnel is configured, but KotSafe VPN engine is not capturing traffic. Apps will bypass the gateway.";
             } else {
@@ -224,7 +231,27 @@ public final class EgressLeakChecker {
                     }
                 }
 
-                // Step 6: Differential Analysis & Shield Verdict
+                // Step 6: Audit WebRTC STUN Leak Surface
+                postProgress(mainHandler, callback, "Auditing WebRTC STUN candidate leak surface...");
+                try {
+                    com.kotsafe.security.model.StunClient.StunResult stunRes =
+                            com.kotsafe.security.model.StunClient.discoverPublicEndpoint(0);
+                    if (stunRes != null && stunRes.success && stunRes.publicIp != null) {
+                        report.webrtcStunIp = stunRes.publicIp;
+                    }
+                } catch (Exception ignored) {}
+
+                // In KotSafe, non-DNS UDP (STUN) is dropped in the native capture engine when VPN is active.
+                // If VPN engine is stopped, external browser apps leak physical IP via WebRTC STUN.
+                report.webrtcLeaking = !report.vpnEngineActive;
+
+                // Step 7: Audit Timezone & Clock Consistency
+                postProgress(mainHandler, callback, "Verifying timezone consistency with exit region...");
+                if (!report.egressCountry.isEmpty()) {
+                    report.timezoneAudit = TimezoneSentinel.auditTimezone(report.egressCountry);
+                }
+
+                // Step 8: Differential Analysis & Shield Verdict
                 postProgress(mainHandler, callback, "Evaluating privacy & shield status...");
 
                 if (!report.socksProxyReachable || report.egressIp.isEmpty()) {
@@ -244,6 +271,9 @@ public final class EgressLeakChecker {
                     } else if (report.ipv6Leaking) {
                         report.isShielded = false;
                         report.diagnosticNote = "IPv4 is shielded, but an active IPv6 interface is exposing your real physical location.";
+                    } else if (report.webrtcLeaking) {
+                        report.isShielded = false;
+                        report.diagnosticNote = "WebRTC STUN query leaked your real physical IP (" + report.webrtcStunIp + ") to external servers.";
                     } else {
                         report.isShielded = true;
                         report.diagnosticNote = "Zero leaks detected. Outbound identity is fully shielded by the exit node.";

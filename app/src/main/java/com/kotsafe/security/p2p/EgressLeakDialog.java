@@ -69,6 +69,8 @@ public class EgressLeakDialog {
         TextView tvDirectIp = view.findViewById(R.id.tv_direct_ip);
         TextView tvVpnStatus = view.findViewById(R.id.tv_vpn_status);
         TextView tvDnsIpv6Status = view.findViewById(R.id.tv_dns_ipv6_status);
+        TextView tvWebrtcStatus = view.findViewById(R.id.tv_webrtc_status);
+        TextView tvTimezoneStatus = view.findViewById(R.id.tv_timezone_status);
         TextView tvDiagnosticNote = view.findViewById(R.id.tv_diagnostic_note);
 
         MaterialButton btnKillSwitch = view.findViewById(R.id.btn_leak_killswitch);
@@ -173,10 +175,51 @@ public class EgressLeakDialog {
                             tvDnsIpv6Status.setTextColor(Color.parseColor("#EF4444"));
                         }
 
-                        // Diagnostic summary note
+                        // WebRTC STUN Protection
+                        if (tvWebrtcStatus != null) {
+                            if (!report.webrtcLeaking) {
+                                tvWebrtcStatus.setText("Shielded (STUN Blocked) ✅");
+                                tvWebrtcStatus.setTextColor(Color.parseColor("#00E676"));
+                            } else {
+                                tvWebrtcStatus.setText("Exposed (VPN Inactive) 🔴");
+                                tvWebrtcStatus.setTextColor(Color.parseColor("#EF4444"));
+                            }
+                        }
+
+                        // Timezone Consistency
+                        if (tvTimezoneStatus != null) {
+                            if (report.timezoneAudit != null) {
+                                if (!report.timezoneAudit.isMismatch) {
+                                    String tzName = !report.timezoneAudit.recommendedTzName.isEmpty() ?
+                                            report.timezoneAudit.recommendedTzName : report.timezoneAudit.deviceTzId;
+                                    tvTimezoneStatus.setText("Aligned (" + tzName + ") ✅");
+                                    tvTimezoneStatus.setTextColor(Color.parseColor("#00E676"));
+                                } else {
+                                    tvTimezoneStatus.setText("Mismatch ⚠️ (Tap to sync)");
+                                    tvTimezoneStatus.setTextColor(Color.parseColor("#F59E0B"));
+                                    tvTimezoneStatus.setOnClickListener(v -> TimezoneSentinel.openDateSettings(context));
+                                }
+                            } else {
+                                tvTimezoneStatus.setText("System Default (" + java.util.TimeZone.getDefault().getID() + ")");
+                                tvTimezoneStatus.setTextColor(Color.parseColor("#94A3B8"));
+                            }
+                        }
+
+                        // Persist verified country for Timezone Sentinel
+                        if (!report.egressCountry.isEmpty()) {
+                            androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+                                    .edit()
+                                    .putString("p2p_last_egress_country", report.egressCountry)
+                                    .apply();
+                        }
+
+                        // Diagnostic summary note & Timezone Audit
                         String diag = "Audit timestamp: " + report.timestamp;
                         if (report.latencyMs > 0) {
                             diag += " • SOCKS5 RTT: " + report.latencyMs + "ms";
+                        }
+                        if (report.timezoneAudit != null && report.timezoneAudit.isMismatch) {
+                            diag += "\n⚠️ Timezone Mismatch: " + report.timezoneAudit.advisoryText;
                         }
                         if (!report.diagnosticNote.isEmpty()) {
                             diag += "\n" + report.diagnosticNote;

@@ -498,6 +498,17 @@ public class P2PExitNodeService extends Service implements P2PExitNodeServer.Sta
             public void onLost(@androidx.annotation.NonNull Network network) {
                 debouncedRepublish(port);
             }
+
+            @Override
+            public void onLinkPropertiesChanged(@androidx.annotation.NonNull Network network, @androidx.annotation.NonNull android.net.LinkProperties linkProperties) {
+                Log.i(TAG, "Dynamic IP / Link properties changed on exit host; republishing candidates");
+                debouncedRepublish(port);
+            }
+
+            @Override
+            public void onCapabilitiesChanged(@androidx.annotation.NonNull Network network, @androidx.annotation.NonNull NetworkCapabilities networkCapabilities) {
+                debouncedRepublish(port);
+            }
         };
 
         try {

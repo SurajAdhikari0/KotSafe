@@ -28,7 +28,8 @@ public final class FirewallPolicy {
         return Intent.ACTION_BOOT_COMPLETED.equals(action)
                 || "android.intent.action.QUICKBOOT_POWERON".equals(action)
                 || "android.intent.action.USER_UNLOCKED".equals(action)
-                || Intent.ACTION_MY_PACKAGE_REPLACED.equals(action);
+                || Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)
+                || Intent.ACTION_POWER_CONNECTED.equals(action);
     }
 
     public static boolean shouldBlockScreenOff(SharedPreferences prefs, boolean screenOn) {

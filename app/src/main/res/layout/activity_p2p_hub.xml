@@ -923,6 +923,64 @@
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <!-- Timezone Sentinel Advisory Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_timezone_advisory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="#F59E0B">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="⚠️ TIMEZONE / CLOCK MISMATCH"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.08"
+                                android:textColor="#F59E0B" />
+
+                            <TextView
+                                android:id="@+id/btn_fix_timezone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Adjust Clock ➔"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/p2pAccent"
+                                android:padding="4dp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tv_timezone_advisory_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Device clock doesn't match the Exit Node region. Websites can detect you are traveling."
+                            android:textSize="11sp"
+                            android:textColor="@color/metricTextPrimary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <!-- ================= QUICK UTILITIES ================= -->

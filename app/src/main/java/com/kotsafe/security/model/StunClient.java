@@ -69,17 +69,21 @@ public class StunClient {
         void onResult(StunResult result);
     }
 
+    public static StunResult discoverPublicEndpoint(int localPort) {
+        for (String server : STUN_SERVERS) {
+            StunResult result = queryStunServer(server, localPort);
+            if (result != null && result.success) {
+                return result;
+            }
+        }
+        return new StunResult(false, null, 0, "STUN NAT traversal failed on all candidate servers.");
+    }
+
     public static void discoverPublicEndpointAsync(int localPort, StunCallback callback) {
         sExecutor.execute(() -> {
-            for (String server : STUN_SERVERS) {
-                StunResult result = queryStunServer(server, localPort);
-                if (result != null && result.success) {
-                    if (callback != null) callback.onResult(result);
-                    return;
-                }
-            }
+            StunResult result = discoverPublicEndpoint(localPort);
             if (callback != null) {
-                callback.onResult(new StunResult(false, null, 0, "STUN NAT traversal failed on all candidate servers."));
+                callback.onResult(result);
             }
         });
     }

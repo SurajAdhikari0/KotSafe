@@ -34,7 +34,9 @@ import androidx.preference.PreferenceManager;
 import com.kotsafe.security.model.CaptureSettings;
 import com.kotsafe.security.model.DefenderManager;
 import com.kotsafe.security.model.FirewallPolicy;
+import com.kotsafe.security.model.P2PExitNodeService;
 import com.kotsafe.security.model.Prefs;
+import com.kotsafe.security.p2p.GatewayPreferenceKeys;
 
 public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = "BootReceiver";
@@ -57,6 +59,14 @@ public class BootReceiver extends BroadcastReceiver {
             return;
         }
 
+        // 1. Auto-restore P2P Exit Node hosting if previously active
+        boolean exitEnabled = prefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false);
+        if (exitEnabled) {
+            Log.i(TAG, "Restoring P2P Exit Node hosting on action: " + action);
+            P2PExitNodeService.start(context);
+        }
+
+        // 2. Auto-restore Defender / Firewall if enabled
         if (!FirewallPolicy.shouldRestoreFirewallOnBoot(context, prefs)) {
             Log.i(TAG, "Boot restore skipped: start-at-boot or firewall preference disabled");
             return;
