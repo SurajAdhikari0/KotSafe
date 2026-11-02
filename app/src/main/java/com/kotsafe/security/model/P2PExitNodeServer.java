@@ -44,6 +44,13 @@
 package com.kotsafe.security.model;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.os.BatteryManager;
 import androidx.preference.PreferenceManager;
 
 import com.kotsafe.security.Log;
@@ -280,6 +287,44 @@ public class P2PExitNodeServer {
     }
 
     private void handleClient(Socket clientSocket) {
+        if (mContext != null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            if (prefs.getBoolean(GatewayPreferenceKeys.HOST_PAUSE_ON_LOW_BATTERY, false)) {
+                try {
+                    IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                    Intent bStatus = mContext.registerReceiver(null, ifilter);
+                    if (bStatus != null) {
+                        int level = bStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                        int scale = bStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                        int st = bStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+                        boolean charging = (st == BatteryManager.BATTERY_STATUS_CHARGING || st == BatteryManager.BATTERY_STATUS_FULL);
+                        int pct = (level >= 0 && scale > 0) ? (int) ((level / (float) scale) * 100) : -1;
+                        if (!charging && pct > 0 && pct < 20) {
+                            Log.w(TAG, "Host battery low (" + pct + "%) and not charging. Dropping client per safeguard.");
+                            try { clientSocket.close(); } catch (Exception ignored) {}
+                            return;
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            if (prefs.getBoolean(GatewayPreferenceKeys.HOST_WIFI_ONLY, false)) {
+                try {
+                    ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    if (cm != null) {
+                        Network activeNet = cm.getActiveNetwork();
+                        NetworkCapabilities caps = cm.getNetworkCapabilities(activeNet);
+                        boolean isWifi = (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI));
+                        if (!isWifi) {
+                            Log.w(TAG, "Host is not on Wi-Fi (Wi-Fi only hosting enabled). Dropping client.");
+                            try { clientSocket.close(); } catch (Exception ignored) {}
+                            return;
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
         Socket targetSocket = null;
         boolean activeClient = false;
         String clientIp = "unknown";

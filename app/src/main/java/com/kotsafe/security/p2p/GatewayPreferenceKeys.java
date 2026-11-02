@@ -54,5 +54,9 @@ public final class GatewayPreferenceKeys {
     // P2P LAN & Local Service Access (Developer SSRF / LAN Gateway Toggle)
     public static final String LOCAL_SERVICE_ACCESS = "personal_gateway_local_service_access";
 
+    // Host Safeguards
+    public static final String HOST_PAUSE_ON_LOW_BATTERY = "personal_gateway_host_pause_on_low_battery";
+    public static final String HOST_WIFI_ONLY = "personal_gateway_host_wifi_only";
+
     private GatewayPreferenceKeys() { }
 }

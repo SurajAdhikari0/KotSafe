@@ -39,13 +39,14 @@ import com.kotsafe.security.model.P2PExitNodeServer;
 import com.kotsafe.security.model.P2PExitNodeService;
 import com.kotsafe.security.model.backend.BackendProviderFactory;
 import com.kotsafe.security.model.backend.CustomHttpProvider;
+import com.kotsafe.security.p2p.EgressLeakDialog;
 import com.kotsafe.security.p2p.GatewayPreferenceKeys;
 import com.kotsafe.security.p2p.GatewayProfile;
 import com.kotsafe.security.p2p.GatewayProfileManager;
 import com.kotsafe.security.p2p.GatewayTelemetry;
 import com.kotsafe.security.p2p.SecurePairingBundle;
 
-public class P2PHubActivity extends BaseActivity {
+public class P2PHubActivity extends BaseActivity implements GatewayTelemetry.Listener {
     private static final String TAG = "P2PHubActivity";
 
     // Mode Switcher
@@ -65,6 +66,8 @@ public class P2PHubActivity extends BaseActivity {
     private TextView mTvActiveClientsCount;
     private View mBtnCopyQrLink;
     private View mBtnRegenerateQr;
+    private SwitchCompat mSwitchHostLowBattery;
+    private SwitchCompat mSwitchHostWifiOnly;
 
     // Client Views
     private SwitchCompat mSwitchClient;
@@ -73,6 +76,18 @@ public class P2PHubActivity extends BaseActivity {
     private TextView mTvClientNodeTelemetry;
     private View mBtnClientScanQr;
     private View mBtnClientPasteCode;
+
+    // Client Telemetry HUD
+    private View mLayoutClientTelemetryHud;
+    private TextView mTvClientPingJitter;
+    private TextView mTvClientSpeed;
+    private TextView mTvClientTransport;
+    private TextView mTvClientHostHealth;
+
+    // Client 1-Tap Egress IP Leak Checker & Guards
+    private View mBtnClientCheckLeak;
+    private SwitchCompat mSwitchClientKillSwitch;
+    private SwitchCompat mSwitchClientLocalLan;
 
     // Utilities
     private View mBtnHubAppRouting;
@@ -119,8 +134,21 @@ public class P2PHubActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        GatewayTelemetry.getInstance().addListener(this);
         updateHostUI();
         updateClientUI();
+        updateTelemetryUI();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        GatewayTelemetry.getInstance().removeListener(this);
+    }
+
+    @Override
+    public void onTelemetryChanged(GatewayTelemetry telemetry) {
+        runOnUiThread(this::updateTelemetryUI);
     }
 
     private void initViews() {
@@ -138,6 +166,8 @@ public class P2PHubActivity extends BaseActivity {
         mTvActiveClientsCount = findViewById(R.id.tv_active_clients_count);
         mBtnCopyQrLink = findViewById(R.id.btn_copy_qr_link);
         mBtnRegenerateQr = findViewById(R.id.btn_regenerate_qr);
+        mSwitchHostLowBattery = findViewById(R.id.switch_host_low_battery);
+        mSwitchHostWifiOnly = findViewById(R.id.switch_host_wifi_only);
 
         mSwitchClient = findViewById(R.id.switch_client_enable);
         mTvClientStatusBadge = findViewById(R.id.tv_client_status_badge);
@@ -145,6 +175,16 @@ public class P2PHubActivity extends BaseActivity {
         mTvClientNodeTelemetry = findViewById(R.id.tv_client_node_telemetry);
         mBtnClientScanQr = findViewById(R.id.btn_client_scan_qr);
         mBtnClientPasteCode = findViewById(R.id.btn_client_paste_code);
+
+        mLayoutClientTelemetryHud = findViewById(R.id.layout_client_telemetry_hud);
+        mTvClientPingJitter = findViewById(R.id.tv_client_ping_jitter);
+        mTvClientSpeed = findViewById(R.id.tv_client_speed);
+        mTvClientTransport = findViewById(R.id.tv_client_transport);
+        mTvClientHostHealth = findViewById(R.id.tv_client_host_health);
+
+        mBtnClientCheckLeak = findViewById(R.id.btn_client_check_leak);
+        mSwitchClientKillSwitch = findViewById(R.id.switch_client_kill_switch);
+        mSwitchClientLocalLan = findViewById(R.id.switch_client_local_lan);
 
         mBtnHubAppRouting = findViewById(R.id.btn_hub_app_routing);
         mBtnHubAdvancedSettings = findViewById(R.id.btn_hub_advanced_settings);
@@ -232,6 +272,24 @@ public class P2PHubActivity extends BaseActivity {
                     .setNegativeButton("Cancel", null)
                     .show();
         });
+
+        if (mSwitchHostLowBattery != null) {
+            mSwitchHostLowBattery.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.HOST_PAUSE_ON_LOW_BATTERY, false));
+            mSwitchHostLowBattery.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!buttonView.isPressed()) return;
+                mPrefs.edit().putBoolean(GatewayPreferenceKeys.HOST_PAUSE_ON_LOW_BATTERY, isChecked).apply();
+                Toast.makeText(this, isChecked ? "🔋 Low battery safeguard enabled (<20%)" : "Low battery safeguard disabled", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        if (mSwitchHostWifiOnly != null) {
+            mSwitchHostWifiOnly.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.HOST_WIFI_ONLY, false));
+            mSwitchHostWifiOnly.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!buttonView.isPressed()) return;
+                mPrefs.edit().putBoolean(GatewayPreferenceKeys.HOST_WIFI_ONLY, isChecked).apply();
+                Toast.makeText(this, isChecked ? "📶 Wi-Fi only hosting enabled" : "Wi-Fi only hosting disabled", Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private void loadOrGenerateHostBundle(boolean forceNew) {
@@ -347,6 +405,53 @@ public class P2PHubActivity extends BaseActivity {
 
         mBtnClientScanQr.setOnClickListener(v -> startQrScanFlow());
         mBtnClientPasteCode.setOnClickListener(v -> showPastePairingDialog());
+
+        if (mBtnClientCheckLeak != null) {
+            mBtnClientCheckLeak.setOnClickListener(v -> {
+                EgressLeakDialog.show(this, 8095, () -> {
+                    mPrefs.edit().putBoolean(GatewayPreferenceKeys.KILL_SWITCH, true).apply();
+                    if (mSwitchClientKillSwitch != null) mSwitchClientKillSwitch.setChecked(true);
+                    Toast.makeText(this, "🛡️ Strict P2P Kill-Switch Activated!", Toast.LENGTH_SHORT).show();
+                });
+            });
+        }
+
+        if (mSwitchClientKillSwitch != null) {
+            mSwitchClientKillSwitch.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.KILL_SWITCH, false));
+            mSwitchClientKillSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!buttonView.isPressed()) return;
+                mPrefs.edit().putBoolean(GatewayPreferenceKeys.KILL_SWITCH, isChecked).apply();
+                Toast.makeText(this, isChecked ? "🛡️ Kill-Switch Enabled: Internet blocked if peer drops" : "Kill-Switch Disabled", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        if (mSwitchClientLocalLan != null) {
+            mSwitchClientLocalLan.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false));
+            mSwitchClientLocalLan.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!buttonView.isPressed()) return;
+                if (isChecked) {
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.gateway_local_service_warning_title)
+                            .setMessage(R.string.gateway_local_service_warning_message)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(R.string.gateway_local_service_warning_confirm, (dialog, which) -> {
+                                mPrefs.edit().putBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, true).apply();
+                                mSwitchClientLocalLan.setChecked(true);
+                                Toast.makeText(this, R.string.gateway_local_service_enabled_toast, Toast.LENGTH_SHORT).show();
+                            })
+                            .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+                                mSwitchClientLocalLan.setChecked(false);
+                            })
+                            .setOnCancelListener(dialog -> {
+                                mSwitchClientLocalLan.setChecked(false);
+                            })
+                            .show();
+                } else {
+                    mPrefs.edit().putBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false).apply();
+                    Toast.makeText(this, "Local LAN Access Disabled", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void startQrScanFlow() {
@@ -511,6 +616,75 @@ public class P2PHubActivity extends BaseActivity {
             mTvClientStatusBadge.setText("⚪ STANDBY");
             mTvClientStatusBadge.setTextColor(Color.parseColor("#38BDF8"));
             mTvClientNodeTelemetry.setText("Scan a pairing QR code or paste link to configure gateway");
+        }
+
+        if (mSwitchClientKillSwitch != null) {
+            mSwitchClientKillSwitch.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.KILL_SWITCH, false));
+        }
+        if (mSwitchClientLocalLan != null) {
+            mSwitchClientLocalLan.setChecked(mPrefs.getBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false));
+        }
+        updateTelemetryUI();
+    }
+
+    private void updateTelemetryUI() {
+        boolean clientOn = mPrefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false);
+        if (mLayoutClientTelemetryHud == null) return;
+
+        if (clientOn) {
+            mLayoutClientTelemetryHud.setVisibility(View.VISIBLE);
+            GatewayTelemetry telemetry = GatewayTelemetry.getInstance();
+
+            // RTT Ping & Jitter
+            int latency = telemetry.getLatencyMs();
+            int jitter = telemetry.getJitterMs();
+            if (mTvClientPingJitter != null) {
+                if (latency >= 0) {
+                    mTvClientPingJitter.setText(latency + " ms" + (jitter >= 0 ? " (± " + jitter + "ms)" : ""));
+                    if (latency < 80) {
+                        mTvClientPingJitter.setTextColor(Color.parseColor("#00E676"));
+                    } else if (latency < 180) {
+                        mTvClientPingJitter.setTextColor(Color.parseColor("#38BDF8"));
+                    } else {
+                        mTvClientPingJitter.setTextColor(Color.parseColor("#F59E0B"));
+                    }
+                } else {
+                    mTvClientPingJitter.setText("-- ms (Waiting)");
+                    mTvClientPingJitter.setTextColor(Color.parseColor("#94A3B8"));
+                }
+            }
+
+            // Speeds
+            if (mTvClientSpeed != null) {
+                mTvClientSpeed.setText(telemetry.getSpeedSummary());
+            }
+
+            // Transport Mode
+            if (mTvClientTransport != null) {
+                if (telemetry.isDirectP2PActive()) {
+                    mTvClientTransport.setText("⚡ Direct P2P UDP");
+                    mTvClientTransport.setTextColor(Color.parseColor("#00E676"));
+                } else {
+                    mTvClientTransport.setText("🔒 Encrypted Relay");
+                    mTvClientTransport.setTextColor(Color.parseColor("#38BDF8"));
+                }
+            }
+
+            // Remote Host Health
+            if (mTvClientHostHealth != null) {
+                if (telemetry.isHostOnline()) {
+                    int bat = telemetry.getBatteryPercent();
+                    String batStr = (bat >= 0) ? "🔋 " + bat + "%" + (telemetry.isCharging() ? "⚡" : "") : "🔋 Online";
+                    String netStr = !telemetry.getWifiSsid().isEmpty() ? "Wi-Fi" : (!telemetry.getCarrierName().isEmpty() ? telemetry.getCarrierName() : "Uplink OK");
+                    mTvClientHostHealth.setText(batStr + " • " + netStr);
+                    mTvClientHostHealth.setTextColor(Color.parseColor("#00E676"));
+                } else {
+                    mTvClientHostHealth.setText("⚪ Peer Standby");
+                    mTvClientHostHealth.setTextColor(Color.parseColor("#94A3B8"));
+                }
+            }
+        } else {
+            mLayoutClientTelemetryHud.setVisibility(View.GONE);
         }
     }
 

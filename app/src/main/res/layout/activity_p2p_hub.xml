@@ -26,13 +26,13 @@
             <!-- Top-Right Full Settings Button -->
             <ImageView
                 android:id="@+id/btn_action_full_settings"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="12dp"
                 android:padding="8dp"
-                android:background="@drawable/ks_bg_btn_circle"
-                android:src="@drawable/ic_settings"
+                android:background="@drawable/bg_toolbar_circle_btn"
+                android:src="@drawable/ic_bottom_settings"
                 app:tint="@android:color/white"
                 android:contentDescription="Full Settings"
                 android:clickable="true"
@@ -349,6 +349,114 @@
                             android:textColor="@color/cardWorkbenchSubtext" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <!-- Host Safeguards Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="@color/cardBorderSubtle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="HOST SAFEGUARDS"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.08"
+                            android:textColor="@color/p2pAccent" />
+
+                        <!-- Safeguard 1: Pause on Low Battery -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pause on Low Battery"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/cardWorkbenchText" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Stop hosting if battery drops below 20%"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/cardWorkbenchSubtext" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/switch_host_low_battery"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@color/cardBorderSubtle" />
+
+                        <!-- Safeguard 2: Wi-Fi Only Hosting -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Wi-Fi Only Hosting"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/cardWorkbenchText" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Prevent consuming cellular mobile data"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/cardWorkbenchSubtext" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/switch_host_wifi_only"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
             <!-- ================= CLIENT MODE CONTAINER ================= -->
@@ -572,6 +680,247 @@
                             android:text="Scan a pairing QR code to configure your first exit gateway"
                             android:textSize="11sp"
                             android:textColor="@color/cardWorkbenchSubtext" />
+
+                        <!-- Live Telemetry Grid -->
+                        <LinearLayout
+                            android:id="@+id/layout_client_telemetry_hud"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginBottom="10dp"
+                                android:background="@color/cardBorderSubtle" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <!-- Ping & Jitter -->
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="RTT PING / JITTER"
+                                        android:textSize="9sp"
+                                        android:textStyle="bold"
+                                        android:letterSpacing="0.08"
+                                        android:textColor="@color/cardWorkbenchSubtext" />
+
+                                    <TextView
+                                        android:id="@+id/tv_client_ping_jitter"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:text="-- ms"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#38BDF8" />
+                                </LinearLayout>
+
+                                <!-- Live Speed -->
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="THROUGHPUT SPEED"
+                                        android:textSize="9sp"
+                                        android:textStyle="bold"
+                                        android:letterSpacing="0.08"
+                                        android:textColor="@color/cardWorkbenchSubtext" />
+
+                                    <TextView
+                                        android:id="@+id/tv_client_speed"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:text="Idle • 0 B/s"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold"
+                                        android:textColor="@color/cardWorkbenchText" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <!-- Transport mode badge -->
+                                <TextView
+                                    android:id="@+id/tv_client_transport"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="🔒 Encrypted Relay"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/p2pAccent" />
+
+                                <!-- Remote host health -->
+                                <TextView
+                                    android:id="@+id/tv_client_host_health"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="🔋 Host Online"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#00E676" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- 1-Tap Egress IP & Residential Leak Checker Button -->
+                        <LinearLayout
+                            android:id="@+id/btn_client_check_leak"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center"
+                            android:paddingVertical="9dp"
+                            android:paddingHorizontal="12dp"
+                            android:background="@drawable/bg_p2p_action_btn"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_shield_check"
+                                app:tint="@color/p2pAccent" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="🛡️ Test Egress IP &amp; Home Shield"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/p2pAccent" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Peer Privacy Guards Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1.2dp"
+                    app:cardBackgroundColor="@color/cardBackground"
+                    app:strokeColor="@color/cardBorderSubtle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="PEER PRIVACY GUARDS"
+                            android:textSize="10sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.08"
+                            android:textColor="@color/p2pAccent" />
+
+                        <!-- Kill Switch Switch -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Strict P2P Kill-Switch"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/cardWorkbenchText" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Block internet if peer drops to prevent travel IP leak"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/cardWorkbenchSubtext" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/switch_client_kill_switch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@color/cardBorderSubtle" />
+
+                        <!-- Local Home LAN Access Switch -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Local Home Network Access"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/cardWorkbenchText" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Access home router (192.168.x.x), local NAS and devices"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/cardWorkbenchSubtext" />
+                            </LinearLayout>
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/switch_client_local_lan"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
