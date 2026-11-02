@@ -545,6 +545,23 @@ public class P2PExitNodeServer {
                 targetSocket.connect(new InetSocketAddress(targetHost, targetPort), timeout);
                 clientSocket.setSoTimeout(0);
                 targetSocket.setSoTimeout(0);
+
+                // Post-connect SSRF & DNS rebinding protection:
+                // Verify the actual resolved IP to prevent TOCTOU DNS rebinding attacks against local LAN
+                InetAddress connectedAddr = targetSocket.getInetAddress();
+                if (connectedAddr != null && (connectedAddr.isLoopbackAddress() || connectedAddr.isSiteLocalAddress() ||
+                        connectedAddr.isLinkLocalAddress() || connectedAddr.isAnyLocalAddress())) {
+                    boolean allowLocalServices = mContext != null &&
+                            PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false) &&
+                            PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean(GatewayPreferenceKeys.LOCAL_SERVICE_ACCESS, false);
+                    if (!allowLocalServices) {
+                        Log.w(TAG, "[P2P Remote: " + clientIp + "] BLOCKED post-connect private destination (Local Service Access disabled): " + connectedAddr);
+                        sendSocksReply(out, 0x02); // Connection not allowed by ruleset
+                        targetSocket.close();
+                        clientSocket.close();
+                        return;
+                    }
+                }
             } catch (Exception e) {
                 Log.w(TAG, "[P2P Remote: " + clientIp + "] Connect to target failed: " + targetHost + ":" + targetPort + " (" + e.getMessage() + ")");
                 sendSocksReply(out, 0x05); // Connection refused

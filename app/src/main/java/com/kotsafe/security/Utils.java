@@ -1577,13 +1577,14 @@ public class Utils {
         return 0;
     }
 
+    private static final java.security.SecureRandom SECURE_RANDOM = new java.security.SecureRandom();
+
     public static String genRandomString(int length) {
         String charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         StringBuilder sb = new StringBuilder(length);
-        Random rnd = new Random();
 
         for(int i = 0; i < length; i++)
-            sb.append(charset.charAt(rnd.nextInt(charset.length())));
+            sb.append(charset.charAt(SECURE_RANDOM.nextInt(charset.length())));
 
         return sb.toString();
     }
