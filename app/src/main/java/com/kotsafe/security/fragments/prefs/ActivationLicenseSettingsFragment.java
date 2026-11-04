@@ -67,11 +67,11 @@ public class ActivationLicenseSettingsFragment extends SettingsSubFragment {
                 try {
                     String deviceId = P2PLicenseManager.getInstance(requireContext()).getOrCreateDeviceId();
                     String deviceName = android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
-                    String target = "/profile.html#license?device_id=" + Uri.encode(deviceId) + "&device_name=" + Uri.encode(deviceName);
-                    String loginUrl = "https://kotsafe.com/login.html?redirect=" + Uri.encode(target);
+                    String target = "/profile#license?device_id=" + Uri.encode(deviceId) + "&device_name=" + Uri.encode(deviceName);
+                    String loginUrl = "https://kotsafe.com/login?redirect=" + Uri.encode(target);
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(loginUrl)));
                 } catch (Exception e) {
-                    Toast.makeText(getContext(), "Open https://kotsafe.com/login.html in your browser", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Open https://kotsafe.com/login in your browser", Toast.LENGTH_LONG).show();
                 }
                 return true;
             });
