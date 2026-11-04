@@ -119,21 +119,20 @@ public final class WifiThreatDetector {
                 boolean bssidChanged = !savedBssid.equalsIgnoreCase(bssid);
                 boolean capsWeakened = isWeakerSecurity(savedCaps, secCaps);
 
-                if (bssidChanged || capsWeakened) {
+                if (capsWeakened) {
                     String detail = "";
                     if (bssidChanged) detail += "BSSID changed: " + savedBssid + " → " + bssid + ". ";
                     if (capsWeakened) detail += "Security weakened: " + savedCaps + " → " + secCaps + ". ";
 
-                    Log.e(TAG, "EVIL TWIN DETECTED for SSID '" + ssid + "': " + detail);
+                    Log.w(TAG, "Wi-Fi security downgrade for SSID '" + ssid + "': " + detail);
 
                     SecurityEvent ev = new SecurityEvent.Builder(
                                 SecurityEvent.Domain.NETWORK, EventTypes.WIFI_EVIL_TWIN)
-                            .severity(SecurityEvent.Severity.CRITICAL)
-                            .title("⚠\uFE0F Evil Twin AP Detected: " + ssid)
+                            .severity(SecurityEvent.Severity.HIGH)
+                            .title("Wi-Fi security needs review: " + ssid)
                             .description(
-                                "The Wi-Fi network '" + ssid + "' appears to be an impersonation "
-                                + "by a rogue access point. " + detail
-                                + "Do NOT transmit sensitive data. Disconnect immediately.")
+                                "The Wi-Fi network '" + ssid + "' is now advertising weaker security. " + detail
+                                + "This does not confirm an attack. Verify the network before sending sensitive data.")
                             .attribute("ssid",       ssid)
                             .attribute("bssid_now",  bssid)
                             .attribute("bssid_prev", savedBssid)
@@ -143,7 +142,9 @@ public final class WifiThreatDetector {
 
                     SecurityEventBus.getInstance().publish(ev);
 
-                    // Update saved baseline to new observed state
+                    // Keep the stronger baseline; a suspicious observation is not trusted.
+                } else if (!"UNKNOWN".equals(secCaps) && !secCaps.isEmpty()) {
+                    // Roaming to another BSSID with unchanged security is normal.
                     prefs.edit()
                             .putString(PREF_PREFIX_BSSID + ssid, bssid)
                             .putString(PREF_PREFIX_CAPS  + ssid, secCaps)
@@ -217,7 +218,7 @@ public final class WifiThreatDetector {
             List<ScanResult> results = wm.getScanResults();
             if (results != null) {
                 for (ScanResult r : results) {
-                    if (bssid.equalsIgnoreCase(r.BSSID) || ssid.equalsIgnoreCase(r.SSID)) {
+                    if (bssid.equalsIgnoreCase(r.BSSID)) {
                         return r.capabilities != null ? r.capabilities.toUpperCase() : "UNKNOWN";
                     }
                 }
@@ -230,8 +231,9 @@ public final class WifiThreatDetector {
      * Returns true when the new security suite is weaker than the saved baseline
      * (e.g. was WPA2 and is now OPEN).
      */
-    private static boolean isWeakerSecurity(String saved, String current) {
-        if (saved == null || current == null) return false;
+    static boolean isWeakerSecurity(String saved, String current) {
+        if (saved == null || current == null || saved.isEmpty() || current.isEmpty()
+                || "UNKNOWN".equals(saved) || "UNKNOWN".equals(current)) return false;
         boolean savedHadEncryption = saved.contains("WPA") || saved.contains("SAE")
                 || saved.contains("WEP") || saved.contains("EAP");
         boolean currentHasEncryption = current.contains("WPA") || current.contains("SAE")

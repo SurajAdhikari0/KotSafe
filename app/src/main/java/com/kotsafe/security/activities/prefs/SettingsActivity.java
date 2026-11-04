@@ -120,6 +120,12 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
                         .replace(R.id.fragment, new com.kotsafe.security.fragments.prefs.P2PExitNodeSettings(), "p2p_exit_node_settings")
                         .commit();
                 setTitle(R.string.p2p_exit_node_title);
+            } else if ("activation_license_settings".equals(targetPref)) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment, new com.kotsafe.security.fragments.prefs.ActivationLicenseSettingsFragment(), "activation_license_settings")
+                        .commit();
+                setTitle("License & Fleets");
             } else if ("advanced_developer_settings".equals(targetPref)) {
                 if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(this)) {
                     com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(this, "Advanced & Developer Mode");

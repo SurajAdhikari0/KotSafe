@@ -14,13 +14,15 @@ package com.kotsafe.security.p2p;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
-import com.kotsafe.security.model.backend.BackendProviderFactory;
+import com.kotsafe.security.BuildConfig;
+import com.kotsafe.security.Utils;
 
 import org.json.JSONObject;
 
@@ -30,37 +32,45 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * P2PLicenseManager
- * 
- * Manages KotSafe Pro & Enterprise P2P activation keys, enforces freemium device
- * limits (Free = 1 device, Pro = up to 6 devices), and validates license signatures
- * against the cloud signaling relay.
+ *
+ * Manages authentic KotSafe Pro & Enterprise activation keys, enforces device
+ * seat limits (Free = 1 device, Pro = 5 devices, Enterprise = 25+ devices), and validates
+ * license signatures against kotsafe.com.
  */
 public final class P2PLicenseManager {
 
     private static final String TAG = "P2PLicenseManager";
-    public static final String DEFAULT_COMMUNITY_LICENSE = "KOT-PRO-CD33C6B9-FD8E";
+    public static final String PRODUCTION_LICENSE_URL = "https://kotsafe.com/api/v1/license";
 
     private static final String PREF_IS_PRO_ACTIVATED = "p2p_license_is_pro_activated";
     private static final String PREF_LICENSE_KEY = "p2p_license_active_key";
     private static final String PREF_LICENSE_TIER = "p2p_license_tier";
     private static final String PREF_LICENSE_EXPIRES = "p2p_license_expires_epoch";
     private static final String PREF_LICENSE_MAX_DEVICES = "p2p_license_max_devices";
+    private static final String PREF_LICENSE_ACTIVE_DEVICES = "p2p_license_active_devices";
+    private static final String PREF_LICENSE_TOKEN = "p2p_license_server_token";
+    private static final String PREF_LICENSE_LAST_VERIFIED = "p2p_license_last_verified_ts";
 
     public enum Tier {
         FREE,
         PRO,
-        ENTERPRISE
+        ENTERPRISE,
+        LIFETIME
     }
 
     public interface LicenseCallback {
         void onSuccess(Tier tier, int maxDevices, long expiresAt);
+        void onError(String errorMessage);
+    }
+
+    public interface DeactivateCallback {
+        void onSuccess();
         void onError(String errorMessage);
     }
 
@@ -83,46 +93,32 @@ public final class P2PLicenseManager {
     }
 
     /**
-     * Automatically provisions a KotSafe Pro community promotional license for all users.
-     * Unlocks up to 6 concurrent exit devices and full security engines.
-     * If the server later revokes or expires this key, the device automatically reverts to Freemium.
-     */
-    public void autoProvisionCommunityLicenseIfNeeded() {
-        if (!mPrefs.getBoolean(PREF_IS_PRO_ACTIVATED, false) || getActiveLicenseKey().isEmpty()) {
-            Log.i(TAG, "Auto-provisioning KotSafe Pro Community License: " + DEFAULT_COMMUNITY_LICENSE);
-            long oneYear = System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000);
-            mPrefs.edit()
-                    .putBoolean(PREF_IS_PRO_ACTIVATED, true)
-                    .putString(PREF_LICENSE_KEY, DEFAULT_COMMUNITY_LICENSE)
-                    .putString(PREF_LICENSE_TIER, Tier.PRO.name())
-                    .putLong(PREF_LICENSE_EXPIRES, oneYear)
-                    .putInt(PREF_LICENSE_MAX_DEVICES, 6)
-                    .putString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, "6")
-                    .apply();
-
-            // Background verification with server: if server revokes it, automatically downgrades
-            verifyWithServerInBackground(DEFAULT_COMMUNITY_LICENSE);
-        }
-    }
-
-    /**
-     * Checks whether the current device holds an active Pro or Enterprise license.
+     * Checks whether the current device holds an active verified Pro, Enterprise, or Lifetime license.
      */
     public boolean isProActivated() {
         if (!mPrefs.getBoolean(PREF_IS_PRO_ACTIVATED, false)) {
             return false;
         }
+        String key = getActiveLicenseKey();
+        if (key.isEmpty()) {
+            return false;
+        }
         long expiresAt = mPrefs.getLong(PREF_LICENSE_EXPIRES, 0);
         if (expiresAt > 0 && System.currentTimeMillis() > expiresAt) {
             Log.w(TAG, "KotSafe Pro license expired at: " + expiresAt);
-            mPrefs.edit().putBoolean(PREF_IS_PRO_ACTIVATED, false).apply();
+            revokeLicense();
+            return false;
+        }
+        String token = mPrefs.getString(PREF_LICENSE_TOKEN, "");
+        if (token.isEmpty()) {
+            // Unverified key without server token
             return false;
         }
         return true;
     }
 
     /**
-     * Returns the current license tier (FREE, PRO, ENTERPRISE).
+     * Returns the current license tier (FREE, PRO, ENTERPRISE, LIFETIME).
      */
     public Tier getLicenseTier() {
         if (!isProActivated()) {
@@ -139,28 +135,59 @@ public final class P2PLicenseManager {
     /**
      * Returns the maximum number of concurrent exit devices permitted:
      * Free Tier = 1 Device
-     * Pro Tier  = User-selected value from preferences (1 to 6)
+     * Pro Tier = 5 Devices (or server provisioned limit)
+     * Enterprise Tier = 25+ Devices
      */
     public int getMaxAllowedExitDevices() {
         if (!isProActivated()) {
             return 1; // Strict Freemium Enforcement
         }
-        try {
-            String selected = mPrefs.getString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, "6");
-            int val = Integer.parseInt(selected);
-            return Math.max(1, Math.min(6, val));
-        } catch (Exception e) {
-            return 6;
+        return mPrefs.getInt(PREF_LICENSE_MAX_DEVICES, 5);
+    }
+
+    /**
+     * Returns the count of registered active devices on this license.
+     */
+    public int getActiveDevicesCount() {
+        if (!isProActivated()) {
+            return 1;
         }
+        return mPrefs.getInt(PREF_LICENSE_ACTIVE_DEVICES, 1);
+    }
+
+    /**
+     * Returns license expiration timestamp (ms epoch). 0 means lifetime.
+     */
+    public long getLicenseExpiresAt() {
+        return mPrefs.getLong(PREF_LICENSE_EXPIRES, 0);
     }
 
     public String getActiveLicenseKey() {
         return mPrefs.getString(PREF_LICENSE_KEY, "");
     }
 
+    public String getOrCreateDeviceId() {
+        String id = mPrefs.getString(GatewayPreferenceKeys.DEVICE_ID, "");
+        if (id.isEmpty()) {
+            id = "dev_" + Utils.genRandomString(16);
+            mPrefs.edit().putString(GatewayPreferenceKeys.DEVICE_ID, id).apply();
+        }
+        return id;
+    }
+
+    private String getLicenseApiBaseUrl() {
+        String custom = mPrefs.getString("personal_gateway_custom_relay_url", "").trim();
+        if (!custom.isEmpty() && (custom.contains("localhost") || custom.contains("127.0.0.1") || custom.contains("10.0.2.2") || custom.contains("192.168."))) {
+            if (!custom.startsWith("http://") && !custom.startsWith("https://")) {
+                custom = "http://" + custom;
+            }
+            return custom + "/api/v1/license";
+        }
+        return PRODUCTION_LICENSE_URL;
+    }
+
     /**
-     * Activates a license key. Attempts online verification with server relay,
-     * with cryptographic offline validation fallback.
+     * Activates a license key with the official kotsafe.com licensing backend.
      */
     public void activateLicense(String rawKey, LicenseCallback callback) {
         if (rawKey == null || rawKey.trim().isEmpty()) {
@@ -170,174 +197,283 @@ public final class P2PLicenseManager {
 
         final String cleanKey = rawKey.trim().toUpperCase(Locale.US);
 
+        if (!cleanKey.startsWith("KOT-")) {
+            callback.onError("Invalid activation key format. KotSafe keys begin with KOT-");
+            return;
+        }
+
+        final String deviceId = getOrCreateDeviceId();
+        final String deviceName = Build.MANUFACTURER + " " + Build.MODEL;
+        final String osVersion = "Android " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")";
+        final String appVersion = BuildConfig.VERSION_NAME;
+
         mExecutor.execute(() -> {
+            HttpURLConnection conn = null;
             try {
-                // 1. Verify key structure format (KOT-PRO-XXXXX-XXXXX or KOT-ENT-XXXXX-XXXXX)
-                if (!cleanKey.startsWith("KOT-")) {
-                    postError(callback, "Invalid activation key format. Keys start with KOT-");
-                    return;
-                }
-
-                // 2. Online verification with relay server
-                String baseUrl = BackendProviderFactory.getEffectiveControlUrl(mContext);
-                String serverUrl = baseUrl + "/v1/license/verify";
-                boolean onlineSuccess = false;
-                Tier tier = cleanKey.contains("ENT") ? Tier.ENTERPRISE : Tier.PRO;
-                int maxDevices = 6;
-                long expiresAt = System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000); // 1 year default
-
-                try {
-                    URL url = new URL(serverUrl);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("POST");
-                    conn.setRequestProperty("Content-Type", "application/json");
-                    conn.setConnectTimeout(6000);
-                    conn.setReadTimeout(6000);
-                    conn.setDoOutput(true);
-
-                    JSONObject req = new JSONObject();
-                    req.put("licenseKey", cleanKey);
-                    req.put("deviceId", mPrefs.getString(GatewayPreferenceKeys.DEVICE_ID, "android-device"));
-
-                    try (OutputStream os = conn.getOutputStream()) {
-                        os.write(req.toString().getBytes(StandardCharsets.UTF_8));
-                    }
-
-                    int code = conn.getResponseCode();
-                    if (code == 403 || code == 401) {
-                        Log.w(TAG, "Server rejected/revoked license key: " + cleanKey);
-                        revokeLicense();
-                        postError(callback, "License has expired or was revoked by server.");
-                        return;
-                    } else if (code == 200) {
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                        StringBuilder sb = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
-                        }
-                        JSONObject resp = new JSONObject(sb.toString());
-                        if (resp.optBoolean("valid", false)) {
-                            onlineSuccess = true;
-                            String serverTier = resp.optString("tier", "PRO");
-                            tier = "ENTERPRISE".equalsIgnoreCase(serverTier) ? Tier.ENTERPRISE : Tier.PRO;
-                            maxDevices = resp.optInt("maxDevices", 6);
-                            expiresAt = resp.optLong("expiresAt", expiresAt);
-                        } else {
-                            Log.w(TAG, "Server returned valid=false for key: " + cleanKey);
-                            revokeLicense();
-                            postError(callback, "License key is invalid or revoked.");
-                            return;
-                        }
-                    }
-                } catch (Exception onlineEx) {
-                    Log.w(TAG, "Online license verification unreachable, falling back to cryptographic offline validation: " + onlineEx.getMessage());
-                }
-
-                // 3. Fallback: Cryptographic offline signature validation
-                if (!onlineSuccess) {
-                    if (validateOfflineKeyChecksum(cleanKey)) {
-                        onlineSuccess = true;
-                    } else {
-                        postError(callback, "Activation key verification failed. Please check the code or network connection.");
-                        return;
-                    }
-                }
-
-                // 4. Save validated entitlement
-                mPrefs.edit()
-                        .putBoolean(PREF_IS_PRO_ACTIVATED, true)
-                        .putString(PREF_LICENSE_KEY, cleanKey)
-                        .putString(PREF_LICENSE_TIER, tier.name())
-                        .putLong(PREF_LICENSE_EXPIRES, expiresAt)
-                        .putInt(PREF_LICENSE_MAX_DEVICES, maxDevices)
-                        .apply();
-
-                Log.i(TAG, "Successfully activated KotSafe " + tier + " license! Max devices: " + maxDevices);
-
-                final Tier finalTier = tier;
-                final int finalMaxDevices = maxDevices;
-                final long finalExpires = expiresAt;
-                mMainHandler.post(() -> callback.onSuccess(finalTier, finalMaxDevices, finalExpires));
-
-            } catch (Exception e) {
-                Log.e(TAG, "License activation error: " + e.getMessage(), e);
-                postError(callback, "Activation failed: " + e.getMessage());
-            }
-        });
-    }
-
-    /**
-     * Background verification with relay server. If the server revokes the promotional
-     * license or marks it expired, the local device is automatically downgraded to Freemium.
-     */
-    public void verifyWithServerInBackground(String key) {
-        if (key == null || key.isEmpty()) return;
-        mExecutor.execute(() -> {
-            try {
-                String baseUrl = BackendProviderFactory.getEffectiveControlUrl(mContext);
-                URL url = new URL(baseUrl + "/v1/license/verify");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                URL url = new URL(getLicenseApiBaseUrl() + "/activate");
+                conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
-                conn.setConnectTimeout(5000);
-                conn.setReadTimeout(5000);
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
                 conn.setDoOutput(true);
 
                 JSONObject req = new JSONObject();
-                req.put("licenseKey", key);
-                req.put("deviceId", mPrefs.getString(GatewayPreferenceKeys.DEVICE_ID, "android-device"));
+                req.put("license_key", cleanKey);
+                req.put("device_id", deviceId);
+                req.put("device_name", deviceName);
+                req.put("os_version", osVersion);
+                req.put("app_version", appVersion);
 
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(req.toString().getBytes(StandardCharsets.UTF_8));
                 }
 
                 int code = conn.getResponseCode();
-                if (code == 403 || code == 401) {
-                    Log.w(TAG, "Server revoked license (" + code + "). Reverting to Freemium.");
+                String responseBody = readStream(code >= 200 && code < 400 ? conn.getInputStream() : conn.getErrorStream());
+                JSONObject resp = new JSONObject(responseBody);
+
+                if (code == 200 && resp.optBoolean("success", false)) {
+                    String serverTier = resp.optString("tier", "PRO");
+                    Tier tier = parseTier(serverTier);
+                    int maxDevices = resp.optInt("max_devices", 5);
+                    int activeDevices = resp.optInt("active_devices", 1);
+                    long expiresAt = resp.optLong("expires_at", 0);
+                    String token = resp.optString("token", "");
+
+                    mPrefs.edit()
+                            .putBoolean(PREF_IS_PRO_ACTIVATED, true)
+                            .putString(PREF_LICENSE_KEY, cleanKey)
+                            .putString(PREF_LICENSE_TIER, tier.name())
+                            .putLong(PREF_LICENSE_EXPIRES, expiresAt)
+                            .putInt(PREF_LICENSE_MAX_DEVICES, maxDevices)
+                            .putInt(PREF_LICENSE_ACTIVE_DEVICES, activeDevices)
+                            .putString(PREF_LICENSE_TOKEN, token)
+                            .putLong(PREF_LICENSE_LAST_VERIFIED, System.currentTimeMillis())
+                            .putString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, String.valueOf(maxDevices))
+                            .apply();
+
+                    Log.i(TAG, "KotSafe " + tier + " license activated! Max devices: " + maxDevices);
+                    mMainHandler.post(() -> callback.onSuccess(tier, maxDevices, expiresAt));
+
+                } else if (code == 409) {
+                    // Seat limit reached
+                    String msg = resp.optString("message", "Seat limit reached for this license. Please deactivate an existing device first.");
+                    mMainHandler.post(() -> callback.onError(msg));
+
+                } else {
+                    String msg = resp.optString("message", "Activation failed (HTTP " + code + "). Please check your key.");
                     revokeLicense();
-                } else if (code == 200) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        sb.append(line);
-                    }
-                    JSONObject resp = new JSONObject(sb.toString());
-                    if (!resp.optBoolean("valid", false)) {
-                        Log.w(TAG, "Server returned valid=false. Reverting to Freemium.");
-                        revokeLicense();
-                    } else {
-                        Log.i(TAG, "Server verified promotional license: active");
-                    }
+                    mMainHandler.post(() -> callback.onError(msg));
                 }
+
             } catch (Exception e) {
-                Log.d(TAG, "Background server license check offline/skipped: " + e.getMessage());
+                Log.e(TAG, "License activation error: " + e.getMessage(), e);
+                mMainHandler.post(() -> callback.onError("Network error connecting to kotsafe.com: " + e.getMessage()));
+            } finally {
+                if (conn != null) conn.disconnect();
             }
         });
     }
 
     /**
-     * Offline signature checksum validation using SHA-256 HMAC digest
+     * Automatically activates this device using the active license linked to the user's KotSafe account.
      */
-    private boolean validateOfflineKeyChecksum(String key) {
-        String[] parts = key.split("-");
-        if (parts.length < 3) return false;
-        try {
-            String payload = parts[0] + "-" + parts[1] + "-" + parts[2];
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest((payload + "kotsafe-salt-2026").getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder();
-            for (int i = 0; i < 4; i++) {
-                hex.append(String.format("%02X", hash[i]));
+    public void activateFromAccount(String email, LicenseCallback callback) {
+        final String deviceId = getOrCreateDeviceId();
+        final String deviceName = Build.MANUFACTURER + " " + Build.MODEL;
+        final String osVersion = "Android " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")";
+        final String appVersion = BuildConfig.VERSION_NAME;
+
+        mExecutor.execute(() -> {
+            HttpURLConnection conn = null;
+            try {
+                URL url = new URL(getLicenseApiBaseUrl() + "/account-activate");
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(8000);
+                conn.setDoOutput(true);
+
+                JSONObject req = new JSONObject();
+                req.put("device_id", deviceId);
+                req.put("device_name", deviceName);
+                req.put("os_version", osVersion);
+                req.put("app_version", appVersion);
+                if (email != null && !email.trim().isEmpty()) {
+                    req.put("email", email.trim());
+                }
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(req.toString().getBytes(StandardCharsets.UTF_8));
+                }
+
+                int code = conn.getResponseCode();
+                String responseBody = readStream(code >= 200 && code < 400 ? conn.getInputStream() : conn.getErrorStream());
+                JSONObject resp = new JSONObject(responseBody);
+
+                if (code == 200 && resp.optBoolean("valid", false)) {
+                    String cleanKey = resp.optString("license_key", "");
+                    String serverTier = resp.optString("tier", "PRO");
+                    Tier tier = parseTier(serverTier);
+                    int maxDevices = resp.optInt("max_devices", 5);
+                    int activeDevices = resp.optInt("active_devices", 1);
+                    long expiresAt = resp.optLong("expires_at", 0);
+                    String token = resp.optString("token", "");
+
+                    mPrefs.edit()
+                            .putBoolean(PREF_IS_PRO_ACTIVATED, true)
+                            .putString(PREF_LICENSE_KEY, cleanKey)
+                            .putString(PREF_LICENSE_TIER, tier.name())
+                            .putLong(PREF_LICENSE_EXPIRES, expiresAt)
+                            .putInt(PREF_LICENSE_MAX_DEVICES, maxDevices)
+                            .putInt(PREF_LICENSE_ACTIVE_DEVICES, activeDevices)
+                            .putString(PREF_LICENSE_TOKEN, token)
+                            .putLong(PREF_LICENSE_LAST_VERIFIED, System.currentTimeMillis())
+                            .putString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, String.valueOf(maxDevices))
+                            .apply();
+
+                    mMainHandler.post(() -> {
+                        if (callback != null) callback.onSuccess(tier, maxDevices, expiresAt);
+                    });
+                } else {
+                    String msg = resp.optString("message", "Failed to activate license from account. Check subscription on kotsafe.com.");
+                    mMainHandler.post(() -> {
+                        if (callback != null) callback.onError(msg);
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Account activation error: " + e.getMessage(), e);
+                mMainHandler.post(() -> {
+                    if (callback != null) callback.onError("Network error connecting to licensing server: " + e.getMessage());
+                });
+            } finally {
+                if (conn != null) conn.disconnect();
             }
-            if (parts.length >= 4) {
-                return parts[3].equalsIgnoreCase(hex.toString().substring(0, Math.min(parts[3].length(), hex.length())));
-            }
-            return parts[2].length() >= 6;
-        } catch (Exception e) {
-            return false;
+        });
+    }
+
+    /**
+     * Heartbeat re-validation with kotsafe.com server.
+     */
+    public void verifyWithServer(LicenseCallback callback) {
+        final String key = getActiveLicenseKey();
+        if (key.isEmpty()) {
+            if (callback != null) callback.onError("No active license found on this device.");
+            return;
         }
+
+        final String deviceId = getOrCreateDeviceId();
+
+        mExecutor.execute(() -> {
+            HttpURLConnection conn = null;
+            try {
+                URL url = new URL(getLicenseApiBaseUrl() + "/verify");
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setConnectTimeout(6000);
+                conn.setReadTimeout(6000);
+                conn.setDoOutput(true);
+
+                JSONObject req = new JSONObject();
+                req.put("license_key", key);
+                req.put("device_id", deviceId);
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(req.toString().getBytes(StandardCharsets.UTF_8));
+                }
+
+                int code = conn.getResponseCode();
+                String responseBody = readStream(code >= 200 && code < 400 ? conn.getInputStream() : conn.getErrorStream());
+                JSONObject resp = new JSONObject(responseBody);
+
+                if (code == 200 && resp.optBoolean("valid", false)) {
+                    String serverTier = resp.optString("tier", "PRO");
+                    Tier tier = parseTier(serverTier);
+                    int maxDevices = resp.optInt("max_devices", 5);
+                    int activeDevices = resp.optInt("active_devices", 1);
+                    long expiresAt = resp.optLong("expires_at", 0);
+                    String token = resp.optString("token", "");
+
+                    mPrefs.edit()
+                            .putBoolean(PREF_IS_PRO_ACTIVATED, true)
+                            .putString(PREF_LICENSE_TIER, tier.name())
+                            .putLong(PREF_LICENSE_EXPIRES, expiresAt)
+                            .putInt(PREF_LICENSE_MAX_DEVICES, maxDevices)
+                            .putInt(PREF_LICENSE_ACTIVE_DEVICES, activeDevices)
+                            .putString(PREF_LICENSE_TOKEN, token)
+                            .putLong(PREF_LICENSE_LAST_VERIFIED, System.currentTimeMillis())
+                            .apply();
+
+                    if (callback != null) {
+                        mMainHandler.post(() -> callback.onSuccess(tier, maxDevices, expiresAt));
+                    }
+                } else {
+                    revokeLicense();
+                    if (callback != null) {
+                        String msg = resp.optString("message", "License verification failed. Reverted to Freemium.");
+                        mMainHandler.post(() -> callback.onError(msg));
+                    }
+                }
+
+            } catch (Exception e) {
+                Log.w(TAG, "License revalidation offline: " + e.getMessage());
+                if (callback != null) {
+                    mMainHandler.post(() -> callback.onError("Offline check: could not reach kotsafe.com (" + e.getMessage() + ")"));
+                }
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
+        });
+    }
+
+    /**
+     * Deactivates the license seat on kotsafe.com and returns the device to Freemium.
+     */
+    public void deactivateLicense(DeactivateCallback callback) {
+        final String key = getActiveLicenseKey();
+        final String deviceId = getOrCreateDeviceId();
+
+        mExecutor.execute(() -> {
+            HttpURLConnection conn = null;
+            try {
+                if (!key.isEmpty()) {
+                    URL url = new URL(getLicenseApiBaseUrl() + "/deactivate");
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json");
+                    conn.setRequestProperty("Accept", "application/json");
+                    conn.setConnectTimeout(6000);
+                    conn.setReadTimeout(6000);
+                    conn.setDoOutput(true);
+
+                    JSONObject req = new JSONObject();
+                    req.put("license_key", key);
+                    req.put("device_id", deviceId);
+
+                    try (OutputStream os = conn.getOutputStream()) {
+                        os.write(req.toString().getBytes(StandardCharsets.UTF_8));
+                    }
+
+                    conn.getResponseCode(); // Execute request
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "Server deactivation notice failed: " + e.getMessage());
+            } finally {
+                if (conn != null) conn.disconnect();
+            }
+
+            // Always revoke locally
+            revokeLicense();
+            if (callback != null) {
+                mMainHandler.post(callback::onSuccess);
+            }
+        });
     }
 
     public void revokeLicense() {
@@ -346,12 +482,35 @@ public final class P2PLicenseManager {
                 .remove(PREF_LICENSE_KEY)
                 .remove(PREF_LICENSE_TIER)
                 .remove(PREF_LICENSE_EXPIRES)
+                .remove(PREF_LICENSE_MAX_DEVICES)
+                .remove(PREF_LICENSE_ACTIVE_DEVICES)
+                .remove(PREF_LICENSE_TOKEN)
+                .remove(PREF_LICENSE_LAST_VERIFIED)
                 .putString(GatewayPreferenceKeys.EXIT_MAX_DEVICES, "1")
                 .apply();
-        Log.i(TAG, "KotSafe Pro license revoked. Restored to Free tier.");
+        Log.i(TAG, "KotSafe Pro license cleared. Restored to Freemium.");
     }
 
-    private void postError(LicenseCallback callback, String msg) {
-        mMainHandler.post(() -> callback.onError(msg));
+    private static Tier parseTier(String tierStr) {
+        if (tierStr == null) return Tier.PRO;
+        try {
+            return Tier.valueOf(tierStr.toUpperCase(Locale.US));
+        } catch (Exception e) {
+            return Tier.PRO;
+        }
+    }
+
+    private static String readStream(java.io.InputStream stream) {
+        if (stream == null) return "{}";
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return "{}";
+        }
     }
 }

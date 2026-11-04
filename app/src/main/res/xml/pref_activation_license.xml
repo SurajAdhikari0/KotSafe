@@ -42,6 +42,20 @@
         app:iconSpaceReserved="true">
 
         <Preference
+            android:key="pref_license_buy_pro"
+            app:title="Get KotSafe Pro / Upgrade"
+            app:summary="Explore plans, multi-device seats and pricing on kotsafe.com"
+            app:icon="@drawable/ic_shopping_cart"
+            app:iconSpaceReserved="true" />
+
+        <Preference
+            android:key="pref_license_sync_account"
+            app:title="Sync License from Account"
+            app:summary="1-tap activate this phone using your kotsafe.com web account"
+            app:icon="@drawable/ic_refresh"
+            app:iconSpaceReserved="true" />
+
+        <Preference
             android:key="pref_license_activate_key"
             app:title="Activate License Key"
             app:summary="Enter your KOT-PRO or KOT-ENT activation key to unlock Pro features"
@@ -51,7 +65,7 @@
         <Preference
             android:key="pref_license_revalidate"
             app:title="Re-validate License"
-            app:summary="Verify license integrity and synchronize seat entitlement with relay server"
+            app:summary="Verify license integrity and synchronize seat entitlement with kotsafe.com"
             app:icon="@drawable/ic_refresh"
             app:iconSpaceReserved="true" />
 

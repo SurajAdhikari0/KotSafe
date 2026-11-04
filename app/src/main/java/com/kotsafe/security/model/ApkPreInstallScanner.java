@@ -446,9 +446,9 @@ public class ApkPreInstallScanner {
             }
             if (dexResult.hasPackerStub) {
                 String desc = (dexResult.detectedPackerName != null && !dexResult.detectedPackerName.isEmpty())
-                        ? "Packed with " + dexResult.detectedPackerName + " — evading static analysis"
-                        : "DEX structure matches known packer signatures — evading static analysis";
-                addEvidence(report, "Packer / Obfuscation Detected", desc, AntivirusEvidenceItem.SEVERITY_MALICIOUS);
+                        ? "Packed with " + dexResult.detectedPackerName + " — limits static analysis; also used by legitimate apps"
+                        : "DEX structure matches known packer signatures — limits static analysis; also used by legitimate apps";
+                addEvidence(report, "Packer / Obfuscation Detected", desc, AntivirusEvidenceItem.SEVERITY_SUSPICIOUS);
             }
 
             // ── Phase 3b: On-Device ML Malware Classifier & Semantic Explainer ──
@@ -471,7 +471,7 @@ public class ApkPreInstallScanner {
                         }
                     }
 
-                    String severity = mlRes.isMalicious ? AntivirusEvidenceItem.SEVERITY_MALICIOUS : AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
+                    String severity = AntivirusEvidenceItem.SEVERITY_SUSPICIOUS; // Static ML is review evidence only.
                     String evidenceTitle = "AI Threat Classification: " + mlRes.threatCategory;
                     String evidenceDetail = expReport.headline + " (ML Risk: " + mlRes.threatScore + "/100). "
                             + (mlRes.contributingFeatures.isEmpty() ? "" : "Identified: " + String.join(", ", mlRes.contributingFeatures));
@@ -611,7 +611,12 @@ public class ApkPreInstallScanner {
             // ── Phase 5: Compute final risk score & verdict ───────────────────
             notifyPhase(listener, "Computing verdict & MITRE alignment…", 90);
             boolean tiVerifiedClean = report.tiQueried && !report.tiMalicious && !report.tiSuspicious && report.tiRiskScore == 0;
-            report.verdict   = scoreToVerdict(report.riskScore, report.tiMalicious, report.hasYaraMalicious, report.updateSafetyVerdict, tiVerifiedClean);
+            report.riskScore = Math.max(report.riskScore, computeFinalRiskScore(report));
+            // Preserve explicit hash/package policy blocks and update-signature failures.
+            if (!VERDICT_THREAT.equals(report.verdict)) {
+                report.verdict = scoreToVerdict(report.riskScore, report.tiMalicious,
+                        report.hasYaraMalicious, report.updateSafetyVerdict, tiVerifiedClean);
+            }
 
             // ── Phase 6: Persist hash to FileHashDbHelper ─────────────────────
             if (!report.sha256.isEmpty()) {
@@ -747,8 +752,8 @@ public class ApkPreInstallScanner {
         if (r.hasDynamicLoading && (r.hasPackerStub || r.permissionRiskScore >= 35 || r.hasDangerousExec)) {
             score = Math.max(score, 75);
             addEvidence(r, "Suspicious Dynamic Dropper Profile",
-                    "App combines dynamic Dalvik class loading with high-risk permissions or packed stubs (T1027.002 / T1407)",
-                    AntivirusEvidenceItem.SEVERITY_MALICIOUS);
+                    "App combines dynamic code loading with sensitive permissions or packing; review its source and purpose.",
+                    AntivirusEvidenceItem.SEVERITY_SUSPICIOUS);
             if (!r.mitreTechniques.contains("T1027.002 - Software Packing / Dynamic Dropper")) {
                 r.mitreTechniques.add("T1027.002 - Software Packing / Dynamic Dropper");
             }
@@ -766,11 +771,11 @@ public class ApkPreInstallScanner {
         return Math.min(score, 100);
     }
 
-    private static String scoreToVerdict(int score, boolean tiConfirmedMalicious, boolean hasYaraMalicious, String updateVerdict, boolean tiVerifiedClean) {
+    static String scoreToVerdict(int score, boolean tiConfirmedMalicious, boolean hasYaraMalicious, String updateVerdict, boolean tiVerifiedClean) {
         if ("SIGNATURE_MISMATCH".equals(updateVerdict)) return VERDICT_THREAT;
         if (tiConfirmedMalicious || hasYaraMalicious) return VERDICT_THREAT;
-        // Clean Threat Intelligence prevents heuristics alone from declaring THREAT (caps at SUSPICIOUS)
-        if (score >= 70 && !tiVerifiedClean) return VERDICT_THREAT;
+        // Even a high combined heuristic score needs independent malware evidence.
+        // An unknown hash is not a positive detection.
         if (score >= 30)                         return VERDICT_SUSPICIOUS;
         return VERDICT_CLEAN;
     }

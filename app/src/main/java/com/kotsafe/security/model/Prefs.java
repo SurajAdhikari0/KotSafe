@@ -121,6 +121,7 @@ public class Prefs {
     public static final String PREF_DNS_SERVER_V6 = "dns_v6";
     public static final String PREF_USE_SYSTEM_DNS = "system_dns";
     public static final String PREF_PCAPNG_ENABLED = "pcapng_format";
+    public static final String PREF_ALWAYS_ON_VPN = "always_on_vpn";
     public static final String PREF_RESTART_ON_DISCONNECT = "restart_on_disconnect";
     public static final String PREF_IGNORED_MITM_VERSION = "ignored_mitm_version";
     public static final String PREF_API_KEY = "api_key";
@@ -350,6 +351,19 @@ public class Prefs {
     }
     public static boolean startAtBoot(SharedPreferences p)        { return(p.getBoolean(PREF_START_AT_BOOT, true)); }
     public static boolean restartOnDisconnect(SharedPreferences p)        { return(p.getBoolean(PREF_RESTART_ON_DISCONNECT, false)); }
+    public static boolean isAlwaysOnVpn(Context ctx, SharedPreferences p) {
+        if (CaptureService.isAlwaysOnVPN()) return true;
+        try {
+            if (ctx != null) {
+                String alwaysOnApp = android.provider.Settings.Secure.getString(ctx.getContentResolver(), "always_on_vpn_app");
+                if (ctx.getPackageName().equals(alwaysOnApp)) return true;
+            }
+        } catch (Exception ignored) {}
+        return p.getBoolean(PREF_ALWAYS_ON_VPN, false);
+    }
+    public static void setAlwaysOnVpn(SharedPreferences p, boolean enabled) {
+        p.edit().putBoolean(PREF_ALWAYS_ON_VPN, enabled).apply();
+    }
     public static boolean isTLSDecryptionSetupDone(SharedPreferences p)     { return(p.getBoolean(PREF_TLS_DECRYPTION_SETUP_DONE, false)); }
     public static boolean getFullPayloadMode(SharedPreferences p) { return(p.getBoolean(PREF_FULL_PAYLOAD, false)); }
     public static boolean isHideSystemTraffic(SharedPreferences p) { return(p.getBoolean(PREF_HIDE_SYSTEM_TRAFFIC, false)); }

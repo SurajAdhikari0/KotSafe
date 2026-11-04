@@ -27,7 +27,8 @@ import com.kotsafe.security.activities.SecurityActionsActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ public class SecurityNotificationHub {
     public static final String CHAN_STATUS = "kot_chan_status";
     public static final String CHAN_THREATS = "kot_chan_threats";
     public static final String CHAN_REPORTS = "kot_chan_reports";
+    public static final String CHAN_REVIEW = "kot_chan_review";
 
     // Fixed Notification IDs (Guarantees no ID proliferation or notification spam)
     public static final int NOTIF_ID_ONGOING_SENTINEL = 4001;
@@ -67,7 +69,12 @@ public class SecurityNotificationHub {
 
     // Aggregated Threat State
     private final List<ThreatAlertItem> mActiveThreatAlerts = Collections.synchronizedList(new ArrayList<>());
-    private final Map<String, Long> mLastAlertTimestamps = new HashMap<>();
+    private final Map<String, Long> mLastAlertTimestamps = new LinkedHashMap<String, Long>() {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Long> eldest) {
+            return size() > 256;
+        }
+    };
+    private static final int MAX_ACTIVE_ALERTS = 100;
 
     public static class ThreatAlertItem {
         public String title;
@@ -125,6 +132,13 @@ public class SecurityNotificationHub {
             threatsChan.enableVibration(true);
             threatsChan.setShowBadge(true);
             mNotificationManager.createNotificationChannel(threatsChan);
+
+            NotificationChannel reviewChan = new NotificationChannel(
+                    CHAN_REVIEW, "Suspicious activity for review", NotificationManager.IMPORTANCE_LOW);
+            reviewChan.setDescription("Unconfirmed findings; review without an urgent interruption.");
+            reviewChan.setSound(null, null);
+            reviewChan.enableVibration(false);
+            mNotificationManager.createNotificationChannel(reviewChan);
 
             // 3. Scan & Security Reports Channel (Default: silent/standard, summary digest)
             NotificationChannel reportsChan = new NotificationChannel(
@@ -210,35 +224,62 @@ public class SecurityNotificationHub {
     @android.annotation.SuppressLint("MissingPermission")
     public synchronized void postThreatAlert(String title, String target, String category, String severity) {
         if (!canPostNotification()) return;
-        // Cooldown & Deduplication check
         long now = SystemClock.elapsedRealtime();
-        String dedupeKey = (category != null ? category : "") + "|" + (target != null ? target : "");
-        Long lastTime = mLastAlertTimestamps.get(dedupeKey);
-        if (lastTime != null && (now - lastTime) < COOLDOWN_WINDOW_MS) {
-            Log.d(TAG, "Throttling duplicate threat alert within cooldown window: " + dedupeKey);
-            return;
+        boolean malicious = "MALICIOUS".equals(severity);
+        for (ThreatAlertItem existing : mActiveThreatAlerts) {
+            if (Objects.equals(existing.target, target) && Objects.equals(existing.threatCategory, category)) {
+                // Repeated observations update one active incident, even after the cooldown.
+                // A stronger verdict must not be hidden by that cooldown.
+                boolean escalated = malicious && !"MALICIOUS".equals(existing.severity);
+                existing.timestamp = System.currentTimeMillis();
+                if (escalated) {
+                    existing.severity = severity;
+                    existing.title = title;
+                    // Keep the escalated finding visible in the latest inbox lines.
+                    mActiveThreatAlerts.remove(existing);
+                    mActiveThreatAlerts.add(existing);
+                    publishAggregatedThreatCard(true);
+                }
+                return;
+            }
         }
+        String dedupeKey = (category != null ? category : "") + "|"
+                + (target != null ? target : "") + "|" + severity;
+        Long lastTime = mLastAlertTimestamps.get(dedupeKey);
+        if (lastTime != null && now - lastTime < COOLDOWN_WINDOW_MS) return;
         mLastAlertTimestamps.put(dedupeKey, now);
-
-        // Add to active alerts list
+        if (mActiveThreatAlerts.size() >= MAX_ACTIVE_ALERTS) {
+            // Do not let routine suspicious observations evict unresolved malicious findings.
+            int removable = -1;
+            for (int i = 0; i < mActiveThreatAlerts.size(); i++) {
+                if (!"MALICIOUS".equals(mActiveThreatAlerts.get(i).severity)) { removable = i; break; }
+            }
+            if (removable < 0 && !malicious) return;
+            mActiveThreatAlerts.remove(removable >= 0 ? removable : 0);
+        }
         mActiveThreatAlerts.add(new ThreatAlertItem(title, target, category, severity));
-
-        publishAggregatedThreatCard();
+        publishAggregatedThreatCard(malicious);
     }
 
     /**
      * Publishes the consolidated InboxStyle threat summary card.
      */
     public synchronized void publishAggregatedThreatCard() {
+        publishAggregatedThreatCard(false);
+    }
+
+    private synchronized void publishAggregatedThreatCard(boolean interrupt) {
         if (mActiveThreatAlerts.isEmpty()) {
             mNotificationManagerCompat.cancel(NOTIF_ID_THREAT_SUMMARY);
             return;
         }
 
         int count = mActiveThreatAlerts.size();
-        String cardTitle = (count == 1)
-                ? "⚠️ Security Threat Detected"
-                : "⚠️ " + count + " Security Threats Detected";
+        boolean hasMalicious = false;
+        for (ThreatAlertItem item : mActiveThreatAlerts) {
+            if ("MALICIOUS".equals(item.severity)) { hasMalicious = true; break; }
+        }
+        String cardTitle = hasMalicious ? "Security threats need attention" : "Suspicious activity to review";
 
         Intent viewThreatsIntent = new Intent(mContext, AntivirusScanActivity.class);
         viewThreatsIntent.putExtra("focus_threats", true);
@@ -250,7 +291,7 @@ public class SecurityNotificationHub {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(cardTitle);
-        inboxStyle.setSummaryText(count + " active threat" + (count > 1 ? "s" : ""));
+        inboxStyle.setSummaryText(count + " security finding" + (count > 1 ? "s" : ""));
 
         // Show most recent threats in the inbox list
         int startIdx = Math.max(0, count - MAX_INBOX_LINES);
@@ -263,22 +304,23 @@ public class SecurityNotificationHub {
         ThreatAlertItem latest = mActiveThreatAlerts.get(count - 1);
         String previewText = (count == 1)
                 ? latest.title + " in " + latest.target
-                : latest.title + " and " + (count - 1) + " other threats detected.";
+                : latest.title + " and " + (count - 1) + " other findings to review.";
 
-        NotificationCompat.Builder b = new NotificationCompat.Builder(mContext, CHAN_THREATS)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(mContext, hasMalicious ? CHAN_THREATS : CHAN_REVIEW)
                 .setSmallIcon(R.drawable.ic_exclamation_triangle_solid)
                 .setContentTitle(cardTitle)
                 .setContentText(previewText)
                 .setStyle(inboxStyle)
                 .setContentIntent(viewPi)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setPriority(interrupt ? NotificationCompat.PRIORITY_HIGH : NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
                 .setColor(ContextCompat.getColor(mContext, R.color.statusError))
                 .setGroup(NOTIF_GROUP_THREATS)
                 .setGroupSummary(true)
-                .setOnlyAlertOnce(true)
+                .setOnlyAlertOnce(!interrupt)
+                .setSilent(!interrupt)
                 .setAutoCancel(true)
-                .addAction(R.drawable.ic_search, "Review Threats", viewPi)
+                .addAction(R.drawable.ic_search, "Review Findings", viewPi)
                 .addAction(R.drawable.ic_close, "Dismiss", dismissPi);
 
         try {
@@ -500,6 +542,9 @@ public class SecurityNotificationHub {
         Intent openReport = new Intent(mContext, AntivirusScanActivity.class);
         PendingIntent pi = PendingIntent.getActivity(mContext, 201, openReport, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
+        if (result.threatsDetected > 0 || result.suspiciousDetected > 0) {
+            mNotificationManagerCompat.cancel(NOTIF_ID_SCAN_REPORT);
+        }
         if (result.threatsDetected > 0) {
             // Threats detected -> publish aggregated high-priority threat card
             postThreatAlert(
@@ -508,9 +553,11 @@ public class SecurityNotificationHub {
                     "Scan Verdict",
                     "MALICIOUS"
             );
+        } else if (result.suspiciousDetected > 0) {
+            postThreatAlert("Scan found suspicious activity", "Latest device scan", "Scan Review", "SUSPICIOUS");
         } else {
-            // Clean scan -> gentle completion card on reports channel
-            String title = "🛡️ Device Scan Complete: Secure";
+            // No findings within the scanned scope is not a guarantee that the device is secure.
+            String title = "Device scan complete: no threats found";
             String summary = String.format(java.util.Locale.US,
                     "Security Score: %d/100 • %d apps, %d files scanned (0 threats)",
                     result.securityScore, result.totalPackagesScanned, result.totalStorageScanned);
@@ -518,6 +565,7 @@ public class SecurityNotificationHub {
             NotificationCompat.Builder b = new NotificationCompat.Builder(mContext, CHAN_REPORTS)
                     .setSmallIcon(R.drawable.ic_check_solid)
                     .setContentTitle(title)
+                    .setSilent(true)
                     .setContentText(summary)
                     .setContentIntent(pi)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

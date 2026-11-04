@@ -613,7 +613,60 @@ public class MainActivity extends BaseActivity {
             } catch (Exception e) {
                 Log.w(TAG, "Failed to parse gateway URI: " + e.getMessage());
             }
+        } else if ("kotsafe".equals(uri.getScheme()) && "license".equals(uri.getHost())) {
+            intent.setData(null);
+            String licenseKey = uri.getQueryParameter("key");
+            if (licenseKey != null && !licenseKey.trim().isEmpty()) {
+                handleLicenseDeepLinkActivation(licenseKey.trim());
+            }
         }
+    }
+
+    private void handleLicenseDeepLinkActivation(String rawKey) {
+        final String cleanKey = rawKey.trim().toUpperCase(java.util.Locale.US);
+
+        final androidx.appcompat.app.AlertDialog progressDialog = new AlertDialog.Builder(this)
+                .setTitle("Activating KotSafe Pro")
+                .setMessage("Verifying license key with kotsafe.com licensing engine…")
+                .setCancelable(false)
+                .show();
+
+        com.kotsafe.security.p2p.P2PLicenseManager.getInstance(this).activateLicense(cleanKey, new com.kotsafe.security.p2p.P2PLicenseManager.LicenseCallback() {
+            @Override
+            public void onSuccess(com.kotsafe.security.p2p.P2PLicenseManager.Tier tier, int maxDevices, long expiresAt) {
+                if (isFinishing() || isDestroyed()) return;
+                progressDialog.dismiss();
+
+                String masked = cleanKey.length() > 8 ? cleanKey.substring(0, 8) + "••••••••" : cleanKey;
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("🎉 KotSafe " + tier.name() + " Activated!")
+                        .setMessage("Your license (" + masked + ") has been successfully activated on this device!\n\n• Tier: " + tier.name() + "\n• Max Exit Devices: " + maxDevices + "\n• High-Speed Mesh & Advanced AI Engines: Active")
+                        .setPositiveButton("Manage License", (d, w) -> {
+                            Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                            settingsIntent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "activation_license_settings");
+                            startActivity(settingsIntent);
+                        })
+                        .setNegativeButton("Done", null)
+                        .show();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                if (isFinishing() || isDestroyed()) return;
+                progressDialog.dismiss();
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("License Activation Failed")
+                        .setMessage(errorMessage)
+                        .setPositiveButton("View Plans", (d, w) -> {
+                            Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                            settingsIntent.putExtra(SettingsActivity.TARGET_PREF_EXTRA, "activation_license_settings");
+                            startActivity(settingsIntent);
+                        })
+                        .setNegativeButton("Dismiss", null)
+                        .show();
+            }
+        });
     }
 
     private void setupToolbar() {

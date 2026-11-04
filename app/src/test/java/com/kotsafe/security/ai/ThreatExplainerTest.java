@@ -62,10 +62,11 @@ public class ThreatExplainerTest {
                 ThreatContextBuilder.buildReport("FlashUpdate", "com.fake.flash", mlResult, mlResult.contributingFeatures);
 
         assertNotNull(report);
-        assertTrue(report.headline.contains("Banking Trojan"));
+        assertTrue(report.headline.contains("review recommended"));
         assertEquals(88, report.riskScore);
-        assertTrue(report.plainEnglishRisk.contains("banking"));
-        assertTrue(report.actionPlan.contains("Uninstall this application immediately"));
+        assertTrue(report.plainEnglishRisk.contains("not a confirmed malware detection"));
+        assertFalse(report.actionPlan.contains("Uninstall this application immediately"));
+        assertTrue(report.actionPlan.contains("Verify the app"));
         assertNotNull(report.conversationalPrompt);
         assertTrue(report.conversationalPrompt.contains("com.fake.flash"));
 

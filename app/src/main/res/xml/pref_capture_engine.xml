@@ -31,7 +31,6 @@
             app:title="@string/capture_interface"
             app:icon="@drawable/ic_pref_interface"
             app:iconSpaceReserved="true"
-            app:useSimpleSummaryProvider="true"
             app:defaultValue="\@inet" />
 
         <DropDownPreference
@@ -66,6 +65,14 @@
             app:summary="@string/vpn_exemptions_summary"
             app:icon="@drawable/ic_pref_vpn_exempt"
             app:iconSpaceReserved="true" />
+
+        <SwitchPreference
+            app:key="always_on_vpn"
+            android:title="@string/always_on_vpn"
+            app:icon="@drawable/ic_pref_always_on_vpn"
+            app:iconSpaceReserved="true"
+            app:summary="@string/always_on_vpn_summary_disabled"
+            android:defaultValue="false" />
 
         <SwitchPreference
             app:key="start_at_boot"

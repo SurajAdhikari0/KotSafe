@@ -290,25 +290,16 @@ public class CaptureService extends VpnService implements Runnable {
                     String details = alert.getDetails();
                     if (details == null || details.trim().isEmpty()) return kotlin.Unit.INSTANCE;
 
-                    // Do not treat formatted debug logs or truncated entries as domain IOCs
-                    if (details.contains("...") || details.toLowerCase().startsWith("dns tunneling")) {
-                        Log.d(CaptureService.TAG, "KotEngine Anomaly: " + details);
-                        return kotlin.Unit.INSTANCE;
+                    // Native port/entropy observations are heuristics, not actionable IOCs.
+                    // A DNS policy block (type 3) is already enforced and needs no new alert.
+                    Log.d(CaptureService.TAG, "KotEngine observation: " + details);
+                    if (alert.getType() == 1 || alert.getType() == 2) {
+                        com.kotsafe.security.model.SecurityNotificationHub.getInstance(CaptureService.this)
+                                .postThreatAlert("Network activity needs review", "UID " + alert.getUid(),
+                                        "NATIVE_HEURISTIC_" + alert.getType(), "SUSPICIOUS");
                     }
+                    // A port number alone (type 4) stays in logs; never auto-block it.
 
-                    com.kotsafe.security.ai.AutonomousSocAnalyst.ThreatIncident incident =
-                            new com.kotsafe.security.ai.AutonomousSocAnalyst.ThreatIncident(
-                                    details,
-                                    "FLOW",
-                                    "NATIVE_THREAT",
-                                    "KotEngine Native Anomaly Alert",
-                                    details,
-                                    "UID " + alert.getUid(),
-                                    85,
-                                    "T1071"
-                            );
-                    com.kotsafe.security.ai.AutonomousSocAnalyst.getInstance(CaptureService.this)
-                            .triageAndRemediate(incident, null);
                 }
                 return kotlin.Unit.INSTANCE;
             });
@@ -487,7 +478,19 @@ public class CaptureService extends VpnService implements Runnable {
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ConnectivityManager cm = (ConnectivityManager) getSystemService(Service.CONNECTIVITY_SERVICE);
-            Network net = cm.getActiveNetwork();
+            Network net = cm != null ? cm.getActiveNetwork() : null;
+            if (cm != null && mSettings.capture_interface != null
+                    && !"@inet".equals(mSettings.capture_interface)
+                    && !"any".equals(mSettings.capture_interface)) {
+                for (Network n : cm.getAllNetworks()) {
+                    LinkProperties lp = cm.getLinkProperties(n);
+                    if (lp != null && mSettings.capture_interface.equals(lp.getInterfaceName())) {
+                        net = n;
+                        Log.i(TAG, "Binding capture underlying network to specific interface: " + mSettings.capture_interface);
+                        break;
+                    }
+                }
+            }
             mUnderlyingNetwork = net;
 
             if(net != null) {

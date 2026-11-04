@@ -195,7 +195,7 @@ public class AntivirusScanEngine {
         // Third-Party Allowlist & False Positive Metrics (Q8)
         public int thirdPartyAllowlistedCount = 0;
         public int thirdPartyFalsePositivesPrevented = 0;
-        public double thirdPartyFalsePositiveRate = 0.0;
+        public double thirdPartyFalsePositiveRate = Double.NaN; // Requires labeled evaluation data.
 
         // Endpoint & Device Security Metrics (EDR v2)
         public DeviceSecurityEngine.DevicePosture devicePosture;
@@ -614,19 +614,18 @@ public class AntivirusScanEngine {
                                         MlMalwareClassifier.getInstance().classify(dexRes.featureVector);
                                 if (mlRes.isMalicious || mlRes.isSuspicious) {
                                     result.behavioralAnomaliesCount++;
-                                    if (mlRes.isMalicious) {
-                                        entry.threatStatus = FileHashEntry.THREAT_MALICIOUS;
-                                    } else if (!entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
+                                    // Static capabilities alone do not confirm malware.
+                                    if (!entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
                                         entry.threatStatus = FileHashEntry.THREAT_SUSPICIOUS;
+                                        entry.threatDetails = "[Heuristic risk " + mlRes.threatScore + "/100] "
+                                                + String.join(" | ", mlRes.contributingFeatures);
                                     }
-                                    entry.threatDetails = "[AI ML: " + mlRes.threatCategory + " (" + mlRes.threatScore + "%)] "
-                                            + String.join(" | ", mlRes.contributingFeatures);
                                     hashDb.enqueueVtLookup(sha256, apkFile.getAbsolutePath());
 
                                     // Build Phase 2 Threat Explanation Report & MITRE ATT&CK Matrix
                                     ThreatContextBuilder.ThreatExplanationReport expReport =
                                             ThreatContextBuilder.buildReport(appLabel, pkgInfo.packageName, mlRes, dexRes.detectedFeatures);
-                                    assessment.reasons.add("AI Detection: " + expReport.headline + " (" + expReport.riskScore + "% risk)");
+                                    assessment.reasons.add("AI Detection: " + expReport.headline + " (" + expReport.riskScore + "/100 heuristic risk)");
 
                                     AntivirusEvidenceItem aiItem = new AntivirusEvidenceItem();
                                     aiItem.type = AntivirusEvidenceItem.TYPE_APP_HASH;
@@ -634,27 +633,23 @@ public class AntivirusScanEngine {
                                     aiItem.sha256 = sha256 != null ? sha256 : "";
                                     aiItem.filePath = apkFile.getAbsolutePath();
                                     aiItem.fileSizeFormatted = Utils.formatBytes(apkFile.length());
-                                    aiItem.title = "AI Threat Detection: " + mlRes.threatCategory;
+                                    aiItem.title = "Suspicious app capabilities";
                                     aiItem.subtitle = appLabel + " (" + pkgInfo.packageName + ")";
                                     aiItem.packageName = pkgInfo.packageName;
                                     aiItem.isSystemApp = false;
                                     aiItem.threatCategory = mlRes.threatCategory;
-                                    aiItem.malwareFamily = mlRes.threatCategory;
-                                    aiItem.verdict = mlRes.isMalicious ? AppTrustEvaluator.VERDICT_MALICIOUS : AppTrustEvaluator.VERDICT_SUSPICIOUS;
-                                    aiItem.confidence = mlRes.threatScore >= 75 ? "HIGH" : "MEDIUM";
+                                    aiItem.malwareFamily = ""; // No family signature was established.
+                                    aiItem.verdict = AppTrustEvaluator.VERDICT_SUSPICIOUS;
+                                    aiItem.confidence = "MEDIUM";
                                     aiItem.mlRiskScore = mlRes.threatScore;
                                     aiItem.aiExplanation = expReport.plainEnglishRisk;
                                     aiItem.aiActionPlan = expReport.actionPlan;
                                     aiItem.aiConversationalPrompt = expReport.conversationalPrompt;
                                     aiItem.mitreTechniques.addAll(expReport.mitreTechniqueLabels);
                                     aiItem.forensicReasons.addAll(mlRes.contributingFeatures);
-                                    aiItem.severity = mlRes.isMalicious ? AntivirusEvidenceItem.SEVERITY_MALICIOUS : AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
+                                    aiItem.severity = AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
                                     aiItem.details = expReport.plainEnglishRisk + "\n\nRecommended Action:\n" + expReport.actionPlan;
-                                    if (mlRes.isMalicious) {
-                                        result.threatsDetected++;
-                                    } else {
-                                        result.suspiciousDetected++;
-                                    }
+                                    result.suspiciousDetected++;
                                     items.add(aiItem);
                                 } else if (dexRes.heuristicConfidenceScore >= 50 && !entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
                                     result.behavioralAnomaliesCount++;
@@ -796,33 +791,27 @@ public class AntivirusScanEngine {
                                         Log.i(TAG, "Suppressed ML false positive on vetted app: " + fullPkgInfo.packageName);
 
                                     } else {
-                                        // Unknown sideloaded app with high ML score — genuine alert
+                                        // High static risk warrants review, not a confirmed malware verdict.
                                         AntivirusEvidenceItem mlItem = new AntivirusEvidenceItem();
                                         mlItem.type = AntivirusEvidenceItem.TYPE_YARA_MATCH;
                                         mlItem.iocValue = sha256 != null ? sha256 : fullPkgInfo.packageName;
                                         mlItem.sha256 = sha256 != null ? sha256 : "";
                                         mlItem.filePath = apkFile.getAbsolutePath();
                                         mlItem.fileSizeFormatted = Utils.formatBytes(apkFile.length());
-                                        mlItem.title = "Neural ML Bytecode Classifier: " + mlRes.verdict;
-                                        mlItem.subtitle = appLabel + " (Risk: " + (int)(mlRes.malwareProbability * 100) + "% | No Trust Anchor)";
+                                        mlItem.title = "Suspicious bytecode characteristics";
+                                        mlItem.subtitle = appLabel + " (Risk: " + (int)(mlRes.malwareProbability * 100) + "/100 | No Trust Anchor)";
                                         mlItem.packageName = fullPkgInfo.packageName;
                                         mlItem.isSystemApp = false;
-                                        mlItem.verdict = mlRes.verdict;
-                                        mlItem.confidence = mlRes.confidenceScore >= 0.7 ? "HIGH" : "MEDIUM";
+                                        mlItem.verdict = AppTrustEvaluator.VERDICT_SUSPICIOUS;
+                                        mlItem.confidence = "MEDIUM";
                                         mlItem.forensicReasons.addAll(mlRes.dominantRiskFactors);
-                                        mlItem.severity = mlRes.isMalicious()
-                                                ? AntivirusEvidenceItem.SEVERITY_MALICIOUS
-                                                : AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
+                                        mlItem.severity = AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
                                         mlItem.details = "Neural ML classification flagged high-risk structural features:\n• "
                                                 + String.join("\n• ", mlRes.dominantRiskFactors)
                                                 + "\n\nNo trusted install source or Play App Signing detected."
                                                 + "\nInstaller: " + (certVerResult.installerPackage != null ? certVerResult.installerPackage : "unknown / sideloaded")
                                                 + "\nPublisher cert days: " + certVerResult.certValidityDays;
-                                        if (mlRes.isMalicious()) {
-                                            result.threatsDetected++;
-                                        } else {
-                                            result.suspiciousDetected++;
-                                        }
+                                        result.suspiciousDetected++;
                                         items.add(mlItem);
                                     }
                                 }
@@ -1520,9 +1509,8 @@ public class AntivirusScanEngine {
             }
         }
 
-        // Third-Party False Positive Rate: confirmed false positive threat verdicts on allowlisted packages
-        // Since all such verdicts are intercepted, suppressed, and deducted, the resulting false-positive threat rate is 0.0%.
-        result.thirdPartyFalsePositiveRate = 0.0;
+        // Suppression counts do not measure accuracy without independently labeled samples.
+        result.thirdPartyFalsePositiveRate = Double.NaN;
 
         // Calculate distribution counts for horizontal segmented distribution bar
         for (AntivirusEvidenceItem item : items) {
@@ -1567,8 +1555,8 @@ public class AntivirusScanEngine {
         sb.append("**Monitored / Low Risk Items:** ").append(result.monitoredItemsCount).append("\n");
         sb.append("**Protected System Apps:** ").append(result.systemAppsProtected).append("\n");
         sb.append("**Curated Third-Party Allowlisted Apps:** ").append(result.thirdPartyAllowlistedCount).append("\n");
-        sb.append("**Third-Party False Positives Prevented:** ").append(result.thirdPartyFalsePositivesPrevented).append("\n");
-        sb.append("**Third-Party False-Positive Threat Rate:** ").append(String.format(java.util.Locale.US, "%.2f%%", result.thirdPartyFalsePositiveRate)).append("\n");
+        sb.append("**Third-Party Findings Suppressed by Allowlist:** ").append(result.thirdPartyFalsePositivesPrevented).append("\n");
+        sb.append("**Third-Party False-Positive Threat Rate:** Not measured; requires labeled evaluation data.\n");
         sb.append("**Total IPs Scanned:** ").append(result.totalIpsScanned).append("\n");
         sb.append("**Total URLs Scanned:** ").append(result.totalUrlsScanned).append("\n");
         sb.append("**Total App Hashes Scanned:** ").append(result.totalHashesScanned).append("\n");
@@ -1579,10 +1567,10 @@ public class AntivirusScanEngine {
         sb.append("## Dual-Metric False-Positive & Allowlist Verification\n\n");
         sb.append("| Metric | Target Scope | Observed Rate | Status |\n");
         sb.append("|---|---|---|---|\n");
-        sb.append("| **System OS False-Positive Rate** | `com.android.*` / OEM Framework | 0.00% | PASS |\n");
-        sb.append("| **Third-Party False-Positive Rate** | Curated Consumer Apps (Banking, Streaming, Social, E-Commerce) | ").append(String.format(java.util.Locale.US, "%.2f%%", result.thirdPartyFalsePositiveRate)).append(" | PASS |\n");
+        sb.append("| **System OS False-Positive Rate** | System / OEM apps | Not measured | NOT EVALUATED |\n");
+        sb.append("| **Third-Party False-Positive Rate** | Consumer apps | Not measured | NOT EVALUATED |\n");
         sb.append("| **Allowlisted Packages Evaluated** | Mainstream Consumer App Allowlist | ").append(result.thirdPartyAllowlistedCount).append(" | ACTIVE |\n");
-        sb.append("| **Prevented / Deducted False Threats** | Auto-filtered from Confirmed Threats | ").append(result.thirdPartyFalsePositivesPrevented).append(" | SAFEGUARDED |\n\n");
+        sb.append("| **Findings Suppressed by Allowlist** | Auto-filtered from Confirmed Threats | ").append(result.thirdPartyFalsePositivesPrevented).append(" | NOT INDEPENDENTLY VERIFIED |\n\n");
 
         sb.append("## Detected Threats & High-Risk Anomalies\n\n");
         boolean hasThreats = false;

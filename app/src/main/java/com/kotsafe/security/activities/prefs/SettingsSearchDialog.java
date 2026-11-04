@@ -350,6 +350,17 @@ public class SettingsSearchDialog extends BottomSheetDialogFragment {
         ));
 
         mAllItems.add(new SearchItem(
+                "always_on_vpn",
+                ctx.getString(R.string.always_on_vpn),
+                ctx.getString(R.string.always_on_vpn_summary_disabled),
+                "Capture",
+                R.drawable.ic_pref_always_on_vpn,
+                ActionType.SCROLL,
+                null,
+                "always on vpn lockdown killswitch kill switch persistent 24/7 background continuous leak"
+        ));
+
+        mAllItems.add(new SearchItem(
                 "start_at_boot",
                 ctx.getString(R.string.start_at_boot),
                 ctx.getString(R.string.start_at_boot_summary),

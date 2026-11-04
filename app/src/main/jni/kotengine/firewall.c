@@ -78,30 +78,30 @@ void netcap_firewall_destroy(netcap_firewall_t *fw) {
 
 void netcap_firewall_set_blocked_uids(netcap_firewall_t *fw, const int32_t *uids, uint32_t count) {
     if (!fw) return;
+    int32_t *replacement = NULL;
+    if (uids && count > 0) {
+        replacement = calloc(count, sizeof(*replacement));
+        if (!replacement) return; /* Keep the active policy on allocation failure. */
+        memcpy(replacement, uids, count * sizeof(*replacement));
+        qsort(replacement, count, sizeof(*replacement), uid_cmp);
+    }
     pthread_mutex_lock(&fw->lock);
 
     free(fw->blocked_uids);
-    fw->blocked_uids = NULL;
-    fw->blocked_uids_count = 0;
-
-    if (uids && count > 0) {
-        fw->blocked_uids = malloc(count * sizeof(int32_t));
-        if (fw->blocked_uids) {
-            memcpy(fw->blocked_uids, uids, count * sizeof(int32_t));
-            fw->blocked_uids_count = count;
-            qsort(fw->blocked_uids, count, sizeof(int32_t), uid_cmp);
-        }
-    }
+    fw->blocked_uids = replacement;
+    fw->blocked_uids_count = replacement ? count : 0;
 
     pthread_mutex_unlock(&fw->lock);
 }
 
 bool netcap_firewall_is_uid_blocked(const netcap_firewall_t *fw, int32_t uid) {
-    if (!fw || uid < 0 || fw->blocked_uids_count == 0 || !fw->blocked_uids) return false;
+    if (!fw || uid < 0) return false;
 
-    /* Binary search */
-    const int32_t *res = bsearch(&uid, fw->blocked_uids, fw->blocked_uids_count, sizeof(int32_t), uid_cmp);
-    return (res != NULL);
+    pthread_mutex_lock((pthread_mutex_t *)&fw->lock);
+    bool blocked = fw->blocked_uids_count > 0 && fw->blocked_uids &&
+        bsearch(&uid, fw->blocked_uids, fw->blocked_uids_count, sizeof(int32_t), uid_cmp) != NULL;
+    pthread_mutex_unlock((pthread_mutex_t *)&fw->lock);
+    return blocked;
 }
 
 static char *normalize_domain(const char *domain) {
@@ -203,7 +203,7 @@ void netcap_firewall_clear_blocked_domains(netcap_firewall_t *fw) {
 }
 
 bool netcap_firewall_is_domain_blocked(const netcap_firewall_t *fw, const char *domain) {
-    if (!fw || !domain || domain[0] == '\0' || fw->domain_count == 0) return false;
+    if (!fw || !domain || domain[0] == '\0') return false;
 
     char *norm = normalize_domain(domain);
     if (!norm) return false;

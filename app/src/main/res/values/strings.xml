@@ -1330,5 +1330,20 @@ While KotSafe incorporates state-of-the-art anomaly heuristics, threat blocklist
     <!-- Account Cloud Preview -->
     <string name="account_login_preview_title">KotSafe Cloud &amp; Threat Intelligence Account</string>
     <string name="account_login_preview_summary">Manage account synchronization, threat feeds, and remote alert notifications.</string>
+
+    <!-- Always-on VPN Settings -->
+    <string name="always_on_vpn">Always-on VPN</string>
+    <string name="always_on_vpn_summary_enabled">Active — Protected continuously by Android OS</string>
+    <string name="always_on_vpn_summary_in_app">Active — 24/7 continuous in-app protection</string>
+    <string name="always_on_vpn_summary_disabled">Keep KotSafe VPN connected 24/7 and prevent network leaks</string>
+    <string name="always_on_vpn_dialog_title">Always-on VPN Setup</string>
+    <string name="always_on_vpn_dialog_enable_msg">To ensure zero network leaks and keep KotSafe running 24/7:\n\n1. Tap \"Open VPN Settings\" below.\n2. In the Android VPN list, tap the ⚙️ Gear icon next to KotSafe.\n3. Turn ON \"Always-on VPN\".\n4. (Recommended) Turn ON \"Block connections without VPN\".</string>
+    <string name="always_on_vpn_dialog_disable_msg">Always-on VPN is currently enforced by Android OS.\n\nTo disable it:\n1. Tap \"Open VPN Settings\" below.\n2. Tap the ⚙️ Gear icon next to KotSafe.\n3. Turn OFF \"Always-on VPN\".</string>
+    <string name="open_vpn_settings">Open VPN Settings</string>
+
+    <!-- Responsive Capture Interface -->
+    <string name="restart">Restart</string>
+    <string name="capture_interface_restart_notice">Capture interface set to %1$s. Restart VPN capture to bind to this interface.</string>
+    <string name="restarting_vpn">Restarting VPN capture…</string>
 </resources>
 

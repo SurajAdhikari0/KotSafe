@@ -63,6 +63,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="kotsafe-gateway" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kotsafe" android:host="license" />
+            </intent-filter>
         </activity>
 
         <activity
