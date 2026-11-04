@@ -39,6 +39,7 @@ BACKUP_P2P_WORKING_DIRECT_VPS/
 *.tar.gz
 
 *.apk
+!downloads/*.apk
 *.aab
 p2p_backup_before_vps_option/
 timeline*.png

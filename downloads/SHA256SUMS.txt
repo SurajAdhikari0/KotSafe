@@ -1,0 +1,2 @@
+9dd2de5642f4577aa4ec0ee8bb2f956cf5d728f46c851fdf65a4d8b9be3a5f57  KotSafe-fullPower-release.apk
+826d61e4209a46244853bd5eed1c302ac464752e9a8cde1f9a4ec323bb42b5aa  KotSafe-standard-release.apk
