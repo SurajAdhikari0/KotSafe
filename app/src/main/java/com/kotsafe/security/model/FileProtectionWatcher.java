@@ -402,6 +402,29 @@ public class FileProtectionWatcher {
             }
         }
 
+        // 2b. Static APK Pre-Install Deep Inspection (ATS Banking, Droppers, Dangerous Permissions)
+        if (displayName.toLowerCase().endsWith(".apk")) {
+            try {
+                ApkPreInstallScanner.PreInstallReport apkReport = ApkPreInstallScanner.scan(mContext, evalFile, null);
+                if (apkReport != null) {
+                    if (ApkPreInstallScanner.VERDICT_THREAT.equals(apkReport.verdict) || apkReport.riskScore >= 70) {
+                        isMalicious = true;
+                        threatFamily = (apkReport.updateWarningMessage != null && !apkReport.updateWarningMessage.isEmpty())
+                                ? apkReport.updateWarningMessage : "Malicious Sideloaded APK";
+                        threatDetails = "Static Heuristic Threat (Score: " + apkReport.riskScore + "/100): "
+                                + apkReport.appName + " (" + apkReport.packageName + ")";
+                    } else if (ApkPreInstallScanner.VERDICT_SUSPICIOUS.equals(apkReport.verdict) || apkReport.riskScore >= 40) {
+                        isSuspicious = true;
+                        threatFamily = "Suspicious Sideloaded APK";
+                        threatDetails = "Elevated Risk Score (" + apkReport.riskScore + "/100): "
+                                + apkReport.appName + " (" + apkReport.packageName + ")";
+                    }
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "ApkPreInstallScanner evaluation failed: " + e.getMessage());
+            }
+        }
+
         // 3. Threat Intelligence Router
         ThreatIntelRouter router = ThreatIntelRouter.getInstance(mContext);
         ThreatIntelProvider.ThreatReport tiReport = router.queryHash(sha256);
@@ -428,24 +451,34 @@ public class FileProtectionWatcher {
         hashDb.upsertFileHash(entry);
 
         // 5. Alert user via SmartScreen & Evidence Ledger
-        if (isMalicious) {
-            Log.w(TAG, "KOTSAFE SENTINEL ALERT: Malicious file detected: " + displayName);
+        if (isMalicious || isSuspicious) {
+            Log.w(TAG, "KOTSAFE SENTINEL ALERT: Sideloaded threat detected: " + displayName);
             SmartScreenManager.getInstance(mContext).showFileThreat(
                     displayName, sourcePath, sha256,
-                    threatFamily, "KotSafe Downloads Sentinel"
+                    threatFamily, "KotSafe Sideload Sentinel"
             );
 
             SecurityDatabase.getInstance(mContext).evidence().insertEvidence(
                     "FILE",
-                    "Malicious Download: " + displayName,
+                    (isMalicious ? "Malicious Sideload: " : "Suspicious Sideload: ") + displayName,
                     threatDetails,
-                    95,
-                    EvidenceDbHelper.VERDICT_MALICIOUS,
+                    isMalicious ? 95 : 65,
+                    isMalicious ? EvidenceDbHelper.VERDICT_MALICIOUS : EvidenceDbHelper.VERDICT_SUSPICIOUS,
                     "",
                     sha256,
                     "HASH",
                     "SENTINEL"
             );
+
+            // Trigger notification alert if in background
+            try {
+                SecurityNotificationHub.getInstance(mContext).postQuarantineAlert(
+                        displayName,
+                        sourcePath,
+                        sha256,
+                        -1
+                );
+            } catch (Exception ignored) {}
         }
     }
 }

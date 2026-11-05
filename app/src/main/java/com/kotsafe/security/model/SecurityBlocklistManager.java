@@ -1143,6 +1143,15 @@ public class SecurityBlocklistManager {
         if (packageName == null || packageName.trim().isEmpty()) return -1;
         Log.i(TAG, "Quarantine app: " + packageName + " [" + source + "] " + reason);
         long id = mRulesDb.quarantineApp(packageName, reason, source);
+        try {
+            com.kotsafe.security.model.Blocklist pcapBl = com.kotsafe.security.KotSafe.getInstance().getBlocklist();
+            if (pcapBl != null) {
+                pcapBl.addApp(packageName);
+                pcapBl.save();
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error syncing app to native blocklist: " + e.getMessage());
+        }
         syncWithCaptureService();
         return id;
     }
@@ -1163,6 +1172,15 @@ public class SecurityBlocklistManager {
         }
         Log.i(TAG, "Block app: " + packageName + " [" + source + "] " + reason);
         long id = mRulesDb.blockApp(packageName, reason, source);
+        try {
+            com.kotsafe.security.model.Blocklist pcapBl = com.kotsafe.security.KotSafe.getInstance().getBlocklist();
+            if (pcapBl != null) {
+                pcapBl.addApp(packageName);
+                pcapBl.save();
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Error syncing app to native blocklist: " + e.getMessage());
+        }
         syncWithCaptureService();
         return id;
     }

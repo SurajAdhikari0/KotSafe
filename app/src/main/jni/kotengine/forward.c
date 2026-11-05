@@ -12,12 +12,19 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <poll.h>
+#ifdef __ANDROID__
 #include <android/log.h>
-
 #define LOG_TAG "KotFwd"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#else
+#include <stdio.h>
+#define LOG_TAG "KotFwd"
+#define LOGI(...) do { printf("[INFO] %s: ", LOG_TAG); printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGW(...) do { printf("[WARN] %s: ", LOG_TAG); printf(__VA_ARGS__); printf("\n"); } while(0)
+#define LOGE(...) do { printf("[ERROR] %s: ", LOG_TAG); printf(__VA_ARGS__); printf("\n"); } while(0)
+#endif
 
 #define NETCAP_NIL_FWD UINT32_MAX
 #define MAX_UDP_REPLY 65535
@@ -336,11 +343,34 @@ static udp_flow_t *create_udp_flow(netcap_forward_engine_t *f, const netcap_flow
         dst_len = sizeof(*d);
     }
     if (connect(sock, (struct sockaddr *)&dst, dst_len) != 0) {
+        if (errno == ENETUNREACH && key->family == 4) {
+            /* RFC 6052 NAT64 synthesis: 64:ff9b::/96 */
+            close(sock);
+            sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+            if (sock >= 0) {
+                fcntl(sock, F_SETFL, O_NONBLOCK);
+                if (!f->protect_cb || f->protect_cb(sock, f->protect_user_data) == 0) {
+                    struct sockaddr_in6 d6 = {0};
+                    d6.sin6_family = AF_INET6;
+                    d6.sin6_port = htons(key->dst_port);
+                    d6.sin6_addr.s6_addr[0] = 0x00;
+                    d6.sin6_addr.s6_addr[1] = 0x64;
+                    d6.sin6_addr.s6_addr[2] = 0xff;
+                    d6.sin6_addr.s6_addr[3] = 0x9b;
+                    memcpy(&d6.sin6_addr.s6_addr[12], key->dst_ip, 4);
+                    if (connect(sock, (struct sockaddr *)&d6, sizeof(d6)) == 0) {
+                        LOGI("create_udp_flow: NAT64 RFC 6052 fallback succeeded for dst_port=%d", key->dst_port);
+                        goto udp_connected;
+                    }
+                }
+                close(sock);
+            }
+        }
         LOGE("create_udp_flow: connect failed errno=%d (%s)", errno, strerror(errno));
         close(sock);
         return NULL;
     }
-
+udp_connected:;
     uint32_t idx = f->udp_free_head;
     f->udp_free_head = f->udp_flows[idx].hash_next;
     udp_flow_t *s = &f->udp_flows[idx];
@@ -745,7 +775,39 @@ static tcp_flow_t *create_tcp_flow(netcap_forward_engine_t *f, const netcap_flow
     }
 
     int rc = connect(sock, (struct sockaddr *)&dst, dst_len);
-    if (rc != 0 && errno != EINPROGRESS) {
+    if (rc != 0 && errno == ENETUNREACH && key->family == 4 && !use_socks5) {
+        /* RFC 6052 NAT64 synthesis: 64:ff9b::/96 */
+        close(sock);
+        sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+        if (sock >= 0) {
+            fcntl(sock, F_SETFL, O_NONBLOCK);
+            setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+            if (!f->protect_cb || f->protect_cb(sock, f->protect_user_data) == 0) {
+                struct sockaddr_in6 d6 = {0};
+                d6.sin6_family = AF_INET6;
+                d6.sin6_port = htons(key->dst_port);
+                d6.sin6_addr.s6_addr[0] = 0x00;
+                d6.sin6_addr.s6_addr[1] = 0x64;
+                d6.sin6_addr.s6_addr[2] = 0xff;
+                d6.sin6_addr.s6_addr[3] = 0x9b;
+                memcpy(&d6.sin6_addr.s6_addr[12], key->dst_ip, 4);
+
+                rc = connect(sock, (struct sockaddr *)&d6, sizeof(d6));
+                if (rc == 0 || errno == EINPROGRESS) {
+                    LOGI("create_tcp_flow: NAT64 RFC 6052 fallback succeeded for dst_port=%d", key->dst_port);
+                } else {
+                    LOGE("create_tcp_flow: NAT64 connect failed dst_port=%d errno=%d (%s)", key->dst_port, errno, strerror(errno));
+                    close(sock);
+                    return NULL;
+                }
+            } else {
+                close(sock);
+                return NULL;
+            }
+        } else {
+            return NULL;
+        }
+    } else if (rc != 0 && errno != EINPROGRESS) {
         LOGE("create_tcp_flow: connect failed dst_port=%d rc=%d errno=%d (%s)", key->dst_port, rc, errno, strerror(errno));
         close(sock);
         return NULL;
