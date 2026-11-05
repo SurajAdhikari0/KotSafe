@@ -1697,15 +1697,19 @@ public class CaptureService extends VpnService implements Runnable {
                     } else {
                         bridge.setSocks5Proxy(null, 0);
                     }
+                    bridge.setProtectDelegate(fdNum -> protect(fdNum));
+                    bridge.setUidResolverDelegate((proto, saddr, sport, daddr, dport) -> getUidQ(proto, saddr, sport, daddr, dport));
+
                     // Install policy before the packet worker can forward any traffic.
                     boolean policyReady = reloadBlocklist() && reloadFirewallWhitelist();
-                    loadFeedPolicy(); // Missing downloaded feeds are reported separately.
                     int startRc = policyReady ? bridge.startCapture(fd) : -1;
                     if (startRc != 0) {
                         Log.e(TAG, "KotEngineBridge.startCapture failed with code: " + startRc);
                         reportError("KotEngine failed to start on TUN fd");
+                        sendServiceStatus("stopped");
                     } else {
                         sendServiceStatus("started");
+                        new Thread(this::loadFeedPolicy, "KotEngineBlacklistLoader").start();
                         if (mSocks5Enabled && mSocks5Address != null && !mSocks5Address.isEmpty() && mSocks5Port > 0) {
                             bridge.setSocks5Proxy(mSocks5Address, mSocks5Port);
                         }
@@ -2012,7 +2016,11 @@ public class CaptureService extends VpnService implements Runnable {
         if(mSettings.root_capture)
             return true;
 
-        return super.protect(socket);
+        boolean res = super.protect(socket);
+        if (!res) {
+            Log.w(TAG, "VpnService.protect(int fd=" + socket + ") returned FALSE!");
+        }
+        return res;
     }
 
     @Override
@@ -2094,13 +2102,19 @@ public class CaptureService extends VpnService implements Runnable {
         return new File(getLibprogPath(ctx, "ushark")).exists();
     }
 
+    private long mLastNotificationUpdateTime = 0L;
+
     // called from native
     public void sendStatsDump(CaptureStats stats) {
         //Log.d(TAG, "sendStatsDump");
 
         last_bytes = stats.bytes_sent + stats.bytes_rcvd;
         last_connections = stats.tot_conns;
-        mHandler.post(this::updateNotification);
+        long now = SystemClock.elapsedRealtime();
+        if (now - mLastNotificationUpdateTime >= 2000L) {
+            mLastNotificationUpdateTime = now;
+            mHandler.post(this::updateNotification);
+        }
 
         // Record live speed point in TrafficTimeSeriesCollector for GlassWire graph
         try {
@@ -2635,6 +2649,7 @@ public class CaptureService extends VpnService implements Runnable {
                         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
                             String line;
                             while ((line = reader.readLine()) != null) {
+                                if (mStopping) return false;
                                 com.kotsafe.security.model.FirewallRuleParser.feedLine(line, feed.hosts, feed.ips);
                             }
                         }

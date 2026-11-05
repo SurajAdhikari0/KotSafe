@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <pthread.h>
 
-#define INITIAL_BUCKETS 1024
+#define INITIAL_BUCKETS 65536
 
 typedef struct domain_node {
     char *domain;
@@ -153,6 +153,51 @@ bool netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domai
 
     pthread_mutex_unlock(&fw->lock);
     return new_node != NULL;
+}
+
+bool netcap_firewall_add_blocked_domains_batch(netcap_firewall_t *fw, const char *const *domains, size_t count) {
+    if (!fw || !domains) return false;
+    if (count == 0) return true;
+
+    pthread_mutex_lock(&fw->lock);
+    for (size_t i = 0; i < count; i++) {
+        const char *dom = domains[i];
+        if (!dom || dom[0] == '\0') continue;
+
+        char *norm = normalize_domain(dom);
+        if (!norm) continue;
+
+        uint32_t h = hash_str(norm);
+        uint32_t b = h & fw->domain_bucket_mask;
+
+        /* Check duplicate in bucket */
+        domain_node_t *node = fw->domain_buckets[b];
+        bool dup = false;
+        while (node) {
+            if (strcmp(node->domain, norm) == 0) {
+                dup = true;
+                break;
+            }
+            node = node->next;
+        }
+
+        if (dup) {
+            free(norm);
+            continue;
+        }
+
+        domain_node_t *new_node = malloc(sizeof(*new_node));
+        if (new_node) {
+            new_node->domain = norm;
+            new_node->next = fw->domain_buckets[b];
+            fw->domain_buckets[b] = new_node;
+            fw->domain_count++;
+        } else {
+            free(norm);
+        }
+    }
+    pthread_mutex_unlock(&fw->lock);
+    return true;
 }
 
 void netcap_firewall_remove_blocked_domain(netcap_firewall_t *fw, const char *domain) {

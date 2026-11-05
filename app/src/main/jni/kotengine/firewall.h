@@ -38,6 +38,11 @@ bool netcap_firewall_is_uid_blocked(const netcap_firewall_t *fw, int32_t uid);
 bool netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domain);
 
 /**
+ * High-performance batch insertion for large threat feed lists (locks once).
+ */
+bool netcap_firewall_add_blocked_domains_batch(netcap_firewall_t *fw, const char *const *domains, size_t count);
+
+/**
  * Removes a domain name from the blocklist.
  */
 void netcap_firewall_remove_blocked_domain(netcap_firewall_t *fw, const char *domain);

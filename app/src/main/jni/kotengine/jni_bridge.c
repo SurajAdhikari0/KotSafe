@@ -14,6 +14,15 @@
 #include <string.h>
 #include <stdio.h>
 #include <arpa/inet.h>
+#ifdef __ANDROID__
+#include <android/log.h>
+#define LOG_TAG "KotEngineBridge"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+#else
+#define LOGI(...)
+#define LOGE(...)
+#endif
 #include "capture_engine.h"
 #include "entropy.h"
 #include "ja4.h"
@@ -148,14 +157,30 @@ static void on_conn_update(const netcap_conn_t *const *conns, uint32_t count, vo
 
 static int protect_fd_upcall(int fd, void *user_data) {
     (void)user_data;
+    if (!g_ctx.jvm || !g_ctx.bridge_obj || !g_ctx.protect_fd) {
+        LOGE("protect_fd_upcall: missing jvm (%p), bridge_obj (%p), or protect_fd (%p)",
+             g_ctx.jvm, g_ctx.bridge_obj, g_ctx.protect_fd);
+        return 0;
+    }
     JNIEnv *env;
     int attached = 0;
     if ((*g_ctx.jvm)->GetEnv(g_ctx.jvm, (void **)&env, JNI_VERSION_1_6) != JNI_OK) {
-        if ((*g_ctx.jvm)->AttachCurrentThread(g_ctx.jvm, &env, NULL) != 0) return -1;
+        if ((*g_ctx.jvm)->AttachCurrentThread(g_ctx.jvm, &env, NULL) != 0) {
+            LOGE("protect_fd_upcall: failed to attach current thread");
+            return 0;
+        }
         attached = 1;
     }
     jboolean ok = (*env)->CallBooleanMethod(env, g_ctx.bridge_obj, g_ctx.protect_fd, (jint)fd);
+    if ((*env)->ExceptionCheck(env)) {
+        LOGE("protect_fd_upcall: exception thrown in protect(fd=%d)", fd);
+        (*env)->ExceptionClear(env);
+        ok = JNI_FALSE;
+    }
     if (attached) (*g_ctx.jvm)->DetachCurrentThread(g_ctx.jvm);
+    if (!ok) {
+        LOGE("protect_fd_upcall: protect(fd=%d) returned FALSE", fd);
+    }
     return ok ? 0 : -1;
 }
 
@@ -192,7 +217,12 @@ Java_com_kotsafe_security_engine_KotEngineBridge_nativeInit(JNIEnv *env, jobject
     }
 
     g_ctx.protect_fd = (*env)->GetMethodID(env, bridge_class, "protect", "(I)Z");
-    if ((*env)->ExceptionCheck(env)) (*env)->ExceptionClear(env);
+    if ((*env)->ExceptionCheck(env) || !g_ctx.protect_fd) {
+        LOGE("KotEngineBridge: failed to find protect(I)Z method!");
+        if ((*env)->ExceptionCheck(env)) (*env)->ExceptionClear(env);
+    } else {
+        LOGI("KotEngineBridge: successfully bound protect(I)Z");
+    }
 
     g_ctx.resolve_uid = (*env)->GetMethodID(env, bridge_class, "resolveUid",
                                             "(ILjava/lang/String;ILjava/lang/String;I)I");

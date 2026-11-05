@@ -220,8 +220,14 @@ class VpnNotificationManager(
         return builder.build()
     }
 
+    private var lastNotifyTimeMs: Long = 0L
+
     fun updateNotification(isStopping: Boolean, stats: CaptureStats?, lastBytes: Long, lastConns: Int) {
         if (isStopping || isNotificationDismissed) return
+
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - lastNotifyTimeMs < 1500L) return
+        lastNotifyTimeMs = now
 
         val notification = getStatusNotification(stats, lastBytes, lastConns)
         val manager = NotificationManagerCompat.from(context)

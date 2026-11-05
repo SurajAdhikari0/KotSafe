@@ -327,25 +327,12 @@ public class FirewallLogManager {
                 try {
                     SmartScreenManager ssm = SmartScreenManager.getInstance(mContext);
                     boolean isBrowser = entry.packageName != null && ssm.isBrowserPackage(entry.packageName);
+                    // Browser activity tracking
                     if (isBrowser) {
                         SmartScreenManager.noteBrowserActivity(entry.packageName);
                     }
-
-
-
-                    // Always run NetworkSecurityMonitor for threat enrichment (AI analysis, DB logging)
-                    String domain = (conn.info != null && !conn.info.isEmpty()) ? conn.info : null;
-                    NetworkSecurityMonitor.getInstance(mContext).onConnection(
-                            entry.appName,
-                            entry.packageName,
-                            entry.dstIp,
-                            entry.dstPort,
-                            domain,
-                            entry.domainOrUrl,
-                            (entry.l7proto != null && !entry.l7proto.isEmpty()) ? entry.l7proto : "TCP"
-                    );
                 } catch (Exception e) {
-                    Log.w(TAG, "NetworkSecurityMonitor dispatch: " + e.getMessage());
+                    Log.w(TAG, "SmartScreen dispatch: " + e.getMessage());
                 }
 
                 // Notify UI listeners

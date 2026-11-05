@@ -1762,7 +1762,7 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
                 updateHardeningButtonStatus();
             }
             mActivity.startCapture();
-        } else if(state == AppState.running) {
+        } else if(state == AppState.running || state == AppState.starting) {
             mActivity.stopCapture();
         }
     }

@@ -494,11 +494,16 @@ public class NetworkSecurityMonitor {
             final String enrichIp = ip;
             final String finalAppName = appName;
 
-            // Use P2 for normal connections, P1 if from a suspicious app
-            int priority = SecurityTaskScheduler.P2_NORMAL;
-            mScheduler.submitNormal("TiEnrich:" + checkValue, () ->
-                    enrichAsync(visitId, finalAppName, packageName,
-                            enrichIp, enrichDomain, url));
+            // Skip background TI enrichment for trusted system/Google services to prevent CPU/GC starvation
+            boolean isWhitelisted = (domain != null && SecurityBlocklistManager.getInstance(mContext).isSystemWhitelisted(domain))
+                    || (ip != null && SecurityBlocklistManager.getInstance(mContext).isSystemWhitelisted(ip))
+                    || (packageName != null && Utils.isVerifiedGoogleTrustedService(mContext, packageName));
+
+            if (!isWhitelisted && (enrichDomain != null || enrichIp != null)) {
+                mScheduler.submitNormal("TiEnrich:" + checkValue, () ->
+                        enrichAsync(visitId, finalAppName, packageName,
+                                enrichIp, enrichDomain, url));
+            }
         }
     }
 

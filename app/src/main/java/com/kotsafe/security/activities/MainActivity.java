@@ -27,6 +27,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
@@ -1240,7 +1242,27 @@ public class MainActivity extends BaseActivity {
         refreshOpenPcapItem();
     }
 
+    private final Handler mStateTimeoutHandler = new Handler(Looper.getMainLooper());
+    private final Runnable mStartingTimeoutRunnable = () -> {
+        if (mState == AppState.starting) {
+            Log.w(TAG, "VPN startup timed out; resetting state to ready");
+            if (CaptureService.isServiceActive()) {
+                CaptureService.stopService();
+            }
+            appStateReady();
+            Utils.showToastLong(this, R.string.vpn_setup_failed);
+        }
+    };
+    private final Runnable mStoppingTimeoutRunnable = () -> {
+        if (mState == AppState.stopping) {
+            Log.w(TAG, "VPN stopping timed out; forcing state to ready");
+            appStateReady();
+        }
+    };
+
     public void appStateReady() {
+        mStateTimeoutHandler.removeCallbacks(mStartingTimeoutRunnable);
+        mStateTimeoutHandler.removeCallbacks(mStoppingTimeoutRunnable);
         mState = AppState.ready;
         notifyAppState();
         updateTabSwitchButton();
@@ -1252,11 +1274,16 @@ public class MainActivity extends BaseActivity {
 
     public void appStateStarting() {
         mState = AppState.starting;
+        mStateTimeoutHandler.removeCallbacks(mStartingTimeoutRunnable);
+        mStateTimeoutHandler.removeCallbacks(mStoppingTimeoutRunnable);
+        mStateTimeoutHandler.postDelayed(mStartingTimeoutRunnable, 10_000);
         notifyAppState();
         updateToolbarStatus();
     }
 
     public void appStateRunning() {
+        mStateTimeoutHandler.removeCallbacks(mStartingTimeoutRunnable);
+        mStateTimeoutHandler.removeCallbacks(mStoppingTimeoutRunnable);
         mState = AppState.running;
         notifyAppState();
         updateTabSwitchButton();
@@ -1278,7 +1305,10 @@ public class MainActivity extends BaseActivity {
     }
 
     public void appStateStopping() {
+        mStateTimeoutHandler.removeCallbacks(mStartingTimeoutRunnable);
+        mStateTimeoutHandler.removeCallbacks(mStoppingTimeoutRunnable);
         mState = AppState.stopping;
+        mStateTimeoutHandler.postDelayed(mStoppingTimeoutRunnable, 6_000);
         notifyAppState();
         updateToolbarStatus();
     }

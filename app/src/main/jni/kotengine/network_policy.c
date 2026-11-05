@@ -99,8 +99,8 @@ bool netcap_network_policy_replace(netcap_network_policy_t *p, int source, bool 
         next->uid_count = uid_count;
         qsort(next->uids, uid_count, sizeof(*next->uids), compare_uid);
     }
-    for (size_t i = 0; i < domain_count; i++) {
-        if (!valid_domain(domains[i]) || !netcap_firewall_add_blocked_domain(next->domains, domains[i])) goto fail;
+    if (domain_count > 0) {
+        if (!netcap_firewall_add_blocked_domains_batch(next->domains, domains, domain_count)) goto fail;
     }
     for (size_t i = 0; i < cidr_count; i++) if (!add_cidr(next->ips, cidrs[i])) goto fail;
     pthread_rwlock_wrlock(&p->lock);

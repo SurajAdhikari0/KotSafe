@@ -511,6 +511,8 @@ public class CustomHttpProvider implements BackendProvider {
         final AtomicBoolean connecting = new AtomicBoolean(false);
         final AtomicBoolean shutdown = new AtomicBoolean(false);
         volatile int backoffMs = 1000;
+        volatile long lastDialAttempt = 0L;
+        volatile long lastErrorLogTime = 0L;
 
         Link(String token, boolean isHost) {
             this.token = token;
@@ -520,11 +522,14 @@ public class CustomHttpProvider implements BackendProvider {
 
         void ensureConnected() {
             if (shutdown.get() || ws != null) return;
+            long now = System.currentTimeMillis();
+            if (now - lastDialAttempt < backoffMs) return;
             if (!connecting.compareAndSet(false, true)) return;
             dial();
         }
 
         private void dial() {
+            lastDialAttempt = System.currentTimeMillis();
             Request request = new Request.Builder()
                     .url(wsUrl())
                     .header("Authorization", "Bearer " + mSharedSecret)
@@ -559,16 +564,18 @@ public class CustomHttpProvider implements BackendProvider {
                     Log.i(TAG, "Relay link closed: " + code + " " + reason);
                     stopPing();
                     ws = null;
-                    connecting.set(false);
                     scheduleReconnect();
                 }
 
                 @Override
                 public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, Response response) {
-                    Log.w(TAG, "Relay link failure: " + t.getMessage());
+                    long now = System.currentTimeMillis();
+                    if (now - lastErrorLogTime > 10_000) {
+                        Log.w(TAG, "Relay link unreachable (" + t.getMessage() + "), backing off " + (backoffMs / 1000) + "s");
+                        lastErrorLogTime = now;
+                    }
                     stopPing();
                     ws = null;
-                    connecting.set(false);
                     CandidateListener l = listener;
                     if (l != null) l.onError("Relay unreachable: " + t.getMessage());
                     scheduleReconnect();
@@ -599,12 +606,18 @@ public class CustomHttpProvider implements BackendProvider {
         }
 
         private void scheduleReconnect() {
-            if (shutdown.get()) return;
+            if (shutdown.get()) {
+                connecting.set(false);
+                return;
+            }
             int delay = backoffMs;
-            backoffMs = Math.min(backoffMs * 2, 30_000);
+            backoffMs = Math.min(backoffMs * 2, 60_000);
             sScheduler.schedule(() -> {
-                if (shutdown.get()) return;
-                if (connecting.compareAndSet(false, true)) dial();
+                if (shutdown.get()) {
+                    connecting.set(false);
+                    return;
+                }
+                dial();
             }, delay, TimeUnit.MILLISECONDS);
         }
 
@@ -642,10 +655,14 @@ public class CustomHttpProvider implements BackendProvider {
 
         void close() {
             shutdown.set(true);
+            connecting.set(false);
             stopPing();
             WebSocket sock = ws;
             ws = null;
-            if (sock != null) sock.close(1000, "closed");
+            if (sock != null) {
+                try { sock.close(1000, "closed"); } catch (Exception ignored) {}
+                try { sock.cancel(); } catch (Exception ignored) {}
+            }
         }
 
         void forceReconnect() {
@@ -1511,7 +1528,7 @@ public class CustomHttpProvider implements BackendProvider {
             try {
                 if (clientLink.ws == null) {
                     clientLink.ensureConnected();
-                    for (int i = 0; i < 60 && clientLink.ws == null && sRelayServerRunning; i++) {
+                    for (int i = 0; i < 15 && clientLink.ws == null && sRelayServerRunning; i++) {
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {
@@ -1524,7 +1541,6 @@ public class CustomHttpProvider implements BackendProvider {
 
                 WebSocket sock = clientLink.ws;
                 if (sock == null) {
-                    Log.w(TAG, "Relay link could not connect; dropping client connection");
                     try { clientSock.close(); } catch (Exception ignored) {}
                     return;
                 }
@@ -1581,11 +1597,19 @@ public class CustomHttpProvider implements BackendProvider {
     @Override
     public synchronized void stopRelayLoopback() {
         sRelayServerRunning = false;
+        String oldToken = sRelayToken;
         sRelayToken = null;
         sRelayPort = 0;
         ServerSocket srv = sRelayServerSocket;
         sRelayServerSocket = null;
         if (srv != null) try { srv.close(); } catch (Exception ignored) {}
+
+        if (oldToken != null) {
+            Link l = sLinks.remove(oldToken);
+            if (l != null) {
+                try { l.close(); } catch (Exception ignored) {}
+            }
+        }
 
         com.kotsafe.security.p2p.DirectPunchCoordinator.getInstance().stop();
         releaseClientSpeedLocks();

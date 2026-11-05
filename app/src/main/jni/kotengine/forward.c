@@ -17,6 +17,7 @@
 #define LOG_TAG "KotFwd"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 #define NETCAP_NIL_FWD UINT32_MAX
 #define MAX_UDP_REPLY 65535
@@ -307,10 +308,14 @@ static udp_flow_t *create_udp_flow(netcap_forward_engine_t *f, const netcap_flow
 
     int family = (key->family == 4) ? AF_INET : AF_INET6;
     int sock = socket(family, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock < 0) return NULL;
+    if (sock < 0) {
+        LOGE("create_udp_flow: socket() failed errno=%d", errno);
+        return NULL;
+    }
     fcntl(sock, F_SETFL, O_NONBLOCK);
 
     if (f->protect_cb && f->protect_cb(sock, f->protect_user_data) != 0) {
+        LOGE("create_udp_flow: protect_cb failed for sock=%d", sock);
         close(sock);
         return NULL;
     }
@@ -331,6 +336,7 @@ static udp_flow_t *create_udp_flow(netcap_forward_engine_t *f, const netcap_flow
         dst_len = sizeof(*d);
     }
     if (connect(sock, (struct sockaddr *)&dst, dst_len) != 0) {
+        LOGE("create_udp_flow: connect failed errno=%d (%s)", errno, strerror(errno));
         close(sock);
         return NULL;
     }
@@ -691,13 +697,17 @@ static tcp_flow_t *create_tcp_flow(netcap_forward_engine_t *f, const netcap_flow
     int family = use_socks5 ? ((f->socks5_family == 6) ? AF_INET6 : AF_INET)
                             : ((key->family == 4) ? AF_INET : AF_INET6);
     int sock = socket(family, SOCK_STREAM, IPPROTO_TCP);
-    if (sock < 0) return NULL;
+    if (sock < 0) {
+        LOGE("create_tcp_flow: socket() failed family=%d errno=%d (%s)", family, errno, strerror(errno));
+        return NULL;
+    }
 
     fcntl(sock, F_SETFL, O_NONBLOCK);
     int one = 1;
     setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
 
     if (f->protect_cb && f->protect_cb(sock, f->protect_user_data) != 0) {
+        LOGE("create_tcp_flow: protect_cb failed for sock=%d", sock);
         close(sock);
         return NULL;
     }
@@ -736,6 +746,7 @@ static tcp_flow_t *create_tcp_flow(netcap_forward_engine_t *f, const netcap_flow
 
     int rc = connect(sock, (struct sockaddr *)&dst, dst_len);
     if (rc != 0 && errno != EINPROGRESS) {
+        LOGE("create_tcp_flow: connect failed dst_port=%d rc=%d errno=%d (%s)", key->dst_port, rc, errno, strerror(errno));
         close(sock);
         return NULL;
     }

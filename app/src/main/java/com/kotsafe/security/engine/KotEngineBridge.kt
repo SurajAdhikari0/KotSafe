@@ -1,5 +1,7 @@
 package com.kotsafe.security.engine
 
+import androidx.annotation.Keep
+
 /**
  * Clean-Room Native Bridge for KotEngine.
  *
@@ -7,6 +9,7 @@ package com.kotsafe.security.engine
  * threat detection, JA4 fingerprinting, and Shannon entropy analysis bridge.
  * 100% clean-room proprietary implementation with zero GPL runtime dependencies.
  */
+@Keep
 class KotEngineBridge {
 
     var listener: ((Array<ConnInfo>) -> Unit)? = null
@@ -23,20 +26,20 @@ class KotEngineBridge {
      */
     var uidResolverDelegate: ((Int, String, Int, String, Int) -> Int)? = null
 
-    @Suppress("unused")
-    private fun protect(fd: Int): Boolean = protectDelegate?.invoke(fd) ?: false
+    @Keep
+    fun protect(fd: Int): Boolean = protectDelegate?.invoke(fd) ?: false
 
-    @Suppress("unused")
-    private fun resolveUid(proto: Int, srcIp: String, srcPort: Int, dstIp: String, dstPort: Int): Int =
+    @Keep
+    fun resolveUid(proto: Int, srcIp: String, srcPort: Int, dstIp: String, dstPort: Int): Int =
         uidResolverDelegate?.invoke(proto, srcIp, srcPort, dstIp, dstPort) ?: -1
 
-    @Suppress("unused")
-    private fun onThreatAlert(type: Int, uid: Int, details: String, timestampMs: Long) {
+    @Keep
+    fun onThreatAlert(type: Int, uid: Int, details: String, timestampMs: Long) {
         threatListener?.invoke(ThreatAlert(type, uid, details, timestampMs))
     }
 
-    @Suppress("unused")
-    private fun onConnectionsUpdated(conns: Array<ConnInfo>) {
+    @Keep
+    fun onConnectionsUpdated(conns: Array<ConnInfo>) {
         listener?.invoke(conns)
     }
 
