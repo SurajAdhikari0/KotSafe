@@ -8,6 +8,7 @@ package com.kotsafe.security.model;
 import android.content.Context;
 import androidx.preference.PreferenceManager;
 
+import com.kotsafe.security.BuildConfig;
 import com.kotsafe.security.Log;
 
 import org.json.JSONArray;
@@ -32,6 +33,8 @@ public class ThreatFeedSyncManager {
     public static final String PREF_AUTO_FEED_SYNC = "auto_threat_feed_sync";
     public static final String PREF_LAST_SYNC_TIME = "threat_feed_last_sync_time";
     public static final String PREF_LAST_SYNC_COUNT = "threat_feed_last_sync_count";
+    public static final String PREF_CLOUD_THREAT_LAST_SYNC_TS = "kotsafe_cloud_threat_last_sync_ts";
+    public static final String DEFAULT_CLOUD_DELTA_URL = "https://kotsafe.com/api/v1/threat-intel/delta";
 
     private static ThreatFeedSyncManager sInstance;
     private final Context mContext;
@@ -69,6 +72,11 @@ public class ThreatFeedSyncManager {
         mExecutor.execute(() -> {
             int addedCount = 0;
             try {
+                if (callback != null) callback.onProgress("Syncing KotSafe Cloud threat intelligence delta…");
+                int cloudDeltaCount = syncKotSafeCloudDelta();
+                addedCount += cloudDeltaCount;
+                Log.i(TAG, "KotSafe Cloud delta sync added " + cloudDeltaCount + " indicators");
+
                 if (callback != null) callback.onProgress("Fetching URLhaus active malware feed…");
                 int urlhausCount = syncUrlhausFeed();
                 addedCount += urlhausCount;
@@ -106,6 +114,154 @@ public class ThreatFeedSyncManager {
                 mIsSyncing = false;
             }
         });
+    }
+
+    // ─── KotSafe Cloud Threat Delta Sync ────────────────────────────────────
+
+    private int syncKotSafeCloudDelta() {
+        int added = 0;
+        HttpURLConnection conn = null;
+        try {
+            long lastSyncTs = PreferenceManager.getDefaultSharedPreferences(mContext)
+                    .getLong(PREF_CLOUD_THREAT_LAST_SYNC_TS, 0L);
+
+            String requestUrl = DEFAULT_CLOUD_DELTA_URL;
+            if (lastSyncTs > 0) {
+                requestUrl += "?since=" + (lastSyncTs / 1000L);
+            }
+
+            URL url = new URL(requestUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(8000);
+            conn.setReadTimeout(10000);
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("User-Agent", "KotSafe-Android/" + BuildConfig.VERSION_NAME);
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 304) {
+                Log.i(TAG, "KotSafe Cloud threat delta: 304 Not Modified (up to date)");
+                return 0;
+            }
+            if (responseCode != 200) {
+                Log.w(TAG, "KotSafe Cloud threat delta HTTP " + responseCode);
+                return 0;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+
+            JSONObject root = new JSONObject(sb.toString());
+            if (!"success".equalsIgnoreCase(root.optString("status", ""))) {
+                return 0;
+            }
+
+            JSONObject delta = root.optJSONObject("delta");
+            if (delta == null) return 0;
+
+            SecurityBlocklistManager blm = SecurityBlocklistManager.getInstance(mContext);
+            TiCacheDb cacheDb = TiCacheDb.getInstance(mContext);
+            FileHashDbHelper hashDb = FileHashDbHelper.getInstance(mContext);
+
+            // 1. Process Added Domains
+            JSONArray domainsAdded = delta.optJSONArray("domains_added");
+            if (domainsAdded != null) {
+                for (int i = 0; i < domainsAdded.length(); i++) {
+                    JSONObject item = domainsAdded.getJSONObject(i);
+                    String domain = item.optString("domain", "").trim().toLowerCase();
+                    String threatType = item.optString("threat_type", "malware");
+                    String family = item.optString("family", "");
+                    int confidence = item.optInt("confidence", 90);
+
+                    if (!domain.isEmpty()) {
+                        cacheDb.store(domain, "DOMAIN", "KotSafe Cloud", true, false, confidence, "MALICIOUS", threatType, family, TiCacheDb.DEFAULT_TTL_MS);
+                        if (!blm.isDomainBlocked(domain)) {
+                            blm.blockDomain(domain, "Cloud Sentinel: " + threatType + (family.isEmpty() ? "" : " (" + family + ")"), "KotSafe Cloud");
+                            added++;
+                        }
+                    }
+                }
+            }
+
+            // 2. Process Removed Domains (False-Positive Unblocking)
+            JSONArray domainsRemoved = delta.optJSONArray("domains_removed");
+            if (domainsRemoved != null) {
+                for (int i = 0; i < domainsRemoved.length(); i++) {
+                    String domain = domainsRemoved.getString(i).trim().toLowerCase();
+                    if (!domain.isEmpty()) {
+                        blm.unblock(domain);
+                    }
+                }
+            }
+
+            // 3. Process Added IPs
+            JSONArray ipsAdded = delta.optJSONArray("ips_added");
+            if (ipsAdded != null) {
+                for (int i = 0; i < ipsAdded.length(); i++) {
+                    JSONObject item = ipsAdded.getJSONObject(i);
+                    String ip = item.optString("ip", "").trim();
+                    String threatType = item.optString("threat_type", "c2_botnet");
+                    int confidence = item.optInt("confidence", 90);
+
+                    if (!ip.isEmpty()) {
+                        cacheDb.store(ip, "IP", "KotSafe Cloud", true, false, confidence, "MALICIOUS", threatType, "Active C2 Node", TiCacheDb.DEFAULT_TTL_MS);
+                        blm.blockIp(ip, "Cloud Sentinel C2: " + threatType, "KotSafe Cloud");
+                        added++;
+                    }
+                }
+            }
+
+            // 4. Process Added Hashes (SHA-256)
+            JSONArray hashesAdded = delta.optJSONArray("hashes_added");
+            if (hashesAdded != null) {
+                for (int i = 0; i < hashesAdded.length(); i++) {
+                    JSONObject item = hashesAdded.getJSONObject(i);
+                    String sha256 = item.optString("sha256", "").trim().toLowerCase();
+                    String threatType = item.optString("threat_type", "banking_trojan");
+                    String family = item.optString("family", "Malware Signature");
+                    int confidence = item.optInt("confidence", 99);
+
+                    if (sha256.length() == 64) {
+                        cacheDb.store(sha256, "HASH", "KotSafe Cloud", true, false, confidence, "MALICIOUS", threatType, family, TiCacheDb.DEFAULT_TTL_MS);
+
+                        FileHashEntry entry = new FileHashEntry();
+                        entry.fileName = family + ".apk";
+                        entry.filePath = "";
+                        entry.sha256 = sha256;
+                        entry.fileClass = FileHashEntry.FILE_CLASS_APK;
+                        entry.scanType = FileHashEntry.SCAN_TYPE_DOWNLOAD;
+                        entry.scanPriority = FileHashEntry.PRIORITY_HIGH;
+                        entry.scanStatus = FileHashEntry.SCAN_STATUS_DONE;
+                        entry.threatStatus = FileHashEntry.THREAT_MALICIOUS;
+                        entry.threatDetails = "KotSafe Cloud: " + threatType + " (" + family + ")";
+                        entry.fileLastModified = System.currentTimeMillis();
+                        hashDb.upsertFileHash(entry);
+                        added++;
+                    }
+                }
+            }
+
+            // Sync with capture service and refresh native engine
+            blm.syncWithCaptureService();
+
+            // Update last sync timestamp
+            PreferenceManager.getDefaultSharedPreferences(mContext).edit()
+                    .putLong(PREF_CLOUD_THREAT_LAST_SYNC_TS, System.currentTimeMillis())
+                    .apply();
+
+        } catch (Exception e) {
+            Log.w(TAG, "KotSafe Cloud delta sync error: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try { conn.disconnect(); } catch (Exception ignored) {}
+            }
+        }
+        return added;
     }
 
     // ─── URLhaus Feed Sync ───────────────────────────────────────────────────
