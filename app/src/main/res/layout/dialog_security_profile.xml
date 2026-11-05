@@ -140,7 +140,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Suraj Adhikari"
+                        android:text="KotSafe User"
                         android:textColor="@color/profileTextPrimary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -151,7 +151,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="surajadhikari716@gmail.com"
+                        android:text="user@kotsafe.com"
                         android:textColor="@color/profileTextSecondary"
                         android:textSize="13sp" />
 
