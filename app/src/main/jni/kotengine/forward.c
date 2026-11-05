@@ -124,50 +124,22 @@ static uint32_t fwd_hash(const netcap_flow_key_t *k) {
 
 static uint32_t next_pow2(uint32_t n) { uint32_t p = 1; while (p < n) p <<= 1; return p; }
 
+static uint32_t csum_add(uint32_t sum, const uint8_t *data, uint32_t len);
+static uint16_t csum_fold(uint32_t sum);
+
 static uint16_t ip_checksum(const void *data, size_t len) {
-    const uint16_t *p = data;
-    uint32_t sum = 0;
-    while (len > 1) { sum += *p++; len -= 2; }
-    if (len) sum += *(const uint8_t *)p;
-    while (sum >> 16) sum = (sum & 0xFFFF) + (sum >> 16);
-    return (uint16_t)~sum;
+    return csum_fold(csum_add(0, data, (uint32_t)len));
 }
 
 static uint16_t tcp_checksum_v4(const uint8_t src_ip[4], const uint8_t dst_ip[4],
                                 const uint8_t *tcp_seg, uint16_t tcp_len) {
-    uint32_t sum = 0;
-    const uint16_t *p;
-
-    /* Pseudo-header */
-    p = (const uint16_t *)src_ip;
-    sum += p[0]; sum += p[1];
-
-    p = (const uint16_t *)dst_ip;
-    sum += p[0]; sum += p[1];
-
-    sum += htons(IPPROTO_TCP);
-    sum += htons(tcp_len);
-
-    /* TCP segment */
-    p = (const uint16_t *)tcp_seg;
-    uint32_t count = tcp_len;
-    while (count > 1) {
-        sum += *p++;
-        count -= 2;
-    }
-    if (count > 0) {
-        uint8_t last[2] = { *(const uint8_t *)p, 0 };
-        sum += *(const uint16_t *)last;
-    }
-
-    while (sum >> 16) {
-        sum = (sum & 0xFFFF) + (sum >> 16);
-    }
-    return (uint16_t)~sum;
+    // Packed flow keys need not be uint16_t-aligned. Sum bytes, never cast them.
+    uint32_t sum = csum_add(0, src_ip, 4);
+    sum = csum_add(sum, dst_ip, 4);
+    sum += IPPROTO_TCP;
+    sum += tcp_len;
+    return csum_fold(csum_add(sum, tcp_seg, tcp_len));
 }
-
-static uint32_t csum_add(uint32_t sum, const uint8_t *data, uint32_t len);
-static uint16_t csum_fold(uint32_t sum);
 
 netcap_forward_engine_t *netcap_forward_create(int tun_fd) {
     netcap_forward_engine_t *f = calloc(1, sizeof(*f));
@@ -921,6 +893,10 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
     for (uint32_t i = 0; i < f->udp_capacity; i++) {
         if (!f->udp_flows[i].occupied) continue;
         udp_flow_t *s = &f->udp_flows[i];
+        if (f->engine && netcap_engine_blocks_flow(f->engine, &s->key)) {
+            close_udp_flow_slot(f, i);
+            continue;
+        }
         for (;;) {
             ssize_t n = recv(s->sock, udp_buf, sizeof(udp_buf), 0);
             if (n <= 0) break;
@@ -935,6 +911,15 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
     for (uint32_t i = 0; i < MAX_ICMP_FLOWS; i++) {
         icmp_flow_t *s = &f->icmp_flows[i];
         if (!s->occupied) continue;
+        netcap_flow_key_t key = {0};
+        key.family = 4;
+        key.proto = 1;
+        memcpy(key.src_ip, s->src_ip, 4);
+        memcpy(key.dst_ip, s->dst_ip, 4);
+        if (f->engine && netcap_engine_blocks_flow(f->engine, &key)) {
+            close_icmp_flow(s);
+            continue;
+        }
         for (;;) {
             ssize_t n = recv(s->sock, icmp_buf, sizeof(icmp_buf), 0);
             if (n <= 0) break;
@@ -952,6 +937,10 @@ void netcap_forward_poll_replies(netcap_forward_engine_t *f) {
         if (!f->tcp_flows[i].occupied) continue;
         tcp_flow_t *s = &f->tcp_flows[i];
         if (s->sock < 0) continue;
+        if (f->engine && netcap_engine_blocks_flow(f->engine, &s->key)) {
+            close_tcp_flow_slot(f, i);
+            continue;
+        }
         pfds[npoll].fd = s->sock;
         pfds[npoll].revents = 0;
         flow_indices[npoll] = i;

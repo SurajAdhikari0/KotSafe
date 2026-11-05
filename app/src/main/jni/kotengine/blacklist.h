@@ -2,6 +2,7 @@
 #define NETCAP_BLACKLIST_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -29,7 +30,7 @@ void netcap_blacklist_destroy(netcap_blacklist_t *bl);
 
 /* Adds a CIDR rule, e.g. addr = 4 bytes for IPv4 or 16 bytes for IPv6,
  * prefix_len in [0,32] or [0,128] respectively. */
-void netcap_blacklist_add(netcap_blacklist_t *bl, const uint8_t *addr,
+bool netcap_blacklist_add(netcap_blacklist_t *bl, const uint8_t *addr,
                            uint8_t family, uint8_t prefix_len);
 
 void netcap_blacklist_remove_all(netcap_blacklist_t *bl, uint8_t family);

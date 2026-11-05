@@ -71,6 +71,10 @@ class KotEngineBridge {
     fun setLanBlockedUids(uids: IntArray?) = nativeSetLanBlockedUids(uids)
 
     /** Configures Android app UIDs completely blocked from internet access */
+    fun replaceFirewallRules(source: Int, enabled: Boolean, uids: IntArray,
+        domains: Array<String>, cidrs: Array<String>): Boolean =
+        nativeReplaceFirewallRules(source, enabled, uids, domains, cidrs)
+
     fun setBlockedUids(uids: IntArray?) = nativeSetBlockedUids(uids)
 
     /** Adds domain to native active firewall blocklist (triggers DNS sinkholing) */
@@ -134,6 +138,8 @@ class KotEngineBridge {
     private external fun nativeSetPrivateDnsBlocked(blocked: Boolean)
     private external fun nativeSetCustomDns(dnsIp: String?): Int
     private external fun nativeSetLanBlockedUids(uids: IntArray?)
+    private external fun nativeReplaceFirewallRules(source: Int, enabled: Boolean, uids: IntArray,
+        domains: Array<String>, cidrs: Array<String>): Boolean
     private external fun nativeSetBlockedUids(uids: IntArray?)
     private external fun nativeAddBlockedDomain(domain: String)
     private external fun nativeRemoveBlockedDomain(domain: String)

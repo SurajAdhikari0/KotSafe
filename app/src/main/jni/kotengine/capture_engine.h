@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "conn_table.h"
 #include "blacklist.h"
+#include "network_policy.h"
 #include "ring_log.h"
 #include "pcapng_writer.h"
 #include "forward.h"
@@ -140,6 +141,11 @@ void netcap_engine_get_conn_speed(netcap_engine_t *engine, const netcap_flow_key
 /* DNS Reverse IP Cache & Answer Learning */
 bool netcap_engine_lookup_dns_cache(netcap_engine_t *engine, const uint8_t *ip, uint8_t family,
                                     char *out_domain, size_t max_len);
+
+bool netcap_engine_replace_policy(netcap_engine_t *engine, int source, bool enabled,
+    const int32_t *uids, size_t uid_count, const char *const *domains, size_t domain_count,
+    const char *const *cidrs, size_t cidr_count);
+bool netcap_engine_blocks_flow(netcap_engine_t *engine, const netcap_flow_key_t *key);
 
 /* Active Firewall Controls (App UID & Malicious Domain) */
 void netcap_engine_set_blocked_uids(netcap_engine_t *engine, const int32_t *uids, size_t count);

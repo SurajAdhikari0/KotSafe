@@ -35,7 +35,7 @@ bool netcap_firewall_is_uid_blocked(const netcap_firewall_t *fw, int32_t uid);
  * Adds a domain name to the blocklist (supports exact and suffix match, e.g. "doubleclick.net"
  * blocks "doubleclick.net" and "ad.doubleclick.net").
  */
-void netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domain);
+bool netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domain);
 
 /**
  * Removes a domain name from the blocklist.

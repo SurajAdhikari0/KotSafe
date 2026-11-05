@@ -50,21 +50,24 @@ void netcap_blacklist_destroy(netcap_blacklist_t *bl) {
     free(bl);
 }
 
-void netcap_blacklist_add(netcap_blacklist_t *bl, const uint8_t *addr,
+bool netcap_blacklist_add(netcap_blacklist_t *bl, const uint8_t *addr,
                            uint8_t family, uint8_t prefix_len) {
+    if (!bl || !addr || (family != 4 && family != 6)) return false;
     trie_node_t *n = (family == 4) ? bl->v4_root : bl->v6_root;
     uint8_t max_len = (family == 4) ? 32 : 128;
-    if (prefix_len > max_len) prefix_len = max_len;
+    if (!n || prefix_len > max_len) return false;
 
     for (int i = 0; i < prefix_len; i++) {
         int bit = get_bit(addr, i);
         if (!n->child[bit]) n->child[bit] = node_new();
+        if (!n->child[bit]) return false;
         n = n->child[bit];
     }
     if (!n->blocked) {
         n->blocked = 1;
         if (family == 4) bl->v4_rules++; else bl->v6_rules++;
     }
+    return true;
 }
 
 void netcap_blacklist_remove_all(netcap_blacklist_t *bl, uint8_t family) {

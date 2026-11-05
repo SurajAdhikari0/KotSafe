@@ -1697,12 +1697,15 @@ public class CaptureService extends VpnService implements Runnable {
                     } else {
                         bridge.setSocks5Proxy(null, 0);
                     }
-                    sendServiceStatus("started");
-                    int startRc = bridge.startCapture(fd);
+                    // Install policy before the packet worker can forward any traffic.
+                    boolean policyReady = reloadBlocklist() && reloadFirewallWhitelist();
+                    loadFeedPolicy(); // Missing downloaded feeds are reported separately.
+                    int startRc = policyReady ? bridge.startCapture(fd) : -1;
                     if (startRc != 0) {
                         Log.e(TAG, "KotEngineBridge.startCapture failed with code: " + startRc);
                         reportError("KotEngine failed to start on TUN fd");
                     } else {
+                        sendServiceStatus("started");
                         if (mSocks5Enabled && mSocks5Address != null && !mSocks5Address.isEmpty() && mSocks5Port > 0) {
                             bridge.setSocks5Proxy(mSocks5Address, mSocks5Port);
                         }
@@ -2277,15 +2280,14 @@ public class CaptureService extends VpnService implements Runnable {
         return blsinfo;
     }
 
-    public void reloadBlocklist() {
+    public boolean reloadBlocklist() {
         if(!mFirewallSupported)
-            return;
+            return true;
 
         Log.i(TAG, "reloading firewall blocklist (firewallEnabled=" + mFirewallEnabled + ", network=" + mCurrentNetworkType + ", screenOn=" + mIsScreenOn + ")");
         if(!mFirewallEnabled) {
             setLanBlockedUids(new int[0]);
-            reloadBlocklist(new MatchList.ListDescriptor());
-            return;
+            return reloadBlocklist(new MatchList.ListDescriptor());
         }
 
         MatchList.ListDescriptor ld = mBlocklist.toListDescriptor();
@@ -2363,22 +2365,23 @@ public class CaptureService extends VpnService implements Runnable {
         int[] lanUids = rulesMgr.getLanBlockedUids();
         setLanBlockedUids(lanUids);
 
-        reloadBlocklist(ld);
+        return reloadBlocklist(ld);
     }
 
-    public void reloadFirewallWhitelist() {
+    public boolean reloadFirewallWhitelist() {
         if(!mFirewallSupported)
-            return;
+            return true;
 
         Log.i(TAG, "reloading firewall whitelist");
-        boolean wl_mode = FirewallPolicy.shouldForceWhitelistMode(mPrefs, mIsScreenOn, Prefs.isFirewallWhitelistMode(mPrefs));
+        boolean wl_mode = mFirewallEnabled && FirewallPolicy.shouldForceWhitelistMode(
+                mPrefs, mIsScreenOn, Prefs.isFirewallWhitelistMode(mPrefs));
         if (wl_mode) {
             MatchList.ListDescriptor ld = mFirewallWhitelist.toListDescriptor();
             // Automatically whitelist all system apps and UIDs by default
             Utils.addSystemAppsToWhitelistDescriptor(this, ld);
-            reloadFirewallWhitelist(ld);
+            return reloadFirewallWhitelist(ld);
         } else {
-            reloadFirewallWhitelist(null);
+            return reloadFirewallWhitelist(null);
         }
     }
 
@@ -2606,114 +2609,92 @@ public class CaptureService extends VpnService implements Runnable {
         } catch (Throwable ignored) {}
     }
 
+    private final Object mFeedPolicyLock = new Object();
+
     private static void reloadBlacklists() {
-        if (INSTANCE == null) return;
-        new Thread(() -> {
-            try {
-                com.kotsafe.security.engine.KotEngineBridge bridge = com.kotsafe.security.engine.KotEngineBridge.getInstance();
-                File bldir = new File(INSTANCE.getFilesDir().getPath() + "/malware_bl");
-                if (!bldir.exists() || !bldir.isDirectory()) return;
-                File[] files = bldir.listFiles();
-                if (files == null) return;
-                for (File f : files) {
-                    if (!f.isFile() || !f.getName().endsWith(".txt")) continue;
-                    try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(f))) {
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            line = line.trim();
-                            if (line.isEmpty() || line.startsWith("#") || line.startsWith("//")) continue;
-                            int prefix = 32;
-                            int slashIdx = line.indexOf('/');
-                            String ipStr = line;
-                            if (slashIdx > 0) {
-                                try { prefix = Integer.parseInt(line.substring(slashIdx + 1)); } catch (Exception ignored) {}
-                                ipStr = line.substring(0, slashIdx);
-                            }
-                            try {
-                                InetAddress addr = InetAddress.getByName(ipStr);
-                                byte[] bytes = addr.getAddress();
-                                if (bytes.length == 4) {
-                                    bridge.blacklistAdd(bytes, 4, prefix);
-                                } else if (bytes.length == 16) {
-                                    int p6 = (slashIdx > 0) ? prefix : 128;
-                                    bridge.blacklistAdd(bytes, 6, p6);
-                                }
-                            } catch (Exception ignored) {}
-                        }
-                    } catch (Exception ignored) {}
-                }
-            } catch (Throwable ignored) {}
-        }, "KotEngineBlacklistLoader").start();
+        CaptureService service = INSTANCE;
+        if (service != null) new Thread(service::loadFeedPolicy, "KotEngineBlacklistLoader").start();
     }
 
-    private static boolean reloadBlocklist(MatchList.ListDescriptor blocklist) {
-        try {
-            com.kotsafe.security.engine.KotEngineBridge bridge = com.kotsafe.security.engine.KotEngineBridge.getInstance();
-            bridge.blacklistClear(4);
-            bridge.blacklistClear(6);
-            bridge.clearBlockedDomains();
-
-            if (blocklist != null && blocklist.hosts != null) {
-                for (String host : blocklist.hosts) {
-                    if (host != null && !host.trim().isEmpty()) {
-                        bridge.addBlockedDomain(host.trim().toLowerCase());
-                    }
+    private boolean loadFeedPolicy() {
+        synchronized (mFeedPolicyLock) {
+            if (INSTANCE != this || mStopping) return false;
+            MatchList.ListDescriptor feed = new MatchList.ListDescriptor();
+            java.util.List<Blacklists.NativeBlacklistStatus> loaded = new java.util.ArrayList<>();
+            if (mMalwareDetectionEnabled) {
+                File directory = new File(getFilesDir(), "malware_bl");
+                File[] files = directory.listFiles();
+                if (files == null) {
+                    Log.w(TAG, "Malware feeds unavailable; retaining the last applied feed policy");
+                    return false;
                 }
-            }
-
-            if (blocklist != null && blocklist.apps != null && !blocklist.apps.isEmpty()) {
-                java.util.List<Integer> parsedUids = new java.util.ArrayList<>();
-                for (String appStr : blocklist.apps) {
-                    if (appStr == null || appStr.trim().isEmpty()) continue;
-                    try {
-                        parsedUids.add(Integer.parseInt(appStr.trim()));
-                    } catch (NumberFormatException ignored) {}
-                }
-                if (!parsedUids.isEmpty()) {
-                    int[] uidArr = new int[parsedUids.size()];
-                    for (int i = 0; i < parsedUids.size(); i++) {
-                        uidArr[i] = parsedUids.get(i);
-                    }
-                    bridge.setBlockedUids(uidArr);
-                } else {
-                    bridge.setBlockedUids(null);
-                }
-            } else {
-                bridge.setBlockedUids(null);
-            }
-
-            if (blocklist != null && blocklist.ips != null) {
-                for (String ipStr : blocklist.ips) {
-                    if (ipStr == null || ipStr.trim().isEmpty()) continue;
-                    ipStr = ipStr.trim();
-                    int prefix = 32;
-                    int slashIdx = ipStr.indexOf('/');
-                    if (slashIdx > 0) {
-                        try {
-                            prefix = Integer.parseInt(ipStr.substring(slashIdx + 1));
-                        } catch (Exception ignored) {}
-                        ipStr = ipStr.substring(0, slashIdx);
-                    }
-                    try {
-                        InetAddress addr = InetAddress.getByName(ipStr);
-                        byte[] bytes = addr.getAddress();
-                        if (bytes.length == 4) {
-                            bridge.blacklistAdd(bytes, 4, prefix);
-                        } else if (bytes.length == 16) {
-                            int p6 = (slashIdx > 0) ? prefix : 128;
-                            bridge.blacklistAdd(bytes, 6, p6);
+                try {
+                    for (File file : files) {
+                        if (!file.isFile() || !file.getName().endsWith(".txt")) continue;
+                        int before = feed.hosts.size() + feed.ips.size();
+                        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(file))) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                com.kotsafe.security.model.FirewallRuleParser.feedLine(line, feed.hosts, feed.ips);
+                            }
                         }
-                    } catch (Exception ignored) {}
+                        int count = feed.hosts.size() + feed.ips.size() - before;
+                        if (count == 0) throw new java.io.IOException("Empty or invalid feed: " + file.getName());
+                        loaded.add(new Blacklists.NativeBlacklistStatus(file.getName(), count));
+                    }
+                    if (loaded.isEmpty()) throw new java.io.IOException("No downloaded feed files");
+                } catch (java.io.IOException error) {
+                    Log.e(TAG, "Feed read failed; retaining the last applied feed policy: " + error.getMessage());
+                    return false;
                 }
             }
-            return true;
-        } catch (Throwable ignored) {
-            return false;
+            // Feed ownership is independent of manual firewall/allowlist settings.
+            boolean applied = applyPolicy(2, mMalwareDetectionEnabled, feed);
+            if (applied) notifyBlacklistsLoaded(loaded.toArray(new Blacklists.NativeBlacklistStatus[0]));
+            return applied;
         }
     }
 
+    private static boolean reloadBlocklist(MatchList.ListDescriptor blocklist) {
+        return applyPolicy(0, true, blocklist);
+    }
+
     private static boolean reloadFirewallWhitelist(MatchList.ListDescriptor whitelist) {
-        return true;
+        return applyPolicy(1, whitelist != null,
+                whitelist != null ? whitelist : new MatchList.ListDescriptor());
+    }
+
+    private static boolean applyPolicy(int source, boolean enabled, MatchList.ListDescriptor rules) {
+        try {
+            if (rules == null || !rules.countries.isEmpty() || !rules.allowlists.isEmpty()) {
+                throw new IllegalArgumentException("Unsupported country or nested policy rules");
+            }
+            int[] uids = com.kotsafe.security.model.FirewallRuleParser.uids(rules.apps, packageName -> {
+                if (INSTANCE == null) return -1;
+                try { return Utils.getPackageUid(INSTANCE.getPackageManager(), packageName, 0); }
+                catch (PackageManager.NameNotFoundException absent) { return -1; }
+            });
+            java.util.List<String> hosts = new java.util.ArrayList<>();
+            java.util.List<String> ips = new java.util.ArrayList<>();
+            for (String host : rules.hosts) {
+                String normalized = com.kotsafe.security.model.FirewallRuleParser.domain(host);
+                if (normalized == null) throw new IllegalArgumentException("Invalid domain rule");
+                hosts.add(normalized);
+            }
+            for (String ip : rules.ips) {
+                String normalized = com.kotsafe.security.model.FirewallRuleParser.ip(ip);
+                if (normalized == null) throw new IllegalArgumentException("Invalid IP rule");
+                ips.add(normalized);
+            }
+            boolean applied = com.kotsafe.security.engine.KotEngineBridge.getInstance().replaceFirewallRules(
+                    source, enabled, uids, hosts.toArray(new String[0]), ips.toArray(new String[0]));
+            if (!applied) throw new IllegalStateException("Native policy replacement failed");
+            return true;
+        } catch (Exception | LinkageError error) {
+            Log.e(TAG, "Policy update failed; previous rules retained: " + error.getMessage());
+            if (INSTANCE != null) INSTANCE.reportError("Firewall update failed; previous rules retained. Review your settings.");
+            return false;
+        }
     }
 
     private static boolean reloadMalwareWhitelist(MatchList.ListDescriptor whitelist) {

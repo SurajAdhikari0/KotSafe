@@ -636,3 +636,49 @@ Java_com_kotsafe_security_engine_KotEngineBridge_nativeLookupDnsCache(JNIEnv *en
     }
     return NULL;
 }
+
+/* Copy Java arrays before building a complete replacement policy. */
+static void free_policy_strings(char **strings, jsize count) {
+    if (!strings) return;
+    for (jsize i = 0; i < count; i++) free(strings[i]);
+    free(strings);
+}
+static char **copy_policy_strings(JNIEnv *env, jobjectArray input, jsize count) {
+    char **copy = calloc(count ? (size_t)count : 1, sizeof(*copy));
+    if (!copy) return NULL;
+    for (jsize i = 0; i < count; i++) {
+        jstring item = (*env)->GetObjectArrayElement(env, input, i);
+        if (!item) { free_policy_strings(copy, count); return NULL; }
+        const char *text = (*env)->GetStringUTFChars(env, item, NULL);
+        if (text) {
+            size_t len = strlen(text) + 1;
+            copy[i] = malloc(len);
+            if (copy[i]) memcpy(copy[i], text, len);
+            (*env)->ReleaseStringUTFChars(env, item, text);
+        }
+        (*env)->DeleteLocalRef(env, item);
+        if (!copy[i]) { free_policy_strings(copy, count); return NULL; }
+    }
+    return copy;
+}
+JNIEXPORT jboolean JNICALL
+Java_com_kotsafe_security_engine_KotEngineBridge_nativeReplaceFirewallRules(
+    JNIEnv *env, jobject thiz, jint source, jboolean enabled, jintArray uid_array,
+    jobjectArray domain_array, jobjectArray cidr_array) {
+    (void)thiz;
+    if (!g_ctx.engine || !uid_array || !domain_array || !cidr_array) return JNI_FALSE;
+    jsize nu = (*env)->GetArrayLength(env, uid_array);
+    jsize nd = (*env)->GetArrayLength(env, domain_array);
+    jsize ni = (*env)->GetArrayLength(env, cidr_array);
+    jint *uids = nu ? (*env)->GetIntArrayElements(env, uid_array, NULL) : NULL;
+    if (nu && !uids) return JNI_FALSE;
+    char **domains = copy_policy_strings(env, domain_array, nd);
+    char **cidrs = (*env)->ExceptionCheck(env) ? NULL : copy_policy_strings(env, cidr_array, ni);
+    bool ok = (!nu || uids) && domains && cidrs && !(*env)->ExceptionCheck(env) &&
+        netcap_engine_replace_policy(g_ctx.engine, source, enabled, (int32_t *)uids,
+            (size_t)nu, (const char *const *)domains, (size_t)nd, (const char *const *)cidrs, (size_t)ni);
+    if (uids) (*env)->ReleaseIntArrayElements(env, uid_array, uids, JNI_ABORT);
+    free_policy_strings(domains, nd);
+    free_policy_strings(cidrs, ni);
+    return ok ? JNI_TRUE : JNI_FALSE;
+}

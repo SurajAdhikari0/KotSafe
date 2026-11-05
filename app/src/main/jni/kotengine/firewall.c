@@ -119,11 +119,11 @@ static char *normalize_domain(const char *domain) {
     return norm;
 }
 
-void netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domain) {
-    if (!fw || !domain || domain[0] == '\0') return;
+bool netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domain) {
+    if (!fw || !domain || domain[0] == '\0') return false;
 
     char *norm = normalize_domain(domain);
-    if (!norm) return;
+    if (!norm) return false;
 
     uint32_t h = hash_str(norm);
 
@@ -136,7 +136,7 @@ void netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domai
         if (strcmp(node->domain, norm) == 0) {
             free(norm);
             pthread_mutex_unlock(&fw->lock);
-            return;
+            return true;
         }
         node = node->next;
     }
@@ -152,6 +152,7 @@ void netcap_firewall_add_blocked_domain(netcap_firewall_t *fw, const char *domai
     }
 
     pthread_mutex_unlock(&fw->lock);
+    return new_node != NULL;
 }
 
 void netcap_firewall_remove_blocked_domain(netcap_firewall_t *fw, const char *domain) {

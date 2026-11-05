@@ -46,6 +46,7 @@ struct netcap_engine {
     netcap_dns_policy_t *dns_policy;
     netcap_dns_cache_t *dns_cache;
     netcap_firewall_t *firewall;
+    netcap_network_policy_t *network_policy;
     netcap_proxy_relay_t *proxy_relay;
     netcap_secrets_store_t *secrets;
 
@@ -279,11 +280,12 @@ netcap_engine_t *netcap_engine_create(const netcap_engine_config_t *cfg) {
     e->dns_policy = netcap_dns_policy_create();
     e->dns_cache = netcap_dns_cache_create(2048);
     e->firewall = netcap_firewall_create();
+    e->network_policy = netcap_network_policy_create();
     e->proxy_relay = netcap_proxy_relay_create();
     e->secrets = netcap_secrets_create(256);
     e->threats = netcap_threat_detector_create();
 
-    if (!e->conns || !e->blacklist || !e->dns_policy || !e->dns_cache || !e->firewall ||
+    if (!e->conns || !e->blacklist || !e->dns_policy || !e->dns_cache || !e->firewall || !e->network_policy ||
         !e->proxy_relay || !e->secrets || !e->threats ||
         netcap_ring_log_init(&e->log, cfg->log_ring_capacity) != 0) {
         netcap_conn_table_destroy(e->conns);
@@ -291,6 +293,7 @@ netcap_engine_t *netcap_engine_create(const netcap_engine_config_t *cfg) {
         netcap_dns_policy_destroy(e->dns_policy);
         netcap_dns_cache_destroy(e->dns_cache);
         netcap_firewall_destroy(e->firewall);
+        netcap_network_policy_destroy(e->network_policy);
         netcap_proxy_relay_destroy(e->proxy_relay);
         netcap_secrets_destroy(e->secrets);
         netcap_threat_detector_destroy(e->threats);
@@ -313,6 +316,7 @@ void netcap_engine_destroy(netcap_engine_t *e) {
     netcap_dns_policy_destroy(e->dns_policy);
     netcap_dns_cache_destroy(e->dns_cache);
     netcap_firewall_destroy(e->firewall);
+    netcap_network_policy_destroy(e->network_policy);
     netcap_proxy_relay_destroy(e->proxy_relay);
     netcap_secrets_destroy(e->secrets);
     netcap_threat_detector_destroy(e->threats);
@@ -441,17 +445,11 @@ static void *worker_main(void *arg) {
                             if (e->uid_resolver) {
                                 char src_str[48], dst_str[48];
                                 ip_to_string(p.key.src_ip, p.key.family, src_str, sizeof(src_str));
-                                ip_to_string(p.key.dst_ip, p.key.family, dst_str, sizeof(dst_str));
+                                ip_to_string(orig_dst_ip, p.key.family, dst_str, sizeof(dst_str));
                                 uid = e->uid_resolver(p.key.proto, src_str, p.key.src_port, dst_str, p.key.dst_port, e->uid_user_data);
                             }
                             if (uid < 0 && e->cfg.enable_uid_resolution) {
                                 uid = resolve_uid_for_port(p.key.src_port, p.key.proto, p.key.family);
-                            }
-                            if (uid < 0) {
-                                if (p.key.dst_port == 53 || p.key.dst_port == 5353 || p.key.src_port == 53 ||
-                                    p.key.proto == 1 /* ICMP */ || p.key.proto == 58 /* ICMPv6 */) {
-                                    uid = 1000; /* Android System UID fallback */
-                                }
                             }
                             if (c && uid >= 0) c->uid = uid;
                         }
@@ -489,7 +487,9 @@ static void *worker_main(void *arg) {
                                     c->domain_name[sizeof(c->domain_name) - 1] = '\0';
                                 }
 
-                                if (netcap_firewall_is_domain_blocked(e->firewall, queried_domain)) {
+                                if (netcap_firewall_is_domain_blocked(e->firewall, queried_domain) ||
+                                    netcap_network_policy_blocks(e->network_policy, uid,
+                                        orig_dst_ip, p.key.family, queried_domain)) {
                                     uint8_t sinkhole_pkt[512];
                                     size_t sh_len = netcap_dns_synthesize_sinkhole_packet(buf, (size_t)n, p.ip_hdr_len, p.key.family,
                                                                                           sinkhole_pkt, sizeof(sinkhole_pkt));
@@ -526,6 +526,17 @@ static void *worker_main(void *arg) {
                                 strncpy(c->domain_name, cached_dom, sizeof(c->domain_name) - 1);
                                 c->domain_name[sizeof(c->domain_name) - 1] = '\0';
                             }
+                        }
+
+                        /* Apply current policy before any proxy destination rewrite. */
+                        if (netcap_network_policy_blocks(e->network_policy, uid,
+                                orig_dst_ip, p.key.family, c ? c->domain_name : NULL)) {
+                            pthread_mutex_lock(&e->stats_lock);
+                            e->stats.blocked_pkts++;
+                            pthread_mutex_unlock(&e->stats_lock);
+                            if (c) c->blacklisted = 1;
+                            if (p.key.proto == NETCAP_PROTO_TCP) write_tcp_rst_packet(e->tun_fd, &p);
+                            continue;
                         }
 
                         /* Enhanced Port & Proxy Redirection */
@@ -981,3 +992,23 @@ void netcap_engine_record_reply_data(netcap_engine_t *engine, const netcap_flow_
     }
 }
 
+
+bool netcap_engine_replace_policy(netcap_engine_t *engine, int source, bool enabled,
+    const int32_t *uids, size_t uid_count, const char *const *domains, size_t domain_count,
+    const char *const *cidrs, size_t cidr_count) {
+    return engine && netcap_network_policy_replace(engine->network_policy, source, enabled,
+        uids, uid_count, domains, domain_count, cidrs, cidr_count);
+}
+
+bool netcap_engine_blocks_flow(netcap_engine_t *engine, const netcap_flow_key_t *key) {
+    if (!engine || !key) return false;
+    netcap_conn_t *c = netcap_conn_table_find(engine->conns, key);
+    char domain[256] = {0};
+    if (c && c->domain_name[0]) {
+        strncpy(domain, c->domain_name, sizeof(domain) - 1);
+    } else {
+        netcap_dns_cache_lookup(engine->dns_cache, key->dst_ip, key->family, domain, sizeof(domain));
+    }
+    return netcap_network_policy_blocks(engine->network_policy, c ? c->uid : -1,
+        key->dst_ip, key->family, domain);
+}
