@@ -1217,6 +1217,23 @@ public class SecurityBlocklistManager {
 
     private final ThreadLocal<Boolean> mIsUnblocking = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
+    public void removeCloudIndicator(String value) {
+        // Cloud corrections never delete user/provider-owned rules for the same indicator.
+        mRulesDb.deleteCloudValue(value);
+        boolean stillOwned=false;
+        for(SecurityRulesDb.SecurityRule rule:mRulesDb.getAllRules()){
+            if(rule.enabled && value.equalsIgnoreCase(rule.value)){stillOwned=true;break;}
+        }
+        if(!stillOwned){
+            try {
+                com.kotsafe.security.model.Blocklist nativeRules=com.kotsafe.security.KotSafe.getInstance().getBlocklist();
+                if(nativeRules!=null){nativeRules.removeHost(value);nativeRules.removeIp(value);nativeRules.save();}
+            }catch(Exception ignored){}
+        }
+        reloadCache();
+        syncWithCaptureService();
+    }
+
     public void unblock(String value) {
         if (value == null || value.isEmpty()) return;
         if (mIsUnblocking.get()) return;

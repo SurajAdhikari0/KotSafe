@@ -36,7 +36,7 @@ import { LicenseApiClient, LicenseApiError } from '../api/licenseApi.ts';
 import { tabSyncManager } from './tabSync.ts';
 import { maskKey, validateKeyFormat } from '../core/keyValidator.ts';
 
-const REVALIDATION_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const REVALIDATION_INTERVAL_MS = 15 * 60 * 1000; // 24 hours
 
 export type StateChangeListener = (
   state: LicenseState,
@@ -74,6 +74,10 @@ export class LicenseService {
 
     const record = cached.record;
     const now = Date.now();
+    if(!record.signature){
+      this.currentRecord=record;this.currentState='UNLICENSED';
+      setTimeout(()=>this.revalidate(),100);return;
+    }
 
     // Check expiration
     if (record.expiresAt && new Date(record.expiresAt).getTime() <= now) {
@@ -373,7 +377,7 @@ export class LicenseService {
         const now = Date.now();
         const grace = calculateGracePeriod(lastVerifiedEpoch, now);
 
-        if (grace.isWithinGrace) {
+        if (grace.isWithinGrace && !!this.currentRecord?.signature) {
           this.currentState = transitionLicenseState(this.currentState, {
             type: 'SERVER_UNREACHABLE',
             lastVerifiedEpoch,

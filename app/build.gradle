@@ -19,6 +19,9 @@ android {
         // The TV never receives a phone password or ID token. It uses this HTTPS relay only
         // for a short-lived, user-approved device-link exchange.
         buildConfigField "String", "TV_AUTH_BASE_URL", "\"https://relay.kotsafe.com\""
+        // Pin the Ed25519 public key used to verify signed cloud threat pages. Set this
+        // per release with -PTHREAT_FEED_PUBLIC_KEY=<base64 raw 32-byte key>.
+        buildConfigField "String", "THREAT_FEED_PUBLIC_KEY", "\"${project.findProperty('THREAT_FEED_PUBLIC_KEY') ?: ''}\""
 
         // only include full translations
         // NOTE: keep in sync with locales_config.xml

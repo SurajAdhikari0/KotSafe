@@ -40,23 +40,10 @@ import androidx.core.app.NotificationCompat;
 import com.kotsafe.security.R;
 
 /**
- * Foreground service that injects a 1×1 pixel FLAG_SECURE window overlay.
- *
- * How FLAG_SECURE works on Android:
- *   The SurfaceFlinger compositor walks all visible layers. If ANY layer
- *   has FLAG_SECURE set, the entire screenshot call returns a black frame.
- *   This means we only need a tiny non-transparent 1×1 px surface to mark
- *   the entire display output as secure — the protected app underneath is
- *   automatically blacked out in screenshots/recordings.
- *
- *   IMPORTANT: The view must NOT have alpha=0 or be INVISIBLE/GONE, because
- *   the compositor skips zero-alpha surfaces when building the layer list.
- *   We use a 1×1 px view with transparent background color (ARGB 0,0,0,0)
- *   but keep View visibility = VISIBLE and alpha = 1f so the layer is
- *   committed to SurfaceFlinger with FLAG_SECURE attached.
- *
- * Requires: SYSTEM_ALERT_WINDOW (android.permission.SYSTEM_ALERT_WINDOW)
- *           already declared in AndroidManifest.xml.
+ * Optional FLAG_SECURE overlay for a user-selected sensitive-app workflow.
+ * Android applies secure flags to the flagged window; this overlay does not establish
+ * that another application's content is protected or that a capture session was detected.
+ * Device/OEM verification is required before presenting any stronger claim.
  */
 public class ScreenshotBlockOverlayService extends Service {
 
@@ -141,7 +128,7 @@ public class ScreenshotBlockOverlayService extends Service {
         try {
             mWindowManager.addView(mOverlayView, params);
             mOverlayAttached = true;
-            android.util.Log.i(TAG, "FLAG_SECURE overlay SHOWN — screenshots blocked");
+            android.util.Log.i(TAG, "FLAG_SECURE overlay shown; cross-app capture protection is not verified");
         } catch (Exception e) {
             android.util.Log.e(TAG, "Failed to add overlay: " + e.getMessage());
         }
@@ -168,7 +155,7 @@ public class ScreenshotBlockOverlayService extends Service {
                     CHANNEL_ID,
                     "Screenshot Protection",
                     NotificationManager.IMPORTANCE_MIN);
-            ch.setDescription("Silently blocks screenshots in protected apps");
+            ch.setDescription("Optional secure overlay; cross-app capture coverage varies by device");
             ch.setShowBadge(false);
             ch.setSound(null, null);
             NotificationManager nm = getSystemService(NotificationManager.class);
@@ -179,8 +166,8 @@ public class ScreenshotBlockOverlayService extends Service {
     private Notification buildNotification() {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_shield)
-                .setContentTitle("Screenshot Protection Active")
-                .setContentText("Screenshots are blocked for selected apps")
+                .setContentTitle("Secure Overlay Active")
+                .setContentText("Cross-app capture protection is not verified; stop sharing before entering payment details")
                 .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setOngoing(true)
                 .setSilent(true)

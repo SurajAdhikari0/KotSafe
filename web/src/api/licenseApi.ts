@@ -12,6 +12,7 @@ import {
   LicenseApiResponse,
   ValidateRequest,
 } from '../types/license.ts';
+import {sharedAccountLicense} from './sharedAccountLicense';
 import { verifyServerSignature } from '../security/signatureVerifier.ts';
 
 export interface ApiClientConfig {
@@ -40,12 +41,15 @@ export class LicenseApiError extends Error {
 
 export class LicenseApiClient {
   private baseUrl: string;
+  private sharedAccount: boolean;
   private timeoutMs: number;
   private maxRetries: number;
   private appVersion: string;
 
   constructor(config: ApiClientConfig = {}) {
     this.baseUrl = config.baseUrl || '';
+    this.sharedAccount=!config.baseUrl;
+    if(config.baseUrl && !['localhost','127.0.0.1'].includes(new URL(config.baseUrl).hostname))throw new Error('Legacy license service is restricted to local development.');
     this.timeoutMs = config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.maxRetries = config.maxRetries ?? DEFAULT_MAX_RETRIES;
     this.appVersion = config.appVersion || DEFAULT_APP_VERSION;
@@ -55,6 +59,7 @@ export class LicenseApiClient {
    * Activates a license key for this device
    */
   async activate(key: string, deviceId: string): Promise<LicenseApiResponse> {
+    if(this.sharedAccount)return sharedAccountLicense('activate',key,deviceId);
     const payload: ActivateRequest = {
       key,
       deviceId,
@@ -85,6 +90,7 @@ export class LicenseApiClient {
    * Re-validates an existing license key
    */
   async validate(key: string, deviceId: string): Promise<LicenseApiResponse> {
+    if(this.sharedAccount)return sharedAccountLicense('verify',key,deviceId);
     const payload: ValidateRequest = {
       key,
       deviceId,
@@ -113,6 +119,7 @@ export class LicenseApiClient {
    * Deactivates license on this device and frees the seat
    */
   async deactivate(key: string, deviceId: string): Promise<LicenseApiResponse> {
+    if(this.sharedAccount)return sharedAccountLicense('deactivate',key,deviceId);
     const payload: DeactivateRequest = {
       key,
       deviceId,

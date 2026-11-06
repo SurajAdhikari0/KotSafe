@@ -364,6 +364,10 @@ public class FileHashDbHelper extends SQLiteOpenHelper {
         getWritableDatabase().delete(TABLE_FILE_HASHES, COL_SCAN_TIMESTAMP + " < ?", new String[]{String.valueOf(cutoffMillis)});
     }
 
+    public synchronized void removeCloudHash(String sha256) {
+        getWritableDatabase().delete(TABLE_FILE_HASHES, COL_SHA256+"=? AND "+COL_THREAT_DETAILS+" LIKE ?",new String[]{sha256,"KotSafe Cloud:%"});
+    }
+
     public synchronized void deleteFileHash(long id) {
         getWritableDatabase().delete(TABLE_FILE_HASHES, COL_ID + " = ?", new String[]{String.valueOf(id)});
     }

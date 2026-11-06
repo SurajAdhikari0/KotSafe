@@ -15,7 +15,8 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { User } from 'firebase/auth';
-import { db } from '../firebase/firebaseConfig';
+import { db, auth } from '../firebase/firebaseConfig';
+import {getOrCreateDeviceId} from '../security/secureStorage';
 
 export interface ConnectedDevice {
   deviceId: string;
@@ -27,24 +28,19 @@ export interface ConnectedDevice {
   isProtected: boolean;
   statusType: 'ONLINE' | 'OFFLINE' | 'REVOKED' | string;
   meshStatus: string;
-  threatScore: number;
+  threatScore: number | null;
   deviceType?: 'android' | 'desktop' | 'ios' | 'server';
   lastHeartbeat: number | Timestamp | { toMillis?: () => number; toDate?: () => Date } | null;
   isCurrentDevice?: boolean;
 }
 
-const LOCAL_STORAGE_DEVICE_ID_KEY = 'kotsafe_desktop_device_id_v2';
+export function getDesktopDeviceId():string {return getOrCreateDeviceId();}
 
-export function getDesktopDeviceId(): string {
-  if (typeof window === 'undefined') return 'desktop_server';
-  let deviceId = localStorage.getItem(LOCAL_STORAGE_DEVICE_ID_KEY);
-  if (!deviceId) {
-    const randomHex = Math.random().toString(36).substring(2, 10);
-    const tsHex = Date.now().toString(36);
-    deviceId = `desktop_${randomHex}_${tsHex}`;
-    localStorage.setItem(LOCAL_STORAGE_DEVICE_ID_KEY, deviceId);
-  }
-  return deviceId;
+async function syncAccountInventory(user:User):Promise<void> {
+ const token=await user.getIdToken();const deviceId=getDesktopDeviceId();
+ const response=await fetch('https://kotsafe.com/api/v1/me/devices',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json',Authorization:`Bearer ${token}`,'X-KotSafe-Device-Id':deviceId},
+ body:JSON.stringify({device_uid:deviceId,name:detectDesktopPlatform().model,platform:'web',os_version:detectDesktopPlatform().os,app_version:'2.0.0',protection_state:'unknown'}),signal:AbortSignal.timeout(10000)});
+ if(!response.ok)throw new Error('Account device registration was denied or unavailable.');
 }
 
 export function detectDesktopPlatform(): { os: string; model: string } {
@@ -77,6 +73,7 @@ export function detectDesktopPlatform(): { os: string; model: string } {
  * Register or update this desktop client in Firestore under `users/{uid}/devices/{deviceId}`
  */
 export async function registerDesktopDevice(user: User): Promise<string> {
+  await syncAccountInventory(user);
   const deviceId = getDesktopDeviceId();
   const { os, model } = detectDesktopPlatform();
 
@@ -85,12 +82,12 @@ export async function registerDesktopDevice(user: User): Promise<string> {
     ownerUid: user.uid,
     model,
     osVersion: os,
-    appVersion: '2.0.5 Desktop Pro',
+    appVersion: '2.0.0',
     isOnline: true,
     statusType: 'ONLINE',
-    isProtected: true,
-    meshStatus: 'Zero-Trust Armed (Desktop Sentinel)',
-    threatScore: 100,
+    isProtected: false,
+    meshStatus: 'Not verified',
+    threatScore: null,
     deviceType: 'desktop',
     lastHeartbeat: serverTimestamp(),
   };
@@ -135,6 +132,7 @@ export function startDesktopHeartbeat(uid: string): () => void {
   const deviceId = getDesktopDeviceId();
   const intervalId = window.setInterval(async () => {
     try {
+      if(auth.currentUser?.uid===uid)await syncAccountInventory(auth.currentUser);
       const userDeviceRef = doc(db, 'users', uid, 'devices', deviceId);
       await updateDoc(userDeviceRef, {
         isOnline: true,
@@ -209,11 +207,11 @@ export function subscribeToUserDevices(
           model: data.model || 'KotSafe Device',
           osVersion: data.osVersion || 'Unknown OS',
           appVersion: data.appVersion || '2.0.5',
-          isOnline: typeof data.isOnline === 'boolean' ? data.isOnline : true,
-          isProtected: typeof data.isProtected === 'boolean' ? data.isProtected : true,
+          isOnline: typeof data.isOnline === 'boolean' ? data.isOnline : false,
+          isProtected: typeof data.isProtected === 'boolean' ? data.isProtected : false,
           statusType: data.statusType || (data.isOnline ? 'ONLINE' : 'OFFLINE'),
-          meshStatus: data.meshStatus || 'Zero-Trust Armed',
-          threatScore: typeof data.threatScore === 'number' ? data.threatScore : 100,
+          meshStatus: data.meshStatus || 'Not verified',
+          threatScore: typeof data.threatScore === 'number' ? data.threatScore : null,
           deviceType: detectedType,
           lastHeartbeat: data.lastHeartbeat || null,
           isCurrentDevice: isCur,
@@ -228,12 +226,12 @@ export function subscribeToUserDevices(
           ownerUid: uid,
           model,
           osVersion: os,
-          appVersion: '2.0.5 Desktop Pro',
+          appVersion: '2.0.0',
           isOnline: true,
-          isProtected: true,
+          isProtected: false,
           statusType: 'ONLINE',
-          meshStatus: 'Zero-Trust Armed (Desktop Sentinel)',
-          threatScore: 100,
+          meshStatus: 'Not verified',
+          threatScore: null,
           deviceType: 'desktop',
           lastHeartbeat: Date.now(),
           isCurrentDevice: true,

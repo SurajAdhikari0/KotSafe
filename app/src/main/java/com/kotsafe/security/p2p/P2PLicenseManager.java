@@ -23,6 +23,10 @@ import androidx.preference.PreferenceManager;
 
 import com.kotsafe.security.BuildConfig;
 import com.kotsafe.security.Utils;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.android.gms.tasks.Tasks;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
 
@@ -90,6 +94,12 @@ public final class P2PLicenseManager {
     private P2PLicenseManager(Context context) {
         mContext = context;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mMainHandler.postDelayed(new Runnable() {
+            @Override public void run() {
+                if (!getActiveLicenseKey().isEmpty()) verifyWithServer(null);
+                mMainHandler.postDelayed(this, 15 * 60 * 1000L);
+            }
+        }, 5000L);
     }
 
     /**
@@ -114,7 +124,9 @@ public final class P2PLicenseManager {
             // Unverified key without server token
             return false;
         }
-        return true;
+        long verified = mPrefs.getLong(PREF_LICENSE_LAST_VERIFIED, 0L);
+        long age = System.currentTimeMillis() - verified;
+        return verified > 0 && age >= 0 && age <= 24 * 60 * 60 * 1000L;
     }
 
     /**
@@ -176,14 +188,17 @@ public final class P2PLicenseManager {
     }
 
     private String getLicenseApiBaseUrl() {
-        String custom = mPrefs.getString("personal_gateway_custom_relay_url", "").trim();
-        if (!custom.isEmpty() && (custom.contains("localhost") || custom.contains("127.0.0.1") || custom.contains("10.0.2.2") || custom.contains("192.168."))) {
-            if (!custom.startsWith("http://") && !custom.startsWith("https://")) {
-                custom = "http://" + custom;
-            }
-            return custom + "/api/v1/license";
-        }
+        // Licensing is independent of the pairing relay. Never send account tokens to a custom relay.
         return PRODUCTION_LICENSE_URL;
+    }
+
+    private void authorize(HttpURLConnection connection) throws Exception {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) throw new IllegalStateException("Sign in before managing a license.");
+        String token = Tasks.await(user.getIdToken(false), 15, TimeUnit.SECONDS).getToken();
+        if (token == null || token.isEmpty()) throw new IllegalStateException("Sign in again to refresh your account.");
+        connection.setRequestProperty("Authorization", "Bearer " + token);
+        connection.setRequestProperty("X-KotSafe-Device-Id", getOrCreateDeviceId());
     }
 
     /**
@@ -213,6 +228,7 @@ public final class P2PLicenseManager {
                 URL url = new URL(getLicenseApiBaseUrl() + "/activate");
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
+                authorize(conn);
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setConnectTimeout(8000);
@@ -222,6 +238,7 @@ public final class P2PLicenseManager {
                 JSONObject req = new JSONObject();
                 req.put("license_key", cleanKey);
                 req.put("device_id", deviceId);
+                req.put("platform", "android");
                 req.put("device_name", deviceName);
                 req.put("os_version", osVersion);
                 req.put("app_version", appVersion);
@@ -292,6 +309,7 @@ public final class P2PLicenseManager {
                 URL url = new URL(getLicenseApiBaseUrl() + "/account-activate");
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
+                authorize(conn);
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setConnectTimeout(8000);
@@ -300,12 +318,11 @@ public final class P2PLicenseManager {
 
                 JSONObject req = new JSONObject();
                 req.put("device_id", deviceId);
+                req.put("platform", "android");
                 req.put("device_name", deviceName);
                 req.put("os_version", osVersion);
                 req.put("app_version", appVersion);
-                if (email != null && !email.trim().isEmpty()) {
-                    req.put("email", email.trim());
-                }
+
 
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(req.toString().getBytes(StandardCharsets.UTF_8));
@@ -374,6 +391,7 @@ public final class P2PLicenseManager {
                 URL url = new URL(getLicenseApiBaseUrl() + "/verify");
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
+                authorize(conn);
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept", "application/json");
                 conn.setConnectTimeout(6000);
@@ -383,6 +401,7 @@ public final class P2PLicenseManager {
                 JSONObject req = new JSONObject();
                 req.put("license_key", key);
                 req.put("device_id", deviceId);
+                req.put("platform", "android");
 
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(req.toString().getBytes(StandardCharsets.UTF_8));
@@ -414,7 +433,7 @@ public final class P2PLicenseManager {
                         mMainHandler.post(() -> callback.onSuccess(tier, maxDevices, expiresAt));
                     }
                 } else {
-                    revokeLicense();
+                    if (code == 401 || code == 403 || code == 404) revokeLicense();
                     if (callback != null) {
                         String msg = resp.optString("message", "License verification failed. Reverted to Freemium.");
                         mMainHandler.post(() -> callback.onError(msg));
@@ -446,6 +465,7 @@ public final class P2PLicenseManager {
                     URL url = new URL(getLicenseApiBaseUrl() + "/deactivate");
                     conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
+                authorize(conn);
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setRequestProperty("Accept", "application/json");
                     conn.setConnectTimeout(6000);
@@ -455,6 +475,7 @@ public final class P2PLicenseManager {
                     JSONObject req = new JSONObject();
                     req.put("license_key", key);
                     req.put("device_id", deviceId);
+                req.put("platform", "android");
 
                     try (OutputStream os = conn.getOutputStream()) {
                         os.write(req.toString().getBytes(StandardCharsets.UTF_8));

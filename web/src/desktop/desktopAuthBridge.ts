@@ -20,6 +20,7 @@ export interface BrowserLoginRequest {
 }
 
 export interface DesktopAuthBridge {
+  licenseRequest?(action:'activate'|'verify'|'deactivate',key:string,deviceId:string):Promise<import('../types/license').LicenseApiResponse>;
   getSession(): Promise<DesktopSession | null>;
   beginBrowserLogin(request: BrowserLoginRequest): Promise<void>;
   beginGuestSession(): Promise<void>;

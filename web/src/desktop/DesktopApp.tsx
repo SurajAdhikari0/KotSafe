@@ -539,7 +539,7 @@ function DesktopWorkspace({
                       <div className="desktop-telemetry-row">
                         <span className="desktop-telemetry-label">Threat Posture</span>
                         <span className="desktop-telemetry-value">
-                          Score {device.threatScore}/100 {device.isProtected ? '· Protected' : ''}
+                          {device.threatScore===null?'Score not measured':`Score ${device.threatScore}/100`} {device.isProtected ? '· Client reports protection' : ''}
                         </span>
                       </div>
                     </div>

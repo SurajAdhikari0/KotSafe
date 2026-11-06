@@ -58,6 +58,10 @@ public class TiCacheDb extends SQLiteOpenHelper {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
+    public void removeProviderValue(String value, String provider) {
+        getWritableDatabase().delete(TABLE_CACHE, COL_IOC_VALUE+"=? AND "+COL_PROVIDER+"=?",new String[]{value,provider});
+    }
+
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);

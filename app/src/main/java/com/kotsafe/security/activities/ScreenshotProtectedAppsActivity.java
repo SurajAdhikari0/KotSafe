@@ -160,7 +160,7 @@ public class ScreenshotProtectedAppsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Per-App Screenshot Block");
+            getSupportActionBar().setTitle("Sensitive App Overlay");
         }
 
         mManager = PhysicalSecurityManager.getInstance(this);

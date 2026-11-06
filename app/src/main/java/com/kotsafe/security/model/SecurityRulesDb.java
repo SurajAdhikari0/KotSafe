@@ -384,6 +384,10 @@ public class SecurityRulesDb extends SQLiteOpenHelper {
         }
     }
 
+    public int deleteCloudValue(String value) {
+        return getWritableDatabase().delete(TABLE_RULES, COL_VALUE+"=? AND "+COL_SOURCE+"=?", new String[]{value,"KotSafe Cloud"});
+    }
+
     public int deleteRuleByValue(String value) {
         if (value == null || value.isEmpty()) return 0;
         String clean = cleanHostOrValue(value).toLowerCase();

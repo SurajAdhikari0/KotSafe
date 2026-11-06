@@ -101,12 +101,27 @@ public class CloudSyncManager {
 
     @SuppressLint("HardwareIds")
     public String getDeviceId() {
-        try {
-            String id = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-            if (id != null && !id.isEmpty()) return id;
-        } catch (Exception ignored) {}
-        return "device_" + Build.SERIAL;
+        return com.kotsafe.security.p2p.P2PLicenseManager.getInstance(mContext).getOrCreateDeviceId();
     }
+
+    private void syncAccountDevice(FirebaseUser user) {
+        java.net.HttpURLConnection connection=null;
+        try {
+            String token=com.google.android.gms.tasks.Tasks.await(user.getIdToken(false),15,java.util.concurrent.TimeUnit.SECONDS).getToken();
+            connection=(java.net.HttpURLConnection)new java.net.URL("https://kotsafe.com/api/v1/me/devices").openConnection();
+            connection.setRequestMethod("POST");connection.setConnectTimeout(10000);connection.setReadTimeout(10000);connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type","application/json");connection.setRequestProperty("Authorization","Bearer "+token);
+            connection.setRequestProperty("X-KotSafe-Device-Id",getDeviceId());
+            org.json.JSONObject body=new org.json.JSONObject();body.put("device_uid",getDeviceId());body.put("name",Build.MANUFACTURER+" "+Build.MODEL);
+            body.put("platform","android");body.put("os_version",Build.VERSION.RELEASE);body.put("app_version",BuildConfig.VERSION_NAME);
+            body.put("protection_state",CaptureService.isServiceActive()?"monitoring":"unknown");
+            try(java.io.OutputStream output=connection.getOutputStream()){output.write(body.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));}
+            int code=connection.getResponseCode();
+            if(code<200 || code>=300)Log.w(TAG,"Account inventory unavailable (HTTP "+code+")");
+        }catch(Exception error){Log.w(TAG,"Account inventory sync failed: "+error.getMessage());}
+        finally{if(connection!=null)connection.disconnect();}
+    }
+
 
     /**
      * Synchronize user profile & register current hardware device on auth success
@@ -114,6 +129,7 @@ public class CloudSyncManager {
     public void syncUserOnAuth(FirebaseUser user) {
         if (user == null) return;
         mExecutor.execute(() -> {
+            syncAccountDevice(user);
             FirebaseFirestore db = getDb();
             if (db == null) return;
 
@@ -134,11 +150,11 @@ public class CloudSyncManager {
 
             // Safe defaults for posture if not exists
             Map<String, Object> posture = new HashMap<>();
-            posture.put("threatScore", 100);
-            posture.put("antivirusArmed", true);
-            posture.put("firewallActive", true);
-            posture.put("currentStatus", "PROTECTED");
-            posture.put("lastScanTime", System.currentTimeMillis());
+            posture.put("threatScore", null);
+            posture.put("antivirusArmed", false);
+            posture.put("firewallActive", CaptureService.isServiceActive());
+            posture.put("currentStatus", "UNKNOWN");
+            posture.put("lastScanTime", null);
             posture.put("threatsBlockedCount", 0);
             userData.put("securityPosture", posture);
 
@@ -156,9 +172,10 @@ public class CloudSyncManager {
             deviceData.put("appVersion", BuildConfig.VERSION_NAME);
             deviceData.put("isOnline", true);
             deviceData.put("statusType", "ONLINE");
-            deviceData.put("isProtected", true);
-            deviceData.put("meshStatus", "Zero-Trust Armed (P2P Direct)");
-            deviceData.put("threatScore", 100);
+            deviceData.put("isProtected", CaptureService.isServiceActive());
+            deviceData.put("protectionState", CaptureService.isServiceActive()?"monitoring":"unknown");
+            deviceData.put("meshStatus", "Not verified");
+            deviceData.put("threatScore", null);
             deviceData.put("lastHeartbeat", FieldValue.serverTimestamp());
 
             db.collection(COL_USERS).document(uid)
@@ -204,6 +221,7 @@ public class CloudSyncManager {
         mExecutor.execute(() -> {
             FirebaseFirestore db = getDb();
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if(user != null)syncAccountDevice(user);
             if (db == null || user == null) return;
 
             String uid = user.getUid();
@@ -523,6 +541,7 @@ public class CloudSyncManager {
             cmdData.put("command", command);
             cmdData.put("status", "PENDING");
             cmdData.put("issuedAt", FieldValue.serverTimestamp());
+            cmdData.put("expiresAt", new com.google.firebase.Timestamp(new java.util.Date(System.currentTimeMillis()+5*60*1000L)));
             cmdData.put("issuedBy", Build.MANUFACTURER + " " + Build.MODEL);
             cmdData.put("issuedByDeviceId", getDeviceId());
 
@@ -562,6 +581,8 @@ public class CloudSyncManager {
     /**
      * Start listening for remote defense commands directed to THIS hardware device
      */
+    private final java.util.Set<String> mRunningCommands=java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     public synchronized void startCommandListener() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = getDb();
@@ -589,16 +610,16 @@ public class CloudSyncManager {
 
                         Log.i(TAG, "Received remote defense command: " + cmd + " (id: " + cmdId + ")");
 
-                        // Mark command EXECUTED immediately to prevent duplicate runs
-                        doc.getReference().update("status", "EXECUTED", "executedAt", FieldValue.serverTimestamp());
-
-                        // Dispatch local execution
-                        executeLocalDefenseCommand(cmd, uid, myDeviceId);
+                        com.google.firebase.Timestamp expiry=doc.getTimestamp("expiresAt");
+                        if(expiry==null || expiry.toDate().getTime()<System.currentTimeMillis()){
+                            doc.getReference().update("status","EXPIRED");continue;
+                        }
+                        if(mRunningCommands.add(doc.getReference().getPath()))executeLocalDefenseCommand(cmd, uid, myDeviceId, doc.getReference());
                     }
                 });
     }
 
-    private void executeLocalDefenseCommand(String cmd, String uid, String myDeviceId) {
+    private void executeLocalDefenseCommand(String cmd, String uid, String myDeviceId, com.google.firebase.firestore.DocumentReference command) {
         new Handler(Looper.getMainLooper()).post(() -> {
             try {
                 if ("REMOTE_KILL_SWITCH".equalsIgnoreCase(cmd)) {
@@ -630,16 +651,13 @@ public class CloudSyncManager {
                     if (CaptureService.isServiceActive()) {
                         CaptureService.stopService();
                     }
-                } else if ("REMOTE_ARM".equalsIgnoreCase(cmd)) {
-                    Log.i(TAG, "Arming protection via remote command");
-                    FirebaseFirestore db = getDb();
-                    if (db != null) {
-                        db.collection(COL_USERS).document(uid).collection(COL_DEVICES).document(myDeviceId)
-                                .update("isProtected", true);
-                    }
+                } else {
+                    throw new IllegalStateException("This remote command requires local user confirmation.");
                 }
+                command.update("status","EXECUTED","completedAt",FieldValue.serverTimestamp()).addOnCompleteListener(result->mRunningCommands.remove(command.getPath()));
             } catch (Exception ex) {
                 Log.e(TAG, "Failed executing defense command " + cmd + ": " + ex.getMessage());
+                command.update("status","FAILED","completedAt",FieldValue.serverTimestamp()).addOnCompleteListener(result->mRunningCommands.remove(command.getPath()));
             }
         });
     }

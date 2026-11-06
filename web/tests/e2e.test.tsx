@@ -17,6 +17,10 @@ import { clearLicenseFromStorage } from '../src/security/secureStorage.ts';
 import { licenseService } from '../src/services/licenseService.ts';
 import { buildCanonicalPayload, generateSignature } from '../src/security/signatureVerifier.ts';
 
+vi.mock('../src/api/sharedAccountLicense',()=>({sharedAccountLicense:async(action:string,_key:string,deviceId:string)=>{
+  const response=await fetch('/license/'+(action==='verify'?'validate':action),{method:'POST',body:JSON.stringify({deviceId})});return response.json();
+}}));
+
 describe('License Activation End-to-End User Flow', () => {
   const validKey = 'KOT-PRO-ABCD1234-EF56';
 

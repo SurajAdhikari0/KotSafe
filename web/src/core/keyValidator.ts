@@ -4,7 +4,7 @@
  */
 
 // Format: KOT-(PRO|ENT|DEV)-[4-10 alphanumeric chars]-[4-8 checksum chars]
-export const KEY_FORMAT_REGEX = /^KOT-(PRO|ENT|DEV)-[A-Z0-9]{4,10}-[A-Z0-9]{4,8}$/;
+export const KEY_FORMAT_REGEX = /^KOT-(PRO|ENT|LIFE|DEV)-(?:[A-Z0-9]{5}-){2}[A-Z0-9]{5}$|^KOT-(PRO|ENT|DEV)-[A-Z0-9]{4,10}-[A-Z0-9]{4,8}$/;
 
 /**
  * Normalizes input:
@@ -62,7 +62,7 @@ export function validateKeyFormat(key: string): {
   }
 
   const tier = parts[1];
-  if (!['PRO', 'ENT', 'DEV'].includes(tier)) {
+  if (!['PRO', 'ENT', 'LIFE', 'DEV'].includes(tier)) {
     return {
       isValid: false,
       error: `Unknown plan tier "${tier}". Expected PRO or ENT.`,

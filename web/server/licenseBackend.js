@@ -330,7 +330,15 @@ const server = http.createServer((req, res) => {
         if (session.approved && session.uid !== decoded.uid) {
           return sendJson(res, 409, { error: 'This TV link was already approved by another account' });
         }
-        const entitlement = getEntitlement(decoded);
+        // The admin/backend database is authoritative; stale custom claims cannot grant a paid plan.
+        const accountResponse = await fetch('https://kotsafe.com/api/v1/me/entitlements', {
+          headers: {Authorization: `Bearer ${idToken}`, Accept: 'application/json'},
+          signal: AbortSignal.timeout(10000),
+        });
+        if (!accountResponse.ok) return sendJson(res, accountResponse.status === 403 ? 403 : 503, {error:'Account entitlement verification is unavailable. No TV access was granted.'});
+        const account = (await accountResponse.json()).data;
+        if (!account || typeof account.p2p_entitled !== 'boolean') throw new Error('Invalid entitlement response');
+        const entitlement = {tier: account.tier, p2pEntitled: account.p2p_entitled, entitlementExpiresAt: account.expires_at || 0};
         session.approved = true;
         session.uid = decoded.uid;
         session.email = typeof decoded.email === 'string' ? decoded.email : '';
@@ -375,6 +383,10 @@ const server = http.createServer((req, res) => {
         console.error('[KotSafe TV Auth] Could not mint TV custom token:', error?.message || error);
         return sendJson(res, 503, { error: 'KotSafe TV sign-in service is not configured' });
       }
+    }
+
+    if (req.url.startsWith('/license/') && process.env.NODE_ENV === 'production') {
+      return sendJson(res, 410, {errorCode:'USE_ACCOUNT_API',message:'Use the authenticated kotsafe.com/api/v1/license service.'});
     }
 
     // 1. POST /license/activate

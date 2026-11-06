@@ -55,6 +55,7 @@ public class KotSafe extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        com.kotsafe.security.model.ScreenCaptureConsent.install(this);
 
         if(!isUnderTest())
             Log.init(getCacheDir().getAbsolutePath());

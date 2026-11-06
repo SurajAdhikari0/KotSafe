@@ -40,6 +40,19 @@ service cloud.firestore {
       // Nested devices subcollection for this user
       match /devices/{deviceId} {
         allow read, write: if isOwner(userId) || isAdmin();
+        match /commands/{commandId} {
+          allow read: if isOwner(userId);
+          allow create: if isOwner(userId) &&
+            request.resource.data.command in ['ISOLATE_WORKSTATION','REMOTE_KILL_SWITCH','RESTORE_WORKSTATION','REMOTE_ARM','REMOTE_DISARM','REMOTE_SCAN'] &&
+            request.resource.data.status == 'PENDING' &&
+            request.resource.data.issuedAt == request.time &&
+            request.resource.data.expiresAt > request.time &&
+            request.resource.data.expiresAt <= request.time + duration.value(10,'m');
+          allow update: if isOwner(userId) &&
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','completedAt']) &&
+            request.resource.data.status in ['EXECUTED','FAILED','EXPIRED'];
+          allow delete: if isOwner(userId);
+        }
       }
 
       // Security audit trail subcollection for this user

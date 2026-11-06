@@ -6,6 +6,7 @@
 package com.kotsafe.security.model;
 
 import android.content.Context;
+import android.util.Base64;
 import androidx.preference.PreferenceManager;
 
 import com.kotsafe.security.BuildConfig;
@@ -20,6 +21,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.Signature;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -118,17 +122,21 @@ public class ThreatFeedSyncManager {
 
     // ─── KotSafe Cloud Threat Delta Sync ────────────────────────────────────
 
-    private int syncKotSafeCloudDelta() {
+    private int syncKotSafeCloudDelta() throws Exception {
         int added = 0;
         HttpURLConnection conn = null;
         try {
             long lastSyncTs = PreferenceManager.getDefaultSharedPreferences(mContext)
                     .getLong(PREF_CLOUD_THREAT_LAST_SYNC_TS, 0L);
 
+            String cursor = null;
+            long serverWatermark = 0L;
+            int pages = 0;
+            do {
+            if (++pages > 10000) throw new java.io.IOException("Threat-feed page limit exceeded; watermark retained.");
             String requestUrl = DEFAULT_CLOUD_DELTA_URL;
-            if (lastSyncTs > 0) {
-                requestUrl += "?since=" + (lastSyncTs / 1000L);
-            }
+            if (cursor != null) requestUrl += "?cursor=" + java.net.URLEncoder.encode(cursor, "UTF-8");
+            else if (lastSyncTs > 0) requestUrl += "?since=" + (lastSyncTs / 1000L);
 
             URL url = new URL(requestUrl);
             conn = (HttpURLConnection) url.openConnection();
@@ -144,8 +152,7 @@ public class ThreatFeedSyncManager {
                 return 0;
             }
             if (responseCode != 200) {
-                Log.w(TAG, "KotSafe Cloud threat delta HTTP " + responseCode);
-                return 0;
+                throw new java.io.IOException("KotSafe Cloud threat delta HTTP " + responseCode);
             }
 
             StringBuilder sb = new StringBuilder();
@@ -157,12 +164,11 @@ public class ThreatFeedSyncManager {
             }
 
             JSONObject root = new JSONObject(sb.toString());
-            if (!"success".equalsIgnoreCase(root.optString("status", ""))) {
-                return 0;
-            }
-
+            if (!"success".equalsIgnoreCase(root.optString("status", ""))) throw new java.io.IOException("Invalid threat-feed response.");
+            root = verifiedCloudPage(root);
             JSONObject delta = root.optJSONObject("delta");
-            if (delta == null) return 0;
+            if (delta == null) throw new java.io.IOException("Missing threat delta.");
+            serverWatermark = Long.parseLong(root.getString("version")) * 1000L;
 
             SecurityBlocklistManager blm = SecurityBlocklistManager.getInstance(mContext);
             TiCacheDb cacheDb = TiCacheDb.getInstance(mContext);
@@ -178,7 +184,7 @@ public class ThreatFeedSyncManager {
                     String family = item.optString("family", "");
                     int confidence = item.optInt("confidence", 90);
 
-                    if (!domain.isEmpty()) {
+                    if (!domain.isEmpty() && confidence >= 70) {
                         cacheDb.store(domain, "DOMAIN", "KotSafe Cloud", true, false, confidence, "MALICIOUS", threatType, family, TiCacheDb.DEFAULT_TTL_MS);
                         if (!blm.isDomainBlocked(domain)) {
                             blm.blockDomain(domain, "Cloud Sentinel: " + threatType + (family.isEmpty() ? "" : " (" + family + ")"), "KotSafe Cloud");
@@ -194,7 +200,8 @@ public class ThreatFeedSyncManager {
                 for (int i = 0; i < domainsRemoved.length(); i++) {
                     String domain = domainsRemoved.getString(i).trim().toLowerCase();
                     if (!domain.isEmpty()) {
-                        blm.unblock(domain);
+                        blm.removeCloudIndicator(domain);
+                        cacheDb.removeProviderValue(domain, "KotSafe Cloud");
                     }
                 }
             }
@@ -208,9 +215,9 @@ public class ThreatFeedSyncManager {
                     String threatType = item.optString("threat_type", "c2_botnet");
                     int confidence = item.optInt("confidence", 90);
 
-                    if (!ip.isEmpty()) {
+                    if (!ip.isEmpty() && confidence >= 70) {
                         cacheDb.store(ip, "IP", "KotSafe Cloud", true, false, confidence, "MALICIOUS", threatType, "Active C2 Node", TiCacheDb.DEFAULT_TTL_MS);
-                        blm.blockIp(ip, "Cloud Sentinel C2: " + threatType, "KotSafe Cloud");
+                        if (!blm.isBlocked(ip)) blm.blockIp(ip, "Cloud Sentinel C2: " + threatType, "KotSafe Cloud");
                         added++;
                     }
                 }
@@ -226,7 +233,7 @@ public class ThreatFeedSyncManager {
                     String family = item.optString("family", "Malware Signature");
                     int confidence = item.optInt("confidence", 99);
 
-                    if (sha256.length() == 64) {
+                    if (sha256.matches("[a-f0-9]{64}") && confidence >= 70) {
                         cacheDb.store(sha256, "HASH", "KotSafe Cloud", true, false, confidence, "MALICIOUS", threatType, family, TiCacheDb.DEFAULT_TTL_MS);
 
                         FileHashEntry entry = new FileHashEntry();
@@ -246,22 +253,70 @@ public class ThreatFeedSyncManager {
                 }
             }
 
-            // Sync with capture service and refresh native engine
-            blm.syncWithCaptureService();
+            for (String key : new String[]{"ips_removed", "hashes_removed"}) {
+                JSONArray removed = delta.optJSONArray(key);
+                if (removed == null) continue;
+                for (int i=0; i<removed.length(); i++) {
+                    String value=removed.getString(i).trim().toLowerCase();
+                    cacheDb.removeProviderValue(value, "KotSafe Cloud");
+                    if ("ips_removed".equals(key)) blm.removeCloudIndicator(value);
+                    else hashDb.removeCloudHash(value);
+                }
+            }
+            cursor = root.isNull("next_cursor") ? null : root.optString("next_cursor", null);
+            if (root.optBoolean("has_more", false) && (cursor == null || cursor.isEmpty())) throw new java.io.IOException("Threat-feed continuation is missing.");
+            if (conn != null) { conn.disconnect(); conn = null; }
+            } while (cursor != null && !cursor.isEmpty());
+            // Only a fully applied server snapshot advances the watermark.
+            SecurityBlocklistManager.getInstance(mContext).syncWithCaptureService();
 
             // Update last sync timestamp
             PreferenceManager.getDefaultSharedPreferences(mContext).edit()
-                    .putLong(PREF_CLOUD_THREAT_LAST_SYNC_TS, System.currentTimeMillis())
+                    .putLong(PREF_CLOUD_THREAT_LAST_SYNC_TS, serverWatermark)
                     .apply();
 
         } catch (Exception e) {
             Log.w(TAG, "KotSafe Cloud delta sync error: " + e.getMessage());
+            throw e;
         } finally {
             if (conn != null) {
                 try { conn.disconnect(); } catch (Exception ignored) {}
             }
         }
         return added;
+    }
+
+    /**
+     * The transport is HTTPS, but the feed is also signed so a compromised relay or
+     * TLS endpoint cannot silently insert block rules. The public key is pinned in
+     * the release build; never accept a public key supplied by the response itself.
+     */
+    private static JSONObject verifiedCloudPage(JSONObject response) throws Exception {
+        String pinned = BuildConfig.THREAT_FEED_PUBLIC_KEY == null ? "" : BuildConfig.THREAT_FEED_PUBLIC_KEY.trim();
+        String payload = response.optString("signed_payload", "");
+        String signature = response.optString("signature", "");
+        if (pinned.isEmpty() || payload.isEmpty() || signature.isEmpty()) {
+            throw new java.io.IOException("Signed cloud threat feed is not configured.");
+        }
+        byte[] key = Base64.decode(pinned, Base64.DEFAULT);
+        if (key.length == 32) {
+            byte[] wrapped = new byte[44];
+            byte[] prefix = new byte[]{0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00};
+            System.arraycopy(prefix, 0, wrapped, 0, prefix.length);
+            System.arraycopy(key, 0, wrapped, prefix.length, key.length);
+            key = wrapped;
+        }
+        Signature verifier = Signature.getInstance("Ed25519");
+        verifier.initVerify(KeyFactory.getInstance("Ed25519").generatePublic(new X509EncodedKeySpec(key)));
+        verifier.update(("kotsafe-threat-delta-v1:" + payload).getBytes(StandardCharsets.UTF_8));
+        if (!verifier.verify(Base64.decode(signature, Base64.DEFAULT))) {
+            throw new java.io.IOException("Cloud threat-feed signature verification failed.");
+        }
+        JSONObject verified = new JSONObject(payload);
+        if (!"success".equalsIgnoreCase(verified.optString("status", "")) || verified.optJSONObject("delta") == null) {
+            throw new java.io.IOException("Signed cloud threat-feed payload is invalid.");
+        }
+        return verified;
     }
 
     // ─── URLhaus Feed Sync ───────────────────────────────────────────────────
