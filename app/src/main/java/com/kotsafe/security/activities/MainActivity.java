@@ -44,6 +44,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import com.kotsafe.security.views.AnimUtils;
+import com.kotsafe.security.dialogs.NotificationCenterBottomSheet;
+import com.kotsafe.security.model.NotificationCenterManager;
 import androidx.core.content.pm.PackageInfoCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
@@ -165,6 +167,7 @@ public class MainActivity extends BaseActivity {
     private TextView mToolbarStatusLabel;
     private ImageView mToolbarLogo;
     private Animation mLogoPulse;
+    private View mDotUnreadNotifications;
 
     // Exit node active connection banner
     private View mBannerExitNodeConnected;
@@ -456,6 +459,7 @@ public class MainActivity extends BaseActivity {
 
         GatewayTelemetry.getInstance().addListener(mExitNodeTelemetryListener);
         updateExitNodeBannerUI();
+        refreshNotificationBadge();
 
         // Mandatory Authentication: Ensure active session or guest mode is present
         boolean isAuthenticated = KotSafeUserManager.isUserAuthenticated(this);
@@ -698,6 +702,8 @@ public class MainActivity extends BaseActivity {
             AnimUtils.attachSpringTouch(btnMore);
             btnMore.setOnClickListener(this::showMorePopupMenu);
         }
+        mDotUnreadNotifications = findViewById(R.id.dot_unread_notifications);
+        refreshNotificationBadge();
 
         // Wire live-status views
         mToolbarStatusLabel = findViewById(R.id.toolbar_status_label);
@@ -883,6 +889,13 @@ public class MainActivity extends BaseActivity {
             boolean isNight = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
             themeToggle.setIcon(isNight ? R.drawable.ic_theme_sun : R.drawable.ic_theme_moon);
             themeToggle.setTitle(isNight ? R.string.theme_light : R.string.theme_dark);
+        }
+        MenuItem notifItem = popup.getMenu().findItem(R.id.action_notifications);
+        if (notifItem != null) {
+            int unread = NotificationCenterManager.getInstance(this).getCachedUnreadCount();
+            if (unread > 0) {
+                notifItem.setTitle(getString(R.string.action_broadcast_notifications) + " (" + unread + ")");
+            }
         }
         popup.setOnMenuItemClickListener(this::onOptionsItemSelected);
         popup.show();
@@ -1467,9 +1480,20 @@ public class MainActivity extends BaseActivity {
         } else if (id == R.id.action_profile) {
             showSecurityProfileDialog();
             return true;
+        } else if (id == R.id.action_notifications) {
+            NotificationCenterBottomSheet.show(this, this::refreshNotificationBadge);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshNotificationBadge() {
+        NotificationCenterManager.getInstance(this).checkUnreadCountAsync(count -> {
+            if (mDotUnreadNotifications != null) {
+                mDotUnreadNotifications.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void toggleThemeMode() {

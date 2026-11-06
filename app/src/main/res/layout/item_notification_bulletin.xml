@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/ks_bg_card"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- Top Metadata Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/bulletin_severity_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/ks_bg_badge_blue"
+            android:text="ADVISORY" />
+
+        <TextView
+            android:id="@+id/bulletin_audience_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:textSize="10sp"
+            android:textColor="@color/ks_grey"
+            android:background="@drawable/about_version_pill"
+            android:text="ANDROID" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/bulletin_time_ago"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp"
+            android:textColor="@color/ks_grey"
+            android:text="2h ago" />
+
+        <View
+            android:id="@+id/bulletin_unread_dot"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/ks_badge_unread_dot" />
+    </LinearLayout>
+
+    <!-- Bulletin Title -->
+    <TextView
+        android:id="@+id/bulletin_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/ks_ink"
+        android:text="Critical Threat Advisory" />
+
+    <!-- Bulletin Message -->
+    <TextView
+        android:id="@+id/bulletin_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="@color/ks_grey"
+        android:lineSpacingExtra="3dp"
+        android:layout_marginTop="6dp"
+        android:text="Bulletin description goes here..." />
+
+    <!-- Action Link Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_bulletin_action"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="10dp"
+        android:text="Open Advisory ↗"
+        android:textSize="11sp"
+        android:textColor="@color/ks_accent"
+        app:strokeColor="@color/ks_stroke"
+        app:cornerRadius="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:visibility="gone" />
+
+    <!-- Sender Footer -->
+    <TextView
+        android:id="@+id/bulletin_sender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:textColor="@color/ks_grey"
+        android:layout_marginTop="8dp"
+        android:text="KotSafe Security Operations" />
+</LinearLayout>
+

@@ -1,4 +1,9 @@
 <resources>
+    <string name="action_broadcast_notifications">Notifications &amp; Bulletins</string>
+    <string name="notification_center_title">Notifications &amp; Bulletins</string>
+    <string name="notification_center_subtitle">Security advisories, system notices, and updates</string>
+    <string name="notification_center_empty">No notifications or bulletins at this time. All systems secure.</string>
+    <string name="notification_center_mark_all_read">Mark all as read</string>
     <string name="kotsafe_app_name" translatable="false">KotSafe</string>
     <string name="default_collector_host" translatable="false">127.0.0.1</string>
     <string name="default_collector_port" translatable="false">1234</string>

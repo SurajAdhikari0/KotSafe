@@ -10,10 +10,17 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_notifications"
+        android:icon="@drawable/ic_profile_bell"
+        android:title="@string/action_broadcast_notifications"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_profile"
         android:icon="@drawable/ic_profile_avatar"
         android:title="@string/security_profile_title"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         app:showAsAction="always" />
 
     <item
