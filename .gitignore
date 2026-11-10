@@ -26,6 +26,7 @@ keystore
 __pycache__
 .venv/
 *.zip
+.aiteam.json
 
 # Sensitive Keys & Credentials
 *.keystore
