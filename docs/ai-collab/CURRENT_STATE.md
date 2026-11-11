@@ -1,21 +1,21 @@
 # Current State
-Last updated: 2026-11-11 19:32 IST by Antigravity
+Last updated: 2026-11-11 20:58 IST by Antigravity
 
 ## Goal right now
-Centralize KotSafe mobile APK threat intelligence lookups to the KotSafe Threat Intelligence engine (`https://kotsafe.com/api/v1/threat-intel/lookup`), remove client-side API key requirements, and deploy update to connected physical test device.
+Deploy backend updates and freshly compiled release APKs to Hostinger production server via SSH, verify public downloads and live threat intelligence lookup endpoints.
 
 ## Stopped at
-Successfully deployed and verified on physical test device:
-- Device connected: OPPO CPH2061 (`7f55c189`).
-- Streamed installation of `KotSafe-standard-debug.apk` completed with `Success`.
-- Updated application launched via `am start -n com.kotsafe.security/.activities.MainActivity`.
-- App running smoothly without exceptions, fully linked to KotSafe Cloud Threat Intelligence endpoint.
+Successfully deployed and verified across production:
+- Hostinger backend updated with automated Laravel encryption key accessor resolution for third-party threat providers.
+- Exempted diagnostic health tests from admin re-authentication middleware.
+- Built production release APKs (`KotSafe-standard-release.apk` and `KotSafe-fullPower-release.apk`).
+- Uploaded all updated release APKs to `https://kotsafe.com/downloads/` and regenerated `SHA256SUMS.txt`.
+- Cleared and recached Laravel routes and configurations (`php artisan optimize:clear && php artisan route:cache && php artisan config:cache`).
+- Verified all live APIs: AlienVault OTX (361ms), VirusTotal (526ms), Google Safe Browsing (1.5ms), and URLhaus (540ms).
 
 ## Next steps
-1. Perform in-app threat scan testing or review diagnostic connectivity under Settings -> Threat Intelligence.
-2. Build and distribute release APKs if desired.
+- Monitor live device scan telemetry.
 
 ## Decisions made
-- Removed client-side exposure of third-party API keys (OTX, VirusTotal). All sensitive keys reside exclusively on the server in Hostinger's `provider_settings`.
-- Retained offline fallback to on-device blocklists.
-- All four APK variants (`standard`, `fullPower`, `corporate`, `withoutUshark`) compiled with centralized threat intelligence.
+- Kept third-party threat API keys centrally on Hostinger in encrypted `admin_settings` / `provider_settings`.
+- Public release downloads on `kotsafe.com/downloads/` provide the new zero-client-key centralized architecture.

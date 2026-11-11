@@ -1,3 +1,11 @@
+### 2026-11-11 20:58 IST — Antigravity: Production deployment of backend updates & release APKs to Hostinger
+- Fixed API key decryption accessor in `ThreatIntelController.php` to automatically decrypt stored provider credentials.
+- Exempted diagnostic ping tests from write-action re-auth barriers in `AdminMiddleware.php`.
+- Assembled signed production release APKs (`KotSafe-standard-release.apk` and `KotSafe-fullPower-release.apk`).
+- Uploaded release APKs to `https://kotsafe.com/downloads/` via SCP and regenerated `SHA256SUMS.txt`.
+- Ran `php artisan optimize:clear`, `php artisan route:cache`, and `php artisan config:cache` on Hostinger.
+- Verified live responses for OTX (361ms), VirusTotal (526ms), and Google Safe Browsing (1.5ms).
+
 ### 2026-11-11 19:32 IST — Antigravity: Push update to physical test device (CPH2061)
 - Installed freshly compiled `KotSafe-standard-debug.apk` onto connected OPPO CPH2061 (`7f55c189`) via `adb install -r -d`.
 - Launched `com.kotsafe.security/.activities.MainActivity`.
