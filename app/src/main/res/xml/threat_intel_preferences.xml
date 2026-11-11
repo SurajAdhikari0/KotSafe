@@ -4,13 +4,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        app:title="AlienVault OTX Integration"
+        app:title="KotSafe Cloud Threat Intelligence (Active)"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreference
+            app:key="kotsafe_cloud_intel_enabled"
+            app:title="KotSafe Threat Cloud Protection"
+            app:summary="Centralized multi-engine defense (AlienVault OTX, URLhaus, MalwareBazaar, VirusTotal &amp; Neon DB). No personal API keys needed."
+            app:defaultValue="true"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="kotsafe_cloud_test_connection"
+            app:title="Test KotSafe Cloud Connection"
+            app:summary="Verify connection to KotSafe Threat Operations Center (https://kotsafe.com)"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="AlienVault OTX Direct Connect (Optional)"
         app:iconSpaceReserved="false">
 
         <EditTextPreference
             app:key="otx_api_key"
             app:title="OTX API Key"
-            app:summary="Configure your personal AlienVault OTX Direct Connect API Key"
+            app:summary="Optional client-side override. KotSafe Cloud already queries OTX centrally."
             app:useSimpleSummaryProvider="false"
             app:iconSpaceReserved="false" />
 
@@ -31,13 +49,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        app:title="VirusTotal Integration"
+        app:title="VirusTotal Direct Connect (Optional)"
         app:iconSpaceReserved="false">
 
         <EditTextPreference
             app:key="virustotal_api_key"
             app:title="VirusTotal API Key"
-            app:summary="Configure your personal VirusTotal API v3 Key"
+            app:summary="Optional client-side override. KotSafe Cloud already queries VirusTotal centrally."
             app:useSimpleSummaryProvider="false"
             app:iconSpaceReserved="false" />
 

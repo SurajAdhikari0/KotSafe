@@ -88,6 +88,16 @@ public class ThreatIntelApiSettings extends PreferenceFragmentCompat {
         updateMaskedSummary(siemTokenPref);
 
         // ── Test connection buttons ──────────────────────────────────────────
+        Preference cloudTestPref = findPreference("kotsafe_cloud_test_connection");
+        if (cloudTestPref != null) {
+            cloudTestPref.setOnPreferenceClickListener(preference -> {
+                testConnection("KotSafe Threat Cloud", () ->
+                        ThreatIntelApiClient.getInstance(requireContext()).testKotSafeCloudConnection(
+                                buildCallback("KotSafe Threat Cloud")));
+                return true;
+            });
+        }
+
         if (mOtxTestPref != null) {
             mOtxTestPref.setOnPreferenceClickListener(preference -> {
                 String key = ThreatIntelApiClient.getInstance(requireContext()).getOtxKey();

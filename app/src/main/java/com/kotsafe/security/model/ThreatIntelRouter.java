@@ -56,6 +56,7 @@ public class ThreatIntelRouter {
     /** Builds the ordered list of providers. Edit here to add future providers. */
     private List<ThreatIntelProvider> buildProviders() {
         List<ThreatIntelProvider> list = new ArrayList<>();
+        list.add(new KotSafeCloudProvider(mContext)); // Primary: Centralized KotSafe Cloud (Neon + OTX + MalwareBazaar + VT)
         list.add(new ThreatFoxProvider(mContext));
         list.add(new URLhausProvider(mContext));
         list.add(new MalwareBazaarProvider(mContext));

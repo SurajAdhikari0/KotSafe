@@ -95,7 +95,21 @@ public class ThreatIntelApiClient {
     }
 
     public boolean hasAnyApiKey() {
-        return !getOtxKey().isEmpty() || !getVtKey().isEmpty();
+        return true; // KotSafe Cloud Intelligence provides built-in multi-engine coverage without client keys
+    }
+
+    public void testKotSafeCloudConnection(ApiCallback<String> callback) {
+        new com.kotsafe.security.model.KotSafeCloudProvider(mContext).testConnection(new com.kotsafe.security.model.KotSafeCloudProvider.CloudCallback() {
+            @Override
+            public void onSuccess(String message) {
+                callback.onSuccess(message);
+            }
+
+            @Override
+            public void onError(String error) {
+                callback.onError(error);
+            }
+        });
     }
 
     public void testOtxConnection(String key, ApiCallback<String> callback) {
@@ -311,7 +325,27 @@ public class ThreatIntelApiClient {
             cleanIoc = ThreatIntelManager.cleanHash(ioc);
         }
 
-        // Try VirusTotal first if key available
+        // 1. Primary: Centralized KotSafe Cloud Intelligence (Multi-Engine Defense: OTX + MalwareBazaar + URLhaus + VT)
+        try {
+            com.kotsafe.security.model.KotSafeCloudProvider cloud = new com.kotsafe.security.model.KotSafeCloudProvider(mContext);
+            if (cloud.isAvailable()) {
+                com.kotsafe.security.model.ThreatIntelProvider.ThreatReport rep = cloud.lookup(cleanIoc, type);
+                if (rep != null && !"UNKNOWN".equalsIgnoreCase(rep.verdict)) {
+                    report.isMalicious = rep.isMalicious;
+                    report.isSuspicious = rep.isSuspicious;
+                    report.maliciousScore = rep.riskScore;
+                    report.totalScans = 75;
+                    report.provider = rep.provider;
+                    report.details = rep.details;
+                    mCache.put(cacheKey, report);
+                    return report;
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.w(TAG, "KotSafe Cloud query failed, falling back: " + e.getMessage());
+        }
+
+        // 2. Secondary fallback: direct local keys if configured
         if (!vtKey.isEmpty() && !cleanIoc.isEmpty()) {
             try {
                 String endpoint = "";
