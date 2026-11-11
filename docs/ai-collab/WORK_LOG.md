@@ -1,3 +1,9 @@
+### 2026-11-11 19:32 IST — Antigravity: Push update to physical test device (CPH2061)
+- Installed freshly compiled `KotSafe-standard-debug.apk` onto connected OPPO CPH2061 (`7f55c189`) via `adb install -r -d`.
+- Launched `com.kotsafe.security/.activities.MainActivity`.
+- Verified clean startup and active process on device.
+- The installed app now routes all threat queries through `https://kotsafe.com/api/v1/threat-intel/lookup` with zero client-side API keys required.
+
 # Work Log
 
 <!-- LOG START: newest entries go directly below this line -->
