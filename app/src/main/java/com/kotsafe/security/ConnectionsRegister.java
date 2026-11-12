@@ -231,6 +231,8 @@ public class ConnectionsRegister {
     }
 
     private void processConnectionStatus(ConnectionDescriptor conn, AppStats stats) {
+        com.kotsafe.security.model.SignedFeedObservations.observe(mContext,"ip",conn.dst_ip);
+        com.kotsafe.security.model.SignedFeedObservations.observe(mContext,"domain",conn.info);
         if(!conn.is_blocked) {
             try {
                 com.kotsafe.security.model.SecurityBlocklistManager secMgr =

@@ -11,22 +11,10 @@ import org.junit.Test;
 public class BuiltInThreatSignatureCatalogTest {
 
     @Test
-    public void detectsKnownSeedSignature() {
+    public void ordinaryFileDoesNotMatchRetiredSeed() {
         String hash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08";
-        BuiltInThreatSignatureCatalog.SignatureRule rule = BuiltInThreatSignatureCatalog.lookup(hash);
-
-        assertNotNull(rule);
-        assertEquals("SEED_MALWARE_SIGNATURE", rule.family);
-        assertEquals("Seed signature loaded from the built-in catalog.", rule.reason);
-    }
-
-    @Test
-    public void normalizesHashInput() {
-        String hash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08";
-        BuiltInThreatSignatureCatalog.SignatureRule rule = BuiltInThreatSignatureCatalog.lookup("SHA256:" + hash.toUpperCase());
-
-        assertNotNull(rule);
-        assertEquals("SEED_MALWARE_SIGNATURE", rule.family);
+        assertNull(BuiltInThreatSignatureCatalog.lookup(hash));
+        assertNull(BuiltInThreatSignatureCatalog.lookup("SHA256:" + hash.toUpperCase()));
     }
 
     @Test

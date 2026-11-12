@@ -16,6 +16,268 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-11 23:33 | Antigravity
+- **My prompt:** Enable signed threat updates and KotSafe threat cloud protection by default, and prompt security warning dialogs when user disables either.
+- **Plan:** Configure default-on status in `threat_intel_preferences.xml` and `ThreatIntelApiSettings.java`, intercept toggles to show explanatory security warning dialogs when disabling, run unit tests, and build APK.
+- **Changes:** Updated `threat_intel_preferences.xml` and `ThreatIntelApiSettings.java` with dialog prompts and auto-enable on sign-in.
+- **Result:** Unit tests passed (`BUILD SUCCESSFUL in 13s`), debug APK assembled (`BUILD SUCCESSFUL in 21s`).
+- **Stopped at:** Ready for device testing or release deployment.
+- **Next:** Deploy to test device upon USB connection.
+
+### 2026-11-11 22:49 | Codex
+- **My prompt:** Automatic handoff after unexpected stop
+- **Plan:** Inspect git state and prepare continuation
+- **Changes:**  M app/build.gradle;  M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java;  M app/src/main/java/com/kotsafe/security/fragments/prefs/ThreatIntelApiSettings.java;  M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java;  M app/src/main/res/xml/threat_intel_preferences.xml; ?? app/src/main/java/com/kotsafe/security/model/SignedFeedWorker.java
+- **Result:** AUTO-GENERATED from git because the previous AI stopped unexpectedly. Verify the code before trusting it.
+
+Changed files:
+ M app/build.gradle
+ M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java
+ M app/src/main/java/com/kotsafe/security/fragments/prefs/ThreatIntelApiSettings.java
+ M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+ M app/src/main/res/xml/threat_intel_preferences.xml
+?? app/src/main/java/com/kotsafe/security/model/SignedFeedWorker.java
+
+Diff summary:
+ app/build.gradle                                   |  10 +
+ .../com/kotsafe/security/ThreatIntelApiClient.java |   3 +-
+ .../fragments/prefs/ThreatIntelApiSettings.java    |  46 +++++
+ .../security/model/KotSafeCloudProvider.java       |  22 ++-
+ app/src/main/res/xml/threat_intel_preferences.xml  |  12 ++
+ docs/ai-collab/CURRENT_STATE.md                    |  14 +-
+ docs/ai-collab/PROGRESS.md                         | 128 ++++++++++++
+ docs/ai-collab/TASKS.json                          |   9 +
+ docs/ai-collab/WORK_LOG.md                         | 216 +++++++++++++++++++++
+ 9 files changed, 441 insertions(+), 19 deletions(-)
+
+
+Recent commits:
+5970e4b7 docs(ai-collab): record production deployment of backend updates and release APKs
+135e95b4 docs(ai-collab): record device update and deployment on CPH2061
+75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
+8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
+1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+
+Note: Signed Android sync implemented locally. Six Android tests and fifteen backend tests passed; no production rollout or physical-device validation.
+- **Stopped at:** Previous AI stopped unexpectedly; verify git state before continuing
+- **Next:** Signed Android sync implemented locally. Six Android tests and fifteen backend tests passed; no production rollout or physical-device validation.
+### 2026-11-11 22:49 | Codex
+- **My prompt:** Start Android device enrollment and signed intelligence sync.
+- **Plan:** Reuse registered account devices, issue short-lived manifest-only tickets, verify snapshots with an APK-pinned Ed25519 key.
+- **Changes:** Added SignedFeedWorker, updated settings XML and fragment, added Android feed pin build properties. Added Laravel AndroidManifestController, v1 routes, config and a regression test in website repository.
+- **Result:** Standard debug APK assembled; six Android verifier/cache tests and fifteen focused backend tests passed locally. No ADB device attached.
+- **Stopped at:** Local enrollment and download implementation complete. Production signer, deployment and phone validation pending.
+- **Next:** Provision dedicated consumer feed and release pin, deploy and verify first signed update on a handset; then connect observe-only matches to scanner and firewall.
+### 2026-11-11 22:30 | Codex
+- **My prompt:** Improve threat intelligence administration and provide a shareable public lookup API key.
+- **Plan:** Expose workspace incidents and add separately revocable read-only lookup keys and explicit indicator publishing.
+- **Changes:** Deployed portal tabs, public lookup endpoint, admin key/publication controls, matching SSO confirmation and fail-closed bootstrap to kotsafe.com. Issued public preview credential; value excluded from logs.
+- **Result:** 2 new backend tests with 17 assertions passed, admin checks and build passed. Verified live admin bundle, 401 without key, 200 unknown with public key, 401 on admin endpoint with same key.
+- **Stopped at:** Released with no indicators automatically published.
+- **Next:** Publish reviewed shareable indicators through the Public API tab and issue dedicated keys for individual partners.
+### 2026-11-11 22:19 | Codex
+- **My prompt:** Fix reported vulnerabilities and improve error handling.
+- **Plan:** Repair and verify admin bootstrap, fresh identity confirmation, service pairing and private storage configuration.
+- **Changes:** Patched backend and packaging copy, rebuilt admin, updated both Python engines, secured config writes and removed embedded credential defaults.
+- **Result:** 29 backend tests, 18 staging tests and 8 secondary engine tests passed locally. Admin package built.
+- **Stopped at:** Local repairs and validation complete. Production deployment and credential rotation outstanding.
+- **Next:** Rotate disclosed credentials, roll out matching service and website builds, then verify real SSO and pairing.
+### 2026-11-11 22:09 | Codex
+- **My prompt:** Review Intelligence security boundaries.
+- **Plan:** Static review and existing defensive tests.
+- **Changes:** Review only.
+- **Result:** Found unsafe website dependency fallback, weak SSO step-up, insufficient service identity verification at pairing, and overly broad local database config permissions. 25 delivery/connector tests passed. Production exploitability not tested.
+- **Stopped at:** Findings reported without secrets.
+- **Next:** Fail closed at bootstrap; secure credentials and require fresh identity proof before activating paired service.
+### 2026-11-11 22:05 | Codex
+- **My prompt:** Start repeatable accuracy baseline.
+- **Plan:** Exercise real device lookup with offline evidence and run Android notification policy suite.
+- **Changes:** Added backend/tests/Feature/ThreatAccuracyBaselineTest.php in website project.
+- **Result:** Five lookup fixtures, two false alerts among three benign controls: example.com disagreement replay and SHA256 of plain test seeded as Anatsa. Synthetic positive detected, outage unknown. Local median 5 ms, max 62.9 ms. Android notification suite passed, including one finding after 1000 repeats; audible phone notifications not measured.
+- **Stopped at:** Baseline intentionally red. No deployments or production changes.
+- **Next:** Correct seeded indicator with withdrawal for installed caches, validate other seeds and address uncorroborated warnings; rerun baseline.
+### 2026-11-11 21:53 | Codex
+- **My prompt:** Automatic handoff after unexpected stop
+- **Plan:** Inspect git state and prepare continuation
+- **Changes:**  M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java;  M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+- **Result:** AUTO-GENERATED from git because the previous AI stopped unexpectedly. Verify the code before trusting it.
+
+Changed files:
+ M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java
+ M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+
+Diff summary:
+ .../com/kotsafe/security/ThreatIntelApiClient.java |   3 +-
+ .../security/model/KotSafeCloudProvider.java       |  22 +--
+ docs/ai-collab/CURRENT_STATE.md                    |  12 +-
+ docs/ai-collab/PROGRESS.md                         | 100 ++++++++++++++
+ docs/ai-collab/WORK_LOG.md                         | 151 +++++++++++++++++++++
+ 5 files changed, 270 insertions(+), 18 deletions(-)
+
+
+Recent commits:
+5970e4b7 docs(ai-collab): record production deployment of backend updates and release APKs
+135e95b4 docs(ai-collab): record device update and deployment on CPH2061
+75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
+8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
+1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+
+Note: Private Infrastructure monitor live at admin/#/monitor. Oracle timer active and snapshots accepted by Hostinger. P2P untouched. Partial host egress estimate,24h history; no billing guarantees or per-service TURN attribution. Tests/build pass.
+- **Stopped at:** Previous AI stopped unexpectedly; verify git state before continuing
+- **Next:** Private Infrastructure monitor live at admin/#/monitor. Oracle timer active and snapshots accepted by Hostinger. P2P untouched. Partial host egress estimate,24h history; no billing guarantees or per-service TURN attribution. Tests/build pass.
+### 2026-11-11 21:53 | Codex
+- **My prompt:** Monitor P2P and Intelligence bandwidth, RAM, storage and free-tier headroom.
+- **Plan:** Lightweight resource-limited minute collector, HMAC ingestion, admin-only dashboard, 24h history and honest quota coverage.
+- **Changes:** Added root-owned Oracle kotsafe-monitor oneshot service and timer with 96MiB memory and 10 percent CPU caps, low CPU/IO priority; installed dedicated secret privately on Oracle and Hostinger. Added Laravel ResourceMonitorController, resource_monitor config, additive samples migration and signed-ingestion/access tests. Added Infrastructure admin page with RAM/disk/outbound meters, CPU/network rates, service health/resource table, history, stale/high-use alerts and source-linked quota notes. Deployed backend and admin to kotsafe.com with backups; prepared source copies synchronized.
+- **Result:** 3 monitor backend tests passed (11 assertions), 10 admin tests passed and production build packaged. Live signed sample accepted, recurring timer active with last job success. Production admin monitoring returns401 unauthenticated. Current sample shows host RAM about610MB, Intelligence about16MB and P2P running. All three P2P containers retain original multiweek uptimes. Live admin index points to new build. Per-service bandwidth, P2P disk attribution and Neon billing/storage are explicitly unavailable rather than fabricated; host counters partial since monitoring install, published10TB quota not account-verified.
+- **Stopped at:** Monitor deployed and receiving real data; authenticated visual QA not performed.
+- **Next:** Open Admin Infrastructure to review real usage; optionally integrate OCI billing and Neon metrics after account API authorization. Keep P2P uncapped; verify under representative traffic.
+### 2026-11-11 21:44 | Codex
+- **My prompt:** Automatic handoff after unexpected stop
+- **Plan:** Inspect git state and prepare continuation
+- **Changes:**  M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java;  M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+- **Result:** AUTO-GENERATED from git because the previous AI stopped unexpectedly. Verify the code before trusting it.
+
+Changed files:
+ M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java
+ M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+
+Diff summary:
+ .../com/kotsafe/security/ThreatIntelApiClient.java |   3 +-
+ .../security/model/KotSafeCloudProvider.java       |  22 ++--
+ docs/ai-collab/CURRENT_STATE.md                    |  12 +--
+ docs/ai-collab/PROGRESS.md                         |  76 ++++++++++++++
+ docs/ai-collab/WORK_LOG.md                         | 114 +++++++++++++++++++++
+ 5 files changed, 209 insertions(+), 18 deletions(-)
+
+
+Recent commits:
+5970e4b7 docs(ai-collab): record production deployment of backend updates and release APKs
+135e95b4 docs(ai-collab): record device update and deployment on CPH2061
+75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
+8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
+1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+
+Note: Oracle capped Intelligence staging active at loopback8787 about16MB idle. P2P unchanged and uninterrupted. Not production connected: memory storage only; Neon/HTTPS/pairing remain. Final APK installed successfully.
+- **Stopped at:** Previous AI stopped unexpectedly; verify git state before continuing
+- **Next:** Oracle capped Intelligence staging active at loopback8787 about16MB idle. P2P unchanged and uninterrupted. Not production connected: memory storage only; Neon/HTTPS/pairing remain. Final APK installed successfully.
+### 2026-11-11 21:44 | Codex
+- **My prompt:** Use existing Oracle VPS for Intelligence while preserving full P2P resources.
+- **Plan:** Install separate least-priority capped staging service and verify original P2P uptime.
+- **Changes:** Oracle: created dedicated kotsafe-intel user, private state directory and /opt/kotsafe-intelligence environment; installed Python venv package and Python dependencies; started independent systemd service on loopback 8787. No P2P limits, ports or container configuration changed; no reboot. Unit CPUQuota 20 percent, CPUWeight 1, Nice 19, idle IO, MemoryHigh 128MiB, MemoryMax 192MiB, swap disabled, OOM preference 900. Unit template saved in Intelligence docs. Final Android debug APK refresh installed successfully after device reconnected.
+- **Result:** Intelligence active health ok, memory staging store, signing configured, enforcement false, AI false. Idle memory about 16MB. P2P signaling/TURN/relay retained original multiweek uptimes. Resource caps verified. Neon storage, HTTPS endpoint and portal pairing not configured; no full-load performance guarantee.
+- **Stopped at:** Isolated loopback staging service running; production activation pending private database and HTTPS configuration.
+- **Next:** Configure rotated Neon credential privately, initialize persistence, establish dedicated HTTPS endpoint and pair portal. Load-test with P2P traffic before enabling live imports. No model installed.
+### 2026-11-11 21:38 | Codex
+- **My prompt:** Automatic handoff after unexpected stop
+- **Plan:** Inspect git state and prepare continuation
+- **Changes:**  M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java;  M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+- **Result:** AUTO-GENERATED from git because the previous AI stopped unexpectedly. Verify the code before trusting it.
+
+Changed files:
+ M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java
+ M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+
+Diff summary:
+ .../com/kotsafe/security/ThreatIntelApiClient.java |  3 +-
+ .../security/model/KotSafeCloudProvider.java       | 22 ++++---
+ docs/ai-collab/CURRENT_STATE.md                    | 12 +---
+ docs/ai-collab/PROGRESS.md                         | 52 +++++++++++++++
+ docs/ai-collab/WORK_LOG.md                         | 77 ++++++++++++++++++++++
+ 5 files changed, 148 insertions(+), 18 deletions(-)
+
+
+Recent commits:
+5970e4b7 docs(ai-collab): record production deployment of backend updates and release APKs
+135e95b4 docs(ai-collab): record device update and deployment on CPH2061
+75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
+8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
+1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+
+Note: Oracle server access authorized and verified using existing SSH key. No changes. 1 GB server with limited memory headroom; do not deploy unrestricted Intelligence imports beside P2P.
+- **Stopped at:** Previous AI stopped unexpectedly; verify git state before continuing
+- **Next:** Oracle server access authorized and verified using existing SSH key. No changes. 1 GB server with limited memory headroom; do not deploy unrestricted Intelligence imports beside P2P.
+### 2026-11-11 21:38 | Codex
+- **My prompt:** Locate authorized Oracle SSH key and check existing P2P server capacity.
+- **Plan:** Use explicitly named key first and perform read-only server inspection.
+- **Changes:** No remote changes. Key already exists at specified private SSH path; no broader credential search needed.
+- **Result:** Oracle SSH key login succeeded. Server x86_64, Python 3.12.3, approximately 954 MB RAM total and 375 MB available, no swap, 40 GB disk free. Docker and Cloudflare/P2P tunnel services running. Low CPU load at inspection. Full ingestion alongside P2P has limited RAM headroom.
+- **Stopped at:** Oracle access confirmed; capacity audit read-only.
+- **Next:** Review per-service memory and apply a measured resource-limited staging design before deploying Intelligence; preserve P2P availability.
+### 2026-11-11 21:18 | Codex
+- **My prompt:** Automatic handoff after unexpected stop
+- **Plan:** Inspect git state and prepare continuation
+- **Changes:**  M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java;  M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+- **Result:** AUTO-GENERATED from git because the previous AI stopped unexpectedly. Verify the code before trusting it.
+
+Changed files:
+ M app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java
+ M app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java
+
+Diff summary:
+ .../com/kotsafe/security/ThreatIntelApiClient.java |  3 +-
+ .../security/model/KotSafeCloudProvider.java       | 22 +++++++-----
+ docs/ai-collab/CURRENT_STATE.md                    | 12 ++-----
+ docs/ai-collab/PROGRESS.md                         | 28 +++++++++++++++
+ docs/ai-collab/WORK_LOG.md                         | 40 ++++++++++++++++++++++
+ 5 files changed, 87 insertions(+), 18 deletions(-)
+
+
+Recent commits:
+5970e4b7 docs(ai-collab): record production deployment of backend updates and release APKs
+135e95b4 docs(ai-collab): record device update and deployment on CPH2061
+75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
+8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
+1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+
+Note: Contract/backend fixes live. Final debug APK built and 11 Android tests passed. Reconnect CPH2061 to install final refresh and test app cloud diagnostic. Await hosting selection for advanced service; do not claim full signed sync or Neon verification.
+- **Stopped at:** Previous AI stopped unexpectedly; verify git state before continuing
+- **Next:** Contract/backend fixes live. Final debug APK built and 11 Android tests passed. Reconnect CPH2061 to install final refresh and test app cloud diagnostic. Await hosting selection for advanced service; do not claim full signed sync or Neon verification.
+### 2026-11-11 21:18 | Codex
+- **My prompt:** Fix audited threat lookup defects and test updated APK on connected ADB device.
+- **Plan:** Correct server verdict contract and Android URL/confidence/timeout handling, regressions, deploy scoped backend, install compatible debug APK.
+- **Changes:** ThreatIntelController: mutually exclusive flags, actual provider count, severity/confidence contract, unknown on provider failure, active type-scoped local matching. Added ThreatIntelLookupContractTest. Android KotSafeCloudProvider preserves URL paths, uses server confidence, bounds response size, closes connections, disallows redirects and plaintext, extends read timeout; diagnostic wording corrected. ThreatIntelApiClient respects cloud enabled state. Production controller deployed after remote diff and private backup; prepared deployment controller synchronized.
+- **Result:** 14 backend contract/gateway/pairing tests passed; additional 5 contract/storage/investigation tests passed. First focused Android tests completed and debug APK built and installed successfully preserving app data. Live example.com now suspicious only, severity MEDIUM, confidence 80, totalScans 14. Phone app running after update. Direct device probe killed by OS and UI automation could not get idle/root; real app-originated cloud lookup remains unverified. Follow-up APK build/test running for diagnostic wording and enabled-state fix.
+- **Stopped at:** Core contract fix deployed; final APK refresh and on-device cloud diagnostic pending. Advanced signed service remains unpaired; hosting choice requested.
+- **Next:** Finish follow-up APK build/install, obtain phone diagnostic result; provision approved persistent service host and device-scoped trust before enabling advanced signed sync. Do not claim all fixes complete.
+### 2026-11-11 21:08 | Codex
+- **My prompt:** Automatic handoff after unexpected stop
+- **Plan:** Inspect git state and prepare continuation
+- **Changes:** No non-shared changes
+- **Result:** AUTO-GENERATED from git because the previous AI stopped unexpectedly. Verify the code before trusting it.
+
+Changed files:
+(none)
+
+Diff summary:
+ docs/ai-collab/CURRENT_STATE.md | 2 +-
+ docs/ai-collab/WORK_LOG.md      | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+
+Recent commits:
+5970e4b7 docs(ai-collab): record production deployment of backend updates and release APKs
+135e95b4 docs(ai-collab): record device update and deployment on CPH2061
+75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
+8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
+1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+
+Note: Production/APK audit findings recorded; no edits. Cloud lookup responds but verdict contradictions and timeout mismatch require fixes. Advanced service unpaired; v2 sync not wired into application.
+- **Stopped at:** Previous AI stopped unexpectedly; verify git state before continuing
+- **Next:** Production/APK audit findings recorded; no edits. Cloud lookup responds but verdict contradictions and timeout mismatch require fixes. Advanced service unpaired; v2 sync not wired into application.
+### 2026-11-11 21:08 | Codex
+- **My prompt:** Audit latest production threat intelligence and connected Android APK.
+- **Plan:** Read shared updates, inspect kotsafe.com via SSH, connected device via adb, and cloud provider/signed sync call sites.
+- **Changes:** Read-only audit; no production or application changes.
+- **Result:** Connected CPH2061 has running APK version 2.1.0-beta code 98 updated Nov 11, with VPN capture and accessibility services. Production advanced Intelligence disabled, no credential or pairing; consumer_devices and license_activations zero, client_sessions one, six threat indicators; external DB setting absent (does not exclude other DSN configuration). Live example.com cloud query took about 12s and returned contradictory malicious=true/suspicious=true with suspicious verdict and fabricated totalScans=75. APK read timeout 4s, URL paths stripped, confidence fixed 0.98. V2 sync coordinator has no application call sites. Focused Android Gradle test started, result pending; no passing claim.
+- **Stopped at:** Confirmed cloud endpoint connectivity but significant accuracy and integration gaps; SSH closed.
+- **Next:** Fix verdict contract, evidence confidence and no-hit semantics, then bound cloud latency and preserve URLs; enroll device and wire opted-in signed sync before declaring end-to-end protection.
 ### 2026-11-11 13:48 | Antigravity
 - **My prompt:** Centralize APK threat intelligence to KotSafe Admin/Backend API and remove client-side OTX/VT keys.
 - **Plan:** Implement `deviceLookup` endpoint on backend (`POST /api/v1/threat-intel/lookup`), create `KotSafeCloudProvider.java`, integrate as primary in `ThreatIntelRouter`, update `ThreatIntelApiClient`, modernize settings UI, and verify with unit tests.

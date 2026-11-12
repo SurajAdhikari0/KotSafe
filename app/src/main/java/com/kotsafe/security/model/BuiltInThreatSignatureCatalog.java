@@ -49,20 +49,7 @@ public final class BuiltInThreatSignatureCatalog {
         }
     }
 
-    private static final Map<String, SignatureRule> RULES = createCatalog();
-
-    private static Map<String, SignatureRule> createCatalog() {
-        Map<String, SignatureRule> map = new HashMap<>();
-        String seedHash = "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08";
-        map.put(seedHash, new SignatureRule(
-                seedHash,
-                "SEED_MALWARE_SIGNATURE",
-                "Seed signature loaded from the built-in catalog.",
-                "MALICIOUS",
-                SecurityRulesDb.PRIORITY_TI
-        ));
-        return Collections.unmodifiableMap(map);
-    }
+    private static final Map<String, SignatureRule> RULES = Collections.emptyMap();
 
     public static SignatureRule lookup(String value) {
         if (value == null || value.trim().isEmpty()) return null;

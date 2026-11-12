@@ -125,6 +125,8 @@ public class IntelligenceManifestV2Test {
         rejects(()->coordinator.sync(true,new URI("https://attacker.example/v1/manifest"),credential,150));
         assertEquals(0,fetched.get()); assertEquals(0,tokens.get());
         assertEquals(2,coordinator.sync(true,approved,credential,150).version); assertEquals(1,fetched.get());
+        assertEquals(2,coordinator.sync(true,approved,credential,151).version);
+        rejects(()->coordinator.sync(true,approved,credential,200));
         assertEquals(3,store.active(150).size());
     }
 }

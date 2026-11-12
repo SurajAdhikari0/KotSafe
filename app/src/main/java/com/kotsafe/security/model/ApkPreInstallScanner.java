@@ -315,6 +315,7 @@ public class ApkPreInstallScanner {
 
             // Compute SHA-256 hash for forensic records
             report.sha256 = FileHashScanner.computeHash(apkFile, "SHA-256");
+            SignedFeedObservations.observe(context,"sha256",report.sha256);
 
             // Immediately whitelist KotSafe self package
             if (report.packageName != null && (report.packageName.equals(context.getPackageName()) || report.packageName.startsWith("com.kotsafe.security") || report.packageName.startsWith("com.kotsafe.security"))) {
@@ -381,6 +382,7 @@ public class ApkPreInstallScanner {
             // ── Phase 2: SHA-256 hash & Firewall Blocklist check ───────────────
             notifyPhase(listener, "Computing SHA-256 hash…", 25);
             report.sha256 = FileHashScanner.computeHash(apkFile, "SHA-256");
+            SignedFeedObservations.observe(context,"sha256",report.sha256);
             Log.d(TAG, "APK sha256=" + report.sha256 + " pkg=" + report.packageName);
 
             SecurityBlocklistManager blMgr = SecurityBlocklistManager.getInstance(context);

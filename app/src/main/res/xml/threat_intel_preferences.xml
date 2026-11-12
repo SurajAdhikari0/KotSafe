@@ -14,6 +14,24 @@
             app:defaultValue="true"
             app:iconSpaceReserved="false" />
 
+        <SwitchPreferenceCompat
+            app:key="signed_feed_opt_in"
+            app:title="Enable signed threat updates"
+            app:defaultValue="true"
+            app:persistent="false"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="signed_feed_now"
+            app:title="Refresh signed updates now"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            app:key="signed_feed_status"
+            app:title="Signed update status"
+            app:selectable="false"
+            app:iconSpaceReserved="false" />
+
         <Preference
             app:key="kotsafe_cloud_test_connection"
             app:title="Test KotSafe Cloud Connection"

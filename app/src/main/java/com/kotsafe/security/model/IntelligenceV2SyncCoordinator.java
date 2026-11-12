@@ -50,7 +50,7 @@ public final class IntelligenceV2SyncCoordinator {
                 || credential.deviceId()==null || !credential.deviceId().matches("[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}"))
             throw new IOException("Device-scoped credentials required");
         if (!syncing.compareAndSet(false,true)) throw new IOException("Intelligence sync already running");
-        try { return store.install(fetcher.fetch(endpoint,credential),nowSeconds); }
+        try { return store.refresh(fetcher.fetch(endpoint,credential),nowSeconds); }
         finally { syncing.set(false); }
     }
 

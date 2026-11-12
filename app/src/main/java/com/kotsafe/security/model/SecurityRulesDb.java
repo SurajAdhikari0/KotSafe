@@ -37,7 +37,7 @@ import java.util.List;
 public class SecurityRulesDb extends SQLiteOpenHelper {
     private static final String TAG = "SecurityRulesDb";
     public static final String DB_NAME = "rules.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public static final String TABLE_RULES = "security_rules";
     public static final String COL_ID = "_id";
@@ -177,7 +177,11 @@ public class SecurityRulesDb extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int old, int nv) {}
+    public void onUpgrade(SQLiteDatabase db, int old, int nv) {
+        if (old < 2) db.delete(TABLE_RULES, "type=? AND value=? AND source=? AND reason=?",
+                new String[]{TYPE_HASH,"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",SOURCE_TI,
+                        "Seed signature loaded from the built-in catalog."});
+    }
 
     // ─── Insert / update ──────────────────────────────────────────────────────
 

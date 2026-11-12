@@ -95,7 +95,8 @@ public class ThreatIntelApiClient {
     }
 
     public boolean hasAnyApiKey() {
-        return true; // KotSafe Cloud Intelligence provides built-in multi-engine coverage without client keys
+        return new com.kotsafe.security.model.KotSafeCloudProvider(mContext).isAvailable()
+                || !getOtxKey().isEmpty() || !getVtKey().isEmpty();
     }
 
     public void testKotSafeCloudConnection(ApiCallback<String> callback) {

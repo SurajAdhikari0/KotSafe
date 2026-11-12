@@ -7,5 +7,23 @@
     "status": "done",
     "created": "2026-11-11 13:36 IST",
     "updated": "2026-11-11 13:47 IST"
+  },
+  {
+    "id": "T002",
+    "title": "Connect opt-in Android signed updates to authenticated device enrollment",
+    "detail": "",
+    "owner": "Codex",
+    "status": "done",
+    "created": "2026-11-11 22:43 IST",
+    "updated": "2026-11-11 22:49 IST"
+  },
+  {
+    "id": "T003",
+    "title": "Activate signed Android consumer feed and match reviewed indicators in observe-only mode",
+    "detail": "",
+    "owner": "Codex",
+    "status": "ready",
+    "created": "2026-11-11 22:55 IST",
+    "updated": "2026-11-11 22:55 IST"
   }
 ]

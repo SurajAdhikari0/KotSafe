@@ -18,6 +18,12 @@
 package com.kotsafe.security.fragments.prefs;
 
 import android.os.Bundle;
+import com.kotsafe.security.model.KotSafeCloudProvider;
+import com.kotsafe.security.model.SignedFeedWorker;
+import com.kotsafe.security.BuildConfig;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.widget.EditText;
@@ -43,6 +49,61 @@ import com.kotsafe.security.ThreatIntelApiClient;
  *  - Users can type a new key at any time to replace; leaving blank keeps the old key.
  */
 public class ThreatIntelApiSettings extends PreferenceFragmentCompat {
+    private final android.content.SharedPreferences.OnSharedPreferenceChangeListener signedUpdateListener =
+            (prefs, key) -> { if (isAdded()) renderSignedFeed(); };
+
+    @Override public void onStart() {
+        super.onStart();
+        SignedFeedWorker.state(requireContext()).registerOnSharedPreferenceChangeListener(signedUpdateListener);
+        renderSignedFeed();
+    }
+
+    @Override public void onStop() {
+        SignedFeedWorker.state(requireContext()).unregisterOnSharedPreferenceChangeListener(signedUpdateListener);
+        super.onStop();
+    }
+
+    private void renderSignedFeed() {
+        SwitchPreferenceCompat toggle = findPreference("signed_feed_opt_in");
+        Preference status = findPreference("signed_feed_status");
+        boolean configured = !BuildConfig.ANDROID_FEED_PIN.isEmpty();
+        boolean signedIn = configured && !SignedFeedWorker.account().isEmpty();
+        android.content.SharedPreferences prefs = SignedFeedWorker.state(requireContext());
+        boolean explicitlyDisabled = prefs.getBoolean("explicitly_disabled", false);
+
+        // Auto-enable signed threat updates by default when signed in unless explicitly disabled
+        if (signedIn && !explicitlyDisabled && !SignedFeedWorker.enabled(requireContext())) {
+            SignedFeedWorker.configure(requireContext(), true);
+        }
+
+        boolean enabled = signedIn && SignedFeedWorker.enabled(requireContext());
+        Preference refresh = findPreference("signed_feed_now");
+        refresh.setEnabled(enabled);
+        refresh.setOnPreferenceClickListener(ignored -> {
+            SignedFeedWorker.refreshNow(requireContext());
+            Toast.makeText(requireContext(),"Signed update requested",Toast.LENGTH_SHORT).show();
+            return true;
+        });
+        if (toggle != null) {
+            toggle.setChecked(enabled);
+            toggle.setEnabled(signedIn);
+            toggle.setSummary(!configured ? "This build has no signed-feed verification key."
+                    : !signedIn ? "Sign in to enroll this device." : "Download verified intelligence for offline review.");
+        }
+        long verified = prefs.getLong("verified", 0);
+        long expiry = prefs.getLong("expiry", 0);
+        java.text.DateFormat format = java.text.DateFormat.getDateTimeInstance();
+        String detail = !enabled ? "Off" : verified == 0 ? "Waiting for the first verified update."
+                : "Verified " + format.format(new java.util.Date(verified)) + " · "
+                + (expiry <= System.currentTimeMillis() ? "Expired " : "Expires ") + format.format(new java.util.Date(expiry));
+        if (enabled && prefs.contains("error")) detail += " " + prefs.getString("error", "");
+        if (enabled && prefs.contains("lastFinding")) detail += "\nLast observed match: " + prefs.getString("lastFinding","")
+                + " · " + format.format(new java.util.Date(prefs.getLong("findingTime",0)*1000));
+        if (status != null) {
+            status.setSummary(detail);
+        }
+    }
+
     private EditTextPreference mOtxKeyPref;
     private EditTextPreference mVtKeyPref;
     private Preference mOtxTestPref;
@@ -56,6 +117,67 @@ public class ThreatIntelApiSettings extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.threat_intel_preferences, rootKey);
+
+        SwitchPreference cloudIntelPref = findPreference(KotSafeCloudProvider.PREF_CLOUD_INTEL_ENABLED);
+        if (cloudIntelPref != null) {
+            cloudIntelPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean enabling = (Boolean) newValue;
+                if (!enabling) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Disable KotSafe Threat Cloud Protection?")
+                            .setMessage("Warning: Disabling KotSafe Threat Cloud turns off centralized real-time lookups across AlienVault OTX, VirusTotal, and URLhaus.\n\nYour device will only rely on local offline signatures and may fail to detect newly emerging zero-day malware or malicious domains.\n\nAre you sure you want to disable it?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Disable Anyway", (dialog, which) -> {
+                                cloudIntelPref.setChecked(false);
+                                PreferenceManager.getDefaultSharedPreferences(requireContext())
+                                        .edit()
+                                        .putBoolean(KotSafeCloudProvider.PREF_CLOUD_INTEL_ENABLED, false)
+                                        .apply();
+                            })
+                            .setNegativeButton("Keep Protected", (dialog, which) -> {
+                                cloudIntelPref.setChecked(true);
+                            })
+                            .setOnCancelListener(dialog -> {
+                                cloudIntelPref.setChecked(true);
+                            })
+                            .show();
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        SwitchPreferenceCompat signed = findPreference("signed_feed_opt_in");
+        if (signed != null) {
+            signed.setOnPreferenceChangeListener((pref, value) -> {
+                boolean enabling = (Boolean) value;
+                if (!enabling) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Disable Signed Threat Updates?")
+                            .setMessage("Warning: Disabling signed threat updates stops background synchronization of cryptographically verified malware definitions.\n\nYour offline threat defense will become outdated over time and won't receive newly discovered indicators.\n\nAre you sure you want to disable it?")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Disable Anyway", (dialog, which) -> {
+                                SignedFeedWorker.state(requireContext()).edit().putBoolean("explicitly_disabled", true).apply();
+                                SignedFeedWorker.configure(requireContext(), false);
+                                signed.setChecked(false);
+                                renderSignedFeed();
+                            })
+                            .setNegativeButton("Keep Enabled", (dialog, which) -> {
+                                signed.setChecked(true);
+                            })
+                            .setOnCancelListener(dialog -> {
+                                signed.setChecked(true);
+                            })
+                            .show();
+                    return false;
+                }
+                SignedFeedWorker.state(requireContext()).edit().remove("explicitly_disabled").apply();
+                SignedFeedWorker.configure(requireContext(), true);
+                renderSignedFeed();
+                return true;
+            });
+        }
+        renderSignedFeed();
 
         mOtxKeyPref = findPreference(ThreatIntelApiClient.PREF_OTX_KEY);
         mVtKeyPref  = findPreference(ThreatIntelApiClient.PREF_VT_KEY);

@@ -36,9 +36,21 @@ public final class IntelligenceSnapshotStore {
     }
 
     public IntelligenceManifestV2Verifier.Snapshot install(byte[] envelope, long nowSeconds) throws IOException {
+        return install(envelope,nowSeconds,false);
+    }
+
+    IntelligenceManifestV2Verifier.Snapshot refresh(byte[] envelope, long nowSeconds) throws IOException {
+        return install(envelope,nowSeconds,true);
+    }
+
+    private IntelligenceManifestV2Verifier.Snapshot install(byte[] envelope,long nowSeconds,boolean allowUnchanged) throws IOException {
         synchronized (lock) {
             try (RandomAccessFile guard=new RandomAccessFile(lockFile,"rw"); FileLock ignored=guard.getChannel().lock()) {
-                restoreLocked(nowSeconds);
+                if (restoreLocked(nowSeconds) && allowUnchanged && current.expiresAt > nowSeconds) {
+                    try (FileInputStream in=file.openRead()) {
+                        if (java.util.Arrays.equals(readBounded(in),envelope)) return current;
+                    }
+                }
                 IntelligenceManifestV2Verifier.Snapshot next=verifier.verify(envelope,nowSeconds,highWatermark);
                 FileOutputStream output=null;
                 try {
@@ -69,6 +81,9 @@ public final class IntelligenceSnapshotStore {
         if (restored.version<highWatermark) throw new IOException("Intelligence cache rollback detected");
         current=restored; highWatermark=restored.version; return true;
     }
+
+    IntelligenceManifestV2Verifier verifier() { return verifier; }
+    IntelligenceManifestV2Verifier.Snapshot snapshot() { synchronized (lock) { return current; } }
 
     public long lastVersion() { synchronized(lock) { return highWatermark; } }
 

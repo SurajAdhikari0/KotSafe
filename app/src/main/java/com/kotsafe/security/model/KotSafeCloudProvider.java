@@ -100,7 +100,7 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
             if (ThreatIntelManager.isPrivateOrLocalIp(cleanIoc)) {
                 return ThreatReport.clean(getProviderName(), cleanIoc, "IP");
             }
-        } else if ("DOMAIN".equalsIgnoreCase(type) || "URL".equalsIgnoreCase(type)) {
+        } else if ("DOMAIN".equalsIgnoreCase(type)) {
             cleanIoc = ThreatIntelManager.cleanDomain(cleanIoc);
         } else if ("HASH".equalsIgnoreCase(type)) {
             cleanIoc = cleanIoc.toLowerCase(Locale.ROOT).replace("sha256:", "").replace("md5:", "").trim();
@@ -110,12 +110,15 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
             return null;
         }
 
+        HttpURLConnection conn = null;
         try {
             URL url = new URL(getEndpointUrl());
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (!"https".equalsIgnoreCase(url.getProtocol())) return null;
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setConnectTimeout(4000);
-            conn.setReadTimeout(4000);
+            conn.setReadTimeout(20000);
+            conn.setInstanceFollowRedirects(false);
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
             conn.setRequestProperty("Accept", "application/json");
@@ -142,10 +145,10 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
                     r.iocValue = cleanIoc;
                     r.iocType = type != null ? type.toUpperCase(Locale.ROOT) : "UNKNOWN";
                     r.isMalicious = data.optBoolean("isMalicious", false);
-                    r.isSuspicious = data.optBoolean("isSuspicious", false);
+                    r.isSuspicious = !r.isMalicious && data.optBoolean("isSuspicious", false);
                     r.riskScore = data.optInt("maliciousScore", 0);
 
-                    String verdict = data.optString("verdict", "safe");
+                    String verdict = data.optString("verdict", "unknown");
                     r.verdict = r.isMalicious ? "MALICIOUS" : (r.isSuspicious ? "SUSPICIOUS" : verdict.toUpperCase(Locale.ROOT));
 
                     String family = data.optString("family", null);
@@ -154,7 +157,7 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
                     }
                     r.malwareFamily = family;
                     r.details = data.optString("details", "");
-                    r.confidence = 0.98f;
+                    r.confidence = Math.max(0, Math.min(100, data.optInt("confidence", 0))) / 100f;
                     r.provider = family != null && !family.isEmpty()
                             ? "KotSafe Cloud (" + family + ")"
                             : "KotSafe Cloud Intelligence";
@@ -166,6 +169,8 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
             }
         } catch (Exception e) {
             Log.w(TAG, "KotSafe Cloud lookup failed: " + e.getMessage());
+        } finally {
+            if (conn != null) conn.disconnect();
         }
 
         return null;
@@ -207,8 +212,8 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
                 if (code == 200) {
                     String resp = readStream(conn.getInputStream());
                     JSONObject json = new JSONObject(resp);
-                    if (json.optBoolean("success", false)) {
-                        callback.onSuccess("Connected: KotSafe Threat Operations Cloud Operational (Multi-Engine Defense Active)");
+                    if (json.optBoolean("success", false) && json.optJSONObject("data") != null) {
+                        callback.onSuccess("KotSafe Cloud API responded. This confirms connectivity, not detection accuracy.");
                         return;
                     }
                 }
@@ -224,6 +229,7 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
         StringBuilder sb = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
+            if (sb.length() + line.length() > 262144) throw new java.io.IOException("Cloud response exceeds limit");
             sb.append(line);
         }
         reader.close();

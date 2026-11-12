@@ -317,6 +317,7 @@ public class FileHashScanner {
                         entry.scanPriority = ScanModeConfig.getPriority(fileClass, true);
                         entry.scanStatus = FileHashEntry.SCAN_STATUS_DONE;
                         entry.sha256 = sha256;
+                        SignedFeedObservations.observe(mContext,"sha256",entry.sha256);
 
                         if (entry.isHighRiskClass()) {
                             try (InputStream is = mContext.getContentResolver().openInputStream(fileUri)) {
@@ -401,6 +402,7 @@ public class FileHashScanner {
                         entry.scanPriority = ScanModeConfig.getPriority(fileClass, true);
                         entry.scanStatus = FileHashEntry.SCAN_STATUS_DONE;
                         entry.sha256 = computeHash(f, "SHA-256");
+                        SignedFeedObservations.observe(mContext,"sha256",entry.sha256);
 
                         // Skip inserting if hash computation failed or file was unreadable
                         if (entry.sha256 == null || entry.sha256.isEmpty()) {
@@ -447,6 +449,7 @@ public class FileHashScanner {
         entry.scanPriority = FileHashEntry.PRIORITY_HIGH;
         entry.scanStatus = FileHashEntry.SCAN_STATUS_DONE;
         entry.sha256 = computeHash(apkFile, "SHA-256");
+        SignedFeedObservations.observe(mContext,"sha256",entry.sha256);
         entry.md5 = computeHash(apkFile, "MD5");
 
         // Check if official service, self package, or standard background service

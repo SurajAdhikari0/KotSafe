@@ -506,6 +506,7 @@ public class AntivirusScanEngine {
                         }
 
                         SecurityBlocklistManager secMgr = SecurityBlocklistManager.getInstance(context);
+                        SignedFeedObservations.observe(context,"sha256",sha256);
                         boolean isRuleBlocked = (sha256 != null && secMgr.isHashBlocked(sha256)) || secMgr.isBlocked(pkgInfo.packageName);
                         String ruleReason = null;
                         if (isRuleBlocked) {
@@ -1654,8 +1655,12 @@ public class AntivirusScanEngine {
                         if (listener != null) {
                             listener.onFileProgress(f.getName(), currentCount, maxFiles);
                         }
-                        if (hashDb.isChangedSinceLastScan(f.getAbsolutePath(), f.lastModified())) {
+                        boolean changed = hashDb.isChangedSinceLastScan(f.getAbsolutePath(), f.lastModified());
+                        if (!changed && SignedFeedWorker.enabled(context))
+                            SignedFeedObservations.observe(context,"sha256",hashDb.getSha256ForPath(f.getAbsolutePath()));
+                        if (changed) {
                             String sha256 = FileHashScanner.computeHash(f, "SHA-256");
+                            SignedFeedObservations.observe(context,"sha256",sha256);
                             if (sha256 != null && !sha256.isEmpty()) {
                                 FileHashEntry entry = new FileHashEntry();
                                 entry.fileName = f.getName();
