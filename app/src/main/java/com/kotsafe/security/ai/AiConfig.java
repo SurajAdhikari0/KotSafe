@@ -148,7 +148,8 @@ public class AiConfig {
     }
 
     public boolean isAutopilotEnabled() {
-        return mPrefs.getBoolean(PREF_AUTOPILOT_RESOLVE, true);
+        return mPrefs.getBoolean(PREF_AUTOPILOT_RESOLVE, true)
+                && mPrefs.getBoolean(com.kotsafe.security.model.DefenderManager.PREF_DEFENDER_AUTO_PILOT, true);
     }
 
     public void setAutopilotEnabled(boolean enabled) {

@@ -19,4 +19,30 @@
             app:defaultValue="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Autopilot decisions">
+        <SwitchPreference
+            app:key="pref_ai_autopilot_resolve"
+            app:title="Automatically block confirmed threats"
+            app:summary="Requires a high-confidence malicious match from KotSafe Cloud. Unconfirmed threats, apps and file hashes are sent for review."
+            app:defaultValue="true" />
+        <SwitchPreference
+            app:key="firewall_screen_off_block"
+            app:title="Restrict traffic when screen is off"
+            app:summary="May delay messages and background app activity. KotSafe P2P transport is excluded; other apps using P2P still follow their firewall rules."
+            app:defaultValue="false" />
+        <Preference
+            app:key="autopilot_runtime_status"
+            app:title="Firewall status"
+            app:selectable="false" />
+        <MultiSelectListPreference
+            app:key="firewall_screen_off_allowed_apps"
+            app:title="Apps allowed while screen is off"
+            app:dialogTitle="Allow these apps while screen is off"
+            app:summary="Choose apps that need background messages or calls. KotSafe P2P transport is already excluded." />
+        <Preference
+            app:title="Fewer repeated alerts"
+            app:summary="Repeated incidents are grouped for five minutes. Higher-risk signals and changes to automatic blocking are reviewed again."
+            app:selectable="false" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

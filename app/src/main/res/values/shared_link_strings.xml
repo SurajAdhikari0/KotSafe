@@ -1,0 +1,8 @@
+<resources>
+    <string name="shared_link_title">Check with KotSafe</string>
+    <string name="shared_link_invalid">Share one complete link starting with https:// or http://.</string>
+    <string name="shared_link_loading">Checking the threat list on this phone…</string>
+    <string name="shared_link_match">A threat report lists this link or its destination. Avoid opening it.</string>
+    <string name="shared_link_unknown">No known match in this phone’s threat list. The link could still be unsafe.</string>
+    <string name="shared_link_unavailable">KotSafe has no usable threat list for this link. Check signed updates in Settings → Threat Intelligence.</string>
+</resources>

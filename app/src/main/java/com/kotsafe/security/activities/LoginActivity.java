@@ -14,8 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
@@ -57,8 +55,6 @@ import com.google.firebase.auth.OAuthProvider;
 import com.kotsafe.security.Log;
 import com.kotsafe.security.R;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -146,11 +142,14 @@ public class LoginActivity extends BaseActivity {
         mGoogleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    if (result.getData() != null) {
                         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
                         handleGoogleSignInResult(task);
                     } else {
                         setLoading(false);
+                        Toast.makeText(this, result.getResultCode() == RESULT_CANCELED
+                                ? "Google sign-in was cancelled." : "Google sign-in could not finish. Please retry.",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -286,16 +285,19 @@ public class LoginActivity extends BaseActivity {
                     .requestEmail();
 
             int webClientIdResId = getResources().getIdentifier("default_web_client_id", "string", getPackageName());
-            if (webClientIdResId != 0) {
-                gsoBuilder.requestIdToken(getString(webClientIdResId));
+            if (webClientIdResId == 0 || getFirebaseAuth() == null) {
+                setLoading(false);
+                Toast.makeText(this, "Google sign-in is unavailable in this build.", Toast.LENGTH_LONG).show();
+                return;
             }
+            gsoBuilder.requestIdToken(getString(webClientIdResId));
 
             GoogleSignInClient client = GoogleSignIn.getClient(this, gsoBuilder.build());
             mGoogleSignInLauncher.launch(client.getSignInIntent());
         } catch (Exception e) {
             setLoading(false);
             Log.e(TAG, "Google Sign-In launch failed: " + e.getMessage());
-            Toast.makeText(this, "Google Sign-In unavailable: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Google sign-in is unavailable. Try again later.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -310,10 +312,9 @@ public class LoginActivity extends BaseActivity {
                         setLoading(false);
                         if (authTask.isSuccessful()) {
                             FirebaseUser user = auth.getCurrentUser();
-                            String email = user != null && user.getEmail() != null ? user.getEmail() : account.getEmail();
-                            recordSuccessfulAuth(email != null ? email : "google_user");
+                            handleSuccessfulOAuthSignIn(user, "Google");
                         } else {
-                            String err = authTask.getException() != null ? authTask.getException().getMessage() : "Google Sign-In failed";
+                            String err = invalidCredentials(authTask.getException()) ? "Google sign-in could not be verified. Try again." : authError(authTask.getException(), "Google sign-in could not be verified. Try again.");
                             Toast.makeText(this, err, Toast.LENGTH_LONG).show();
                         }
                     });
@@ -321,13 +322,17 @@ public class LoginActivity extends BaseActivity {
                 }
             }
             setLoading(false);
-            recordSuccessfulAuth(account != null && account.getEmail() != null ? account.getEmail() : "google_user");
+            Toast.makeText(this, "Google sign-in could not be verified. Try again.", Toast.LENGTH_LONG).show();
         } catch (ApiException e) {
             setLoading(false);
             Log.e(TAG, "Google Sign-In error code: " + e.getStatusCode());
-            if (e.getStatusCode() != 12501) { // 12501 is user cancelled
-                Toast.makeText(this, "Google Sign-In error (" + e.getStatusCode() + ")", Toast.LENGTH_SHORT).show();
+            String message;
+            switch (e.getStatusCode()) {
+                case 12501: message = "Google sign-in was cancelled."; break;
+                case 7: message = "Check your internet connection and try Google sign-in again."; break;
+                default: message = "Google sign-in could not finish. Please try again.";
             }
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -345,6 +350,7 @@ public class LoginActivity extends BaseActivity {
                 }).addOnFailureListener(e -> {
                     setLoading(false);
                     Log.e(TAG, "Pending OAuth recovery failed: " + e.getMessage());
+                    Toast.makeText(this, "Sign-in could not be resumed. Please try again.", Toast.LENGTH_LONG).show();
                 });
             }
         }
@@ -375,7 +381,7 @@ public class LoginActivity extends BaseActivity {
                     .addOnFailureListener(e -> {
                         setLoading(false);
                         Log.e(TAG, "GitHub Sign-In error: " + e.getMessage());
-                        Toast.makeText(this, "GitHub Sign-In failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, authError(e, "GitHub sign-in could not finish. Please try again."), Toast.LENGTH_LONG).show();
                     });
         } else {
             auth.startActivityForSignInWithProvider(this, provider.build())
@@ -386,7 +392,7 @@ public class LoginActivity extends BaseActivity {
                     .addOnFailureListener(e -> {
                         setLoading(false);
                         Log.e(TAG, "GitHub Sign-In error: " + e.getMessage());
-                        Toast.makeText(this, "GitHub Sign-In failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, authError(e, "GitHub sign-in could not finish. Please try again."), Toast.LENGTH_LONG).show();
                     });
         }
     }
@@ -416,7 +422,7 @@ public class LoginActivity extends BaseActivity {
                     .addOnFailureListener(e -> {
                         setLoading(false);
                         Log.e(TAG, "Microsoft Sign-In error: " + e.getMessage());
-                        Toast.makeText(this, "Microsoft Sign-In failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, authError(e, "Microsoft sign-in could not finish. Please try again."), Toast.LENGTH_LONG).show();
                     });
         } else {
             auth.startActivityForSignInWithProvider(this, provider.build())
@@ -427,7 +433,7 @@ public class LoginActivity extends BaseActivity {
                     .addOnFailureListener(e -> {
                         setLoading(false);
                         Log.e(TAG, "Microsoft Sign-In error: " + e.getMessage());
-                        Toast.makeText(this, "Microsoft Sign-In failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, authError(e, "Microsoft sign-in could not finish. Please try again."), Toast.LENGTH_LONG).show();
                     });
         }
     }
@@ -442,9 +448,9 @@ public class LoginActivity extends BaseActivity {
                 String uid = user.getUid();
                 email = providerName.toLowerCase(Locale.ROOT) + "_" + uid.substring(0, Math.min(8, uid.length()));
             }
-            recordSuccessfulAuth(email);
+            beginSecurityCheck(email);
         } else {
-            recordSuccessfulAuth(providerName.toLowerCase(Locale.ROOT) + "_user");
+            Toast.makeText(this, "Sign-in could not be verified. Try again.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -476,7 +482,7 @@ public class LoginActivity extends BaseActivity {
         }
 
         // 3. Validate Password Constraints
-        if (TextUtils.isEmpty(cleanPassword) || cleanPassword.length() < 8) {
+        if (TextUtils.isEmpty(cleanPassword) || (mIsSignUpMode && cleanPassword.length() < 8)) {
             mTilPassword.setError(getString(R.string.invalid_password_error));
             mEtPassword.requestFocus();
             return;
@@ -506,7 +512,7 @@ public class LoginActivity extends BaseActivity {
                                     Toast.makeText(this, "Account created! Please verify your email before logging in.", Toast.LENGTH_LONG).show();
                                 }
                             } else {
-                                String errorMsg = task.getException() != null ? task.getException().getMessage() : "Registration failed";
+                                String errorMsg = authError(task.getException(), "Could not create the account. Try again.");
                                 mTilPassword.setError(errorMsg);
                                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
                             }
@@ -518,38 +524,35 @@ public class LoginActivity extends BaseActivity {
                             setLoading(false);
                             if (task.isSuccessful()) {
                                 FirebaseUser user = auth.getCurrentUser();
-                                if (user != null && !user.isEmailVerified()) {
+                                if (user == null) {
+                                    mTilPassword.setError("Sign-in could not be verified. Try again.");
+                                    return;
+                                }
+                                if (!user.isEmailVerified()) {
                                     showEmailVerificationDialog(user, cleanEmail, false);
                                     return;
                                 }
-                                String email = user != null && user.getEmail() != null ? user.getEmail() : cleanEmail;
-                                recordSuccessfulAuth(email);
+                                String email = user.getEmail() != null ? user.getEmail() : cleanEmail;
+                                beginSecurityCheck(email);
                             } else {
-                                recordFailedAttempt();
-                                String errorMsg = task.getException() != null ? task.getException().getMessage() : "Authentication failed";
+                                Exception failure = task.getException();
+                                if (invalidCredentials(failure)) recordFailedAttempt();
+                                String errorMsg = authError(failure, "Could not sign in. Please try again.");
                                 mTilPassword.setError(errorMsg);
                                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
                             }
                         });
             }
         } else {
-            // Local timing-attack resilient fallback when Firebase backend is in offline/mock mode
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                setLoading(false);
-                boolean valid = verifyMockCredentials(cleanEmail, cleanPassword);
-                if (valid) {
-                    recordSuccessfulAuth(cleanEmail);
-                } else {
-                    recordFailedAttempt();
-                }
-            }, 600);
+            setLoading(false);
+            mTilPassword.setError("Account service unavailable. Please try again later.");
         }
     }
 
     private void showEmailVerificationDialog(FirebaseUser user, String email, boolean isNewRegistration) {
         String title = isNewRegistration ? "Verify Your Email" : "Email Verification Required";
         String message = isNewRegistration
-                ? "A verification link has been sent to " + email + ".\n\nPlease check your inbox and click the link to activate your account before signing in."
+                ? "To finish creating your account, check the inbox for " + email + ". If no link arrives, choose Resend Email."
                 : "Your account (" + email + ") is not yet verified.\n\nPlease check your email inbox and click the verification link to proceed.";
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -576,9 +579,9 @@ public class LoginActivity extends BaseActivity {
                     positiveBtn.setEnabled(true);
                     if (reloadTask.isSuccessful()) {
                         if (user.isEmailVerified()) {
-                            Toast.makeText(LoginActivity.this, "Email verified successfully! Welcome.", Toast.LENGTH_SHORT).show();
+
                             dialog.dismiss();
-                            recordSuccessfulAuth(email);
+                            beginSecurityCheck(email);
                         } else {
                             Toast.makeText(LoginActivity.this, "Email is not verified yet. Please check your inbox and click the link.", Toast.LENGTH_LONG).show();
                         }
@@ -627,7 +630,7 @@ public class LoginActivity extends BaseActivity {
                         }
                     });
         } else {
-            Toast.makeText(this, "Password reset instructions queued for: " + rawEmail, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Password reset unavailable. Please try again later.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -672,22 +675,40 @@ public class LoginActivity extends BaseActivity {
         return password.replace("\0", "").replace("\r", "").replace("\n", "");
     }
 
-    /**
-     * Constant-time comparison to prevent side-channel timing analysis attacks.
-     */
-    private boolean verifyMockCredentials(String email, String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] inputHash = md.digest((email + ":" + password).getBytes(StandardCharsets.UTF_8));
-            byte[] expectedHash = md.digest("mock_auth_seed".getBytes(StandardCharsets.UTF_8));
-            // Always perform constant-time check
-            return MessageDigest.isEqual(inputHash, expectedHash) || !email.isEmpty();
-        } catch (Exception e) {
-            return !email.isEmpty() && password.length() >= 8;
-        }
+    static boolean invalidCredentials(Exception failure) {
+        if (!(failure instanceof com.google.firebase.auth.FirebaseAuthException)) return false;
+        String code = ((com.google.firebase.auth.FirebaseAuthException) failure).getErrorCode();
+        return "ERROR_INVALID_CREDENTIAL".equals(code) || "ERROR_INVALID_LOGIN_CREDENTIALS".equals(code)
+                || "ERROR_WRONG_PASSWORD".equals(code) || "ERROR_USER_NOT_FOUND".equals(code);
     }
 
-    private void recordSuccessfulAuth(String userHandle) {
+    static String authError(Exception failure, String fallback) {
+        if (invalidCredentials(failure)) return "Email or password is incorrect. New to KotSafe? Choose Sign up below.";
+        if (failure instanceof com.google.firebase.FirebaseNetworkException) return "Check your internet connection and try again.";
+        if (failure instanceof com.google.firebase.FirebaseTooManyRequestsException) return "Too many attempts. Please try again later.";
+        if (failure instanceof com.google.firebase.auth.FirebaseAuthUserCollisionException) return "Try signing in with your original sign-in method.";
+        if (failure instanceof com.google.firebase.auth.FirebaseAuthWeakPasswordException) return "Choose a stronger password and try again.";
+        return fallback;
+    }
+
+    private void beginSecurityCheck(String userHandle) {
+        FirebaseAuth auth = getFirebaseAuth();
+        FirebaseUser user = auth == null ? null : auth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Your sign-in expired. Please sign in again.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        getSharedPreferences(PREF_AUTH, MODE_PRIVATE).edit().remove(KEY_LOGGED_IN_UID).apply();
+        check2FaAndProceed(userHandle, user.getUid());
+    }
+
+    private void completeVerifiedSignIn(String userHandle, String uid) {
+        FirebaseAuth auth = getFirebaseAuth();
+        FirebaseUser user = auth == null ? null : auth.getCurrentUser();
+        if (user == null || !uid.equals(user.getUid())) {
+            Toast.makeText(this, "Your account changed. Please sign in again.", Toast.LENGTH_LONG).show();
+            return;
+        }
         SharedPreferences prefs = getSharedPreferences(PREF_AUTH, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit()
                 .putInt(KEY_FAILED_ATTEMPTS, 0)
@@ -695,64 +716,31 @@ public class LoginActivity extends BaseActivity {
                 .putBoolean(KEY_REMEMBER_ME, mCbRememberMe.isChecked())
                 .putString(KEY_LOGGED_IN_EMAIL, userHandle);
 
-        // Also persist Firebase UID if available
-        FirebaseAuth auth = getFirebaseAuth();
-        if (auth != null && auth.getCurrentUser() != null) {
-            editor.putString(KEY_LOGGED_IN_UID, auth.getCurrentUser().getUid());
-            // Enterprise cloud database sync for user, device, and telemetry
-            com.kotsafe.security.model.CloudSyncManager.getInstance(this).syncUserOnAuth(auth.getCurrentUser());
-        }
+        editor.putString(KEY_LOGGED_IN_UID, uid);
+        com.kotsafe.security.model.CloudSyncManager.getInstance(this).syncUserOnAuth(user);
         editor.putBoolean(com.kotsafe.security.model.KotSafeUserManager.KEY_GUEST_MODE, false);
         editor.apply();
 
         Toast.makeText(this, "Welcome, " + userHandle + "!", Toast.LENGTH_SHORT).show();
-        check2FaAndProceed(userHandle);
+        proceedToNextScreen();
     }
 
-    private void check2FaAndProceed(String userHandle) {
+    private void check2FaAndProceed(String userHandle, String uid) {
         setLoading(true);
-        com.kotsafe.security.model.KotSafeUserManager.isTwoFactorEnabled(this, new com.kotsafe.security.model.KotSafeUserManager.Callback<Boolean>() {
+        com.kotsafe.security.model.KotSafeUserManager.loadSignInChallenge(uid, new com.kotsafe.security.model.KotSafeUserManager.Callback<String>() {
             @Override
-            public void onSuccess(Boolean enabled) {
-                if (enabled != null && enabled) {
-                    com.kotsafe.security.model.KotSafeUserManager.getTwoFactorSecret(LoginActivity.this, new com.kotsafe.security.model.KotSafeUserManager.Callback<String>() {
-                        @Override
-                        public void onSuccess(String secret) {
-                            setLoading(false);
-                            if (secret != null && !secret.trim().isEmpty()) {
-                                show2FaVerificationDialog(secret, userHandle);
-                            } else {
-                                // 2FA is marked enabled, but secret could not be loaded! Fail closed for security.
-                                show2FaCredentialErrorDialog("Two-factor authentication is active for this account, but security credentials could not be loaded from cloud. Please verify your connection and try again.");
-                            }
-                        }
-
-                        @Override
-                        public void onError(String message) {
-                            setLoading(false);
-                            show2FaCredentialErrorDialog("Failed to load two-factor security configuration: " + (message != null ? message : "Network error") + ".");
-                        }
-                    });
-                } else {
-                    setLoading(false);
-                    proceedToNextScreen();
-                }
+            public void onSuccess(String secret) {
+                if (isFinishing() || isDestroyed()) return;
+                setLoading(false);
+                if (secret == null) completeVerifiedSignIn(userHandle, uid);
+                else show2FaVerificationDialog(secret, userHandle, uid);
             }
 
             @Override
             public void onError(String message) {
+                if (isFinishing() || isDestroyed()) return;
                 setLoading(false);
-                // Check local cached 2FA status
-                SharedPreferences prefs = getSharedPreferences(PREF_AUTH, Context.MODE_PRIVATE);
-                boolean local2fa = prefs.getBoolean(com.kotsafe.security.model.KotSafeUserManager.KEY_2FA_ENABLED, false);
-                if (local2fa) {
-                    String localSecret = prefs.getString(com.kotsafe.security.model.KotSafeUserManager.KEY_2FA_SECRET, null);
-                    if (localSecret != null && !localSecret.trim().isEmpty()) {
-                        show2FaVerificationDialog(localSecret, userHandle);
-                        return;
-                    }
-                }
-                show2FaCredentialErrorDialog("Unable to verify security policy (" + (message != null ? message : "connection failure") + "). Please verify internet access and retry.");
+                show2FaCredentialErrorDialog(message);
             }
         });
     }
@@ -770,7 +758,7 @@ public class LoginActivity extends BaseActivity {
                         }
                     } catch (Exception ignored) {}
                     String handle = user != null && user.getEmail() != null ? user.getEmail() : "KotSafe User";
-                    check2FaAndProceed(handle);
+                    beginSecurityCheck(handle);
                 })
                 .setNegativeButton("Sign Out", (d, w) -> {
                     com.kotsafe.security.model.KotSafeUserManager.signOut(this, null);
@@ -779,7 +767,7 @@ public class LoginActivity extends BaseActivity {
                 .show();
     }
 
-    private void show2FaVerificationDialog(String secret, String userHandle) {
+    private void show2FaVerificationDialog(String secret, String userHandle, String uid) {
         View view = getLayoutInflater().inflate(R.layout.dialog_verify_2fa, null);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
@@ -854,8 +842,7 @@ public class LoginActivity extends BaseActivity {
                                         mTwoFactorLockoutTimer = null;
                                     }
                                     dialog.dismiss();
-                                    Toast.makeText(LoginActivity.this, "Backup recovery code verified! Welcome, " + userHandle, Toast.LENGTH_SHORT).show();
-                                    proceedToNextScreen();
+                                    completeVerifiedSignIn(userHandle, uid);
                                 } else {
                                     if (tvError != null) {
                                         tvError.setText("Invalid or already used backup code.");
@@ -899,8 +886,7 @@ public class LoginActivity extends BaseActivity {
                     com.kotsafe.security.model.KotSafeUserManager.updateLastUsedTotpWindow(this, result.matchedWindow);
 
                     dialog.dismiss();
-                    Toast.makeText(this, "Two-factor verified! Welcome, " + userHandle, Toast.LENGTH_SHORT).show();
-                    proceedToNextScreen();
+                    completeVerifiedSignIn(userHandle, uid);
                 } else {
                     int attempts = prefs.getInt(KEY_2FA_FAILED_ATTEMPTS, 0) + 1;
                     prefs.edit().putInt(KEY_2FA_FAILED_ATTEMPTS, attempts).apply();

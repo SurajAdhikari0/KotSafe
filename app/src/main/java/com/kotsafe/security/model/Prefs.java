@@ -88,6 +88,7 @@ public class Prefs {
     public static final String PREF_FIREWALL_WHITELIST_INIT_VER = "firewall_wl_init";
     public static final String PREF_FIREWALL_WHITELIST = "firewall_whitelist";
     public static final String PREF_FIREWALL_SCREEN_OFF_BLOCK = "firewall_screen_off_block";
+    public static final String PREF_SCREEN_OFF_ALLOWED_APPS = "firewall_screen_off_allowed_apps";
     public static final String PREF_DECRYPTION_LIST = "decryption_list";
     public static final String PREF_START_AT_BOOT = "start_at_boot";
     public static final String PREF_SNAPLEN = "snaplen";

@@ -80,7 +80,7 @@ public class VirusTotalProvider implements ThreatIntelProvider {
         report.provider = getProviderName();
         report.iocValue = iocValue;
         report.iocType = iocType;
-        report.verdict = "SAFE";
+        report.verdict = "UNKNOWN";
 
         String apiKey = PreferenceManager.getDefaultSharedPreferences(mContext)
                 .getString(PREF_VT_KEY, "");
@@ -100,7 +100,7 @@ public class VirusTotalProvider implements ThreatIntelProvider {
             int code = conn.getResponseCode();
             if (code == 404) {
                 // Not found = not in VT DB
-                report.verdict = "SAFE";
+                report.verdict = "UNKNOWN";
                 report.details = "Not found in VirusTotal";
                 return report;
             }
@@ -152,6 +152,7 @@ public class VirusTotalProvider implements ThreatIntelProvider {
                     report.verdict = "SUSPICIOUS";
                 }
 
+                if (malicious == 0 && suspicious == 0 && harmless > 0) report.verdict = "SAFE";
                 report.confidence = total > 0 ? (float) (malicious + suspicious) / total : 0f;
             }
 

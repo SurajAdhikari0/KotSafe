@@ -92,15 +92,31 @@ public class ThreatIntelRouter {
 
     public ThreatIntelProvider.ThreatReport queryDomain(String domain) {
         if (domain == null || domain.isEmpty()) return null;
-        // Normalize: strip scheme if accidentally included
-        domain = domain.replaceFirst("^https?://", "").split("/")[0].trim().toLowerCase();
-        String normalizedDomain = domain;
-        return route(normalizedDomain, "DOMAIN", p -> p.queryDomain(normalizedDomain));
+        String host = reputationHost(domain);
+        if (host == null) return null;
+        if (android.util.Patterns.IP_ADDRESS.matcher(host).matches()) {
+            return ThreatIntelManager.isPrivateOrLocalIp(host) ? null : queryIp(host);
+        }
+        return route(host, "DOMAIN", provider -> provider.queryDomain(host));
     }
 
     public ThreatIntelProvider.ThreatReport queryUrl(String url) {
-        if (url == null || url.isEmpty()) return null;
-        return route(url, "URL", p -> p.queryUrl(url));
+        return queryDomain(url);
+    }
+
+    static String reputationHost(String value) {
+        if (value == null || value.trim().isEmpty()) return null;
+        String input = value.trim();
+        try {
+            java.net.URI uri = new java.net.URI(input.contains("://") ? input : "https://" + input);
+            if (!"https".equalsIgnoreCase(uri.getScheme()) && !"http".equalsIgnoreCase(uri.getScheme())) return null;
+            String host = uri.getHost();
+            if (host == null) return null;
+            if (host.startsWith("[") && host.endsWith("]")) host = host.substring(1, host.length() - 1);
+            return host.toLowerCase(java.util.Locale.ROOT);
+        } catch (java.net.URISyntaxException invalid) {
+            return null;
+        }
     }
 
     // ─── Internal routing ─────────────────────────────────────────────────────
@@ -115,7 +131,8 @@ public class ThreatIntelRouter {
         TiCacheDb.CacheEntry cached = mCache.lookup(iocValue);
         if (cached != null) {
             Log.d(TAG, "Cache hit for " + iocValue + " [" + cached.provider + "]");
-            return cacheEntryToReport(cached);
+            ThreatIntelProvider.ThreatReport report = cacheEntryToReport(cached);
+            if (report.hasVerdict()) return report;
         }
 
         // Step 2: Query all enabled providers
@@ -126,7 +143,7 @@ public class ThreatIntelRouter {
             if (!provider.isAvailable()) continue;
             try {
                 ThreatIntelProvider.ThreatReport result = queryFn.query(provider);
-                if (result == null) continue;
+                if (result == null || !result.hasVerdict()) continue;
 
                 queriedCount++;
                 Log.d(TAG, provider.getProviderCode() + " → " + iocValue +

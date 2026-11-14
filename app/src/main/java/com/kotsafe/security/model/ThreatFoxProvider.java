@@ -159,7 +159,7 @@ public class ThreatFoxProvider implements ThreatIntelProvider {
                 return report;
             }
         } else if ("no_result".equalsIgnoreCase(status) || "no_results".equalsIgnoreCase(status)) {
-            return ThreatReport.clean(getProviderName(), ioc, iocType);
+            return ThreatReport.error(getProviderName(), ioc);
         }
 
         return ThreatReport.error(getProviderName(), ioc);

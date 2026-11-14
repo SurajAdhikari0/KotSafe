@@ -2393,6 +2393,25 @@ public class CaptureService extends VpnService implements Runnable {
             MatchList.ListDescriptor ld = mFirewallWhitelist.toListDescriptor();
             // Automatically whitelist all system apps and UIDs by default
             Utils.addSystemAppsToWhitelistDescriptor(this, ld);
+            // Preserve KotSafe gateway control and transport traffic when the
+            // temporary screen-off policy enables whitelist mode.
+            if (FirewallPolicy.shouldBlockScreenOff(mPrefs, mIsScreenOn)
+                    && !Prefs.isFirewallWhitelistMode(mPrefs)
+                    && !ld.apps.contains(Integer.toString(android.os.Process.myUid()))) {
+                ld.apps.add(Integer.toString(android.os.Process.myUid()));
+            }
+            if (FirewallPolicy.shouldBlockScreenOff(mPrefs, mIsScreenOn)
+                    && !Prefs.isFirewallWhitelistMode(mPrefs)) {
+                for (String packageName : mPrefs.getStringSet(Prefs.PREF_SCREEN_OFF_ALLOWED_APPS,
+                        java.util.Collections.emptySet())) {
+                    try {
+                        String uid = Integer.toString(getPackageManager().getApplicationInfo(packageName, 0).uid);
+                        if (!ld.apps.contains(uid)) ld.apps.add(uid);
+                    } catch (android.content.pm.PackageManager.NameNotFoundException removedApp) {
+                        // A removed app's exception does not authorize another package.
+                    }
+                }
+            }
             return reloadFirewallWhitelist(ld);
         } else {
             return reloadFirewallWhitelist(null);
@@ -2405,6 +2424,7 @@ public class CaptureService extends VpnService implements Runnable {
         if(mScreenStateMonitor != null) {
             if(enabled) {
                 mScreenStateMonitor.startMonitoring();
+                mIsScreenOn = mScreenStateMonitor.isScreenOn();
                 mScreenOffBlockingActive = FirewallPolicy.shouldBlockScreenOff(mPrefs, mScreenStateMonitor.isScreenOn());
             } else {
                 mScreenStateMonitor.stopMonitoring();
@@ -2477,6 +2497,10 @@ public class CaptureService extends VpnService implements Runnable {
         nativeSetFirewallEnabled(enabled);
         INSTANCE.reloadBlocklist();
         INSTANCE.reloadFirewallWhitelist();
+    }
+
+    public static boolean isFirewallRunning() {
+        return INSTANCE != null && isServiceActive() && INSTANCE.mFirewallSupported && INSTANCE.mFirewallEnabled;
     }
 
     public static @NonNull CaptureStats getStats() {

@@ -170,6 +170,10 @@ public class SettingsSearchDialog extends BottomSheetDialogFragment {
             }
         }
 
+        if (!com.kotsafe.security.model.Prefs.isAdvancedFeaturesEnabled(
+                androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()))) {
+            mFilteredItems.removeIf(item -> com.kotsafe.security.model.AdvancedSettingsVisibility.isAdvancedOnly(item.key));
+        }
         if (mTvNoResults != null) {
             mTvNoResults.setVisibility(mFilteredItems.isEmpty() ? View.VISIBLE : View.GONE);
         }

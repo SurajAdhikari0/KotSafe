@@ -35,6 +35,13 @@ import com.kotsafe.security.interfaces.FragmentViewCreatedListener;
 
 public abstract class SettingsSubFragment extends PreferenceFragmentCompat {
     @Override
+    public void onResume() {
+        super.onResume();
+        com.kotsafe.security.model.AdvancedSettingsVisibility.apply(getPreferenceScreen(),
+                com.kotsafe.security.model.Prefs.isAdvancedFeaturesEnabled(
+                        androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext())));
+    }
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 

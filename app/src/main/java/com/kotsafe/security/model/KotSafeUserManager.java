@@ -158,16 +158,15 @@ public class KotSafeUserManager {
                     if (isPasswordUser && !user.isEmailVerified()) {
                         return false;
                     }
-                    return true;
+                    SharedPreferences prefs = context.getSharedPreferences(LoginActivity.PREF_AUTH, Context.MODE_PRIVATE);
+                    return user.getUid().equals(prefs.getString(LoginActivity.KEY_LOGGED_IN_UID, null));
                 } else if (user == null) {
                     return false;
                 }
             }
         } catch (Exception ignored) {}
 
-        SharedPreferences prefs = context.getSharedPreferences(LoginActivity.PREF_AUTH, Context.MODE_PRIVATE);
-        String email = prefs.getString(LoginActivity.KEY_LOGGED_IN_EMAIL, null);
-        return email != null && !email.trim().isEmpty();
+        return false;
     }
 
     public static String getLoggedInEmail(Context context) {
@@ -328,6 +327,34 @@ public class KotSafeUserManager {
      * Check if Two-Factor Authentication (2FA) is enabled for the current account.
      * Queries Firestore live, falling back to local cached preferences.
      */
+    public static void loadSignInChallenge(String uid, Callback<String> callback) {
+        try {
+            FirebaseFirestore.getInstance().collection("users").document(uid)
+                    .get(com.google.firebase.firestore.Source.SERVER)
+                    .addOnSuccessListener(snapshot -> {
+                        try {
+                            if (!snapshot.exists() || !Boolean.TRUE.equals(snapshot.getBoolean("twoFactorEnabled"))) {
+                                callback.onSuccess(null);
+                                return;
+                            }
+                            String stored = snapshot.getString("twoFactorSecret");
+                            if (stored == null || stored.isEmpty()) stored = snapshot.getString("securityPosture.twoFactorSecret");
+                            String secret = stored != null && stored.startsWith(CRYPTO_PREFIX)
+                                    ? decryptSecretFromCloud(uid, stored) : stored;
+                            if (secret == null || secret.trim().isEmpty() || secret.startsWith(CRYPTO_PREFIX)) {
+                                callback.onError("Two-factor credentials could not be verified.");
+                            } else {
+                                callback.onSuccess(secret);
+                            }
+                        } catch (RuntimeException invalidSettings) {
+                            callback.onError("Two-factor settings could not be read.");
+                        }
+                    }).addOnFailureListener(error -> callback.onError("Could not verify account security settings. Check your connection and retry."));
+        } catch (RuntimeException unavailable) {
+            callback.onError("Account security service unavailable. Please retry.");
+        }
+    }
+
     public static void isTwoFactorEnabled(Context context, Callback<Boolean> callback) {
         if (context == null) {
             if (callback != null) callback.onError("Context null");
@@ -820,43 +847,33 @@ public class KotSafeUserManager {
         String targetHash = hashBackupCode(uid, inputCode);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("users").document(uid).get()
-                .addOnSuccessListener(snapshot -> {
-                    if (!snapshot.exists()) {
-                        if (callback != null) callback.onSuccess(false);
-                        return;
-                    }
-                    List<Map<String, Object>> codes = (List<Map<String, Object>>) snapshot.get("twoFactorBackupCodes");
-                    if (codes == null || codes.isEmpty()) {
-                        if (callback != null) callback.onSuccess(false);
-                        return;
-                    }
-
-                    boolean matched = false;
-                    List<Map<String, Object>> updatedList = new ArrayList<>();
-                    for (Map<String, Object> item : codes) {
-                        Map<String, Object> copy = new HashMap<>(item);
-                        String h = (String) copy.get("hash");
-                        Boolean used = (Boolean) copy.get("used");
-                        if (!matched && targetHash.equals(h) && (used == null || !used)) {
-                            copy.put("used", true);
-                            copy.put("usedAt", System.currentTimeMillis());
-                            matched = true;
-                        }
-                        updatedList.add(copy);
-                    }
-
-                    if (matched) {
-                        db.collection("users").document(uid).update("twoFactorBackupCodes", updatedList);
-                        logSecurityEvent(context, "BACKUP_CODE_USED", "Backup code used", "Single-use recovery code verified");
-                        if (callback != null) callback.onSuccess(true);
-                    } else {
-                        if (callback != null) callback.onSuccess(false);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    if (callback != null) callback.onError(e.getMessage());
-                });
+        com.google.firebase.firestore.DocumentReference account = db.collection("users").document(uid);
+        db.runTransaction(transaction -> {
+            com.google.firebase.firestore.DocumentSnapshot snapshot = transaction.get(account);
+            List<Map<String, Object>> storedCodes = (List<Map<String, Object>>) snapshot.get("twoFactorBackupCodes");
+            if (storedCodes == null) return false;
+            List<Map<String, Object>> updatedCodes = new ArrayList<>();
+            boolean matched = false;
+            for (Map<String, Object> storedCode : storedCodes) {
+                Map<String, Object> code = new HashMap<>(storedCode);
+                if (!matched && targetHash.equals(code.get("hash")) && !Boolean.TRUE.equals(code.get("used"))) {
+                    code.put("used", true);
+                    code.put("usedAt", System.currentTimeMillis());
+                    matched = true;
+                }
+                updatedCodes.add(code);
+            }
+            if (matched) {
+                transaction.update(account, "twoFactorBackupCodes", updatedCodes);
+                return true;
+            }
+            return false;
+        }).addOnSuccessListener(matched -> {
+            if (matched) logSecurityEvent(context, "BACKUP_CODE_USED", "Backup code used", "Single-use recovery code verified");
+            if (callback != null) callback.onSuccess(matched);
+        }).addOnFailureListener(error -> {
+            if (callback != null) callback.onError("Could not verify the recovery code. Check your connection and retry.");
+        });
     }
 
     // ─────────────────────────────────────────────────────────────────────────────

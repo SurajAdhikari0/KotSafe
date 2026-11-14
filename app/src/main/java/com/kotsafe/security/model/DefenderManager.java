@@ -62,7 +62,7 @@ public class DefenderManager {
     }
 
     /**
-     * Checks if all defensive subsystems (Firewall, AV, Quad9 DNS, Screen-Off Block, Daily Scan) are configured & armed.
+     * Checks whether firewall, malware detection and scheduled scans are configured.
      */
     public static boolean isAllSafetyArmed(Context context) {
         if (context == null) return false;
@@ -70,13 +70,9 @@ public class DefenderManager {
 
         boolean fwOn = Prefs.isFirewallEnabled(context, prefs);
         boolean avOn = Prefs.isMalwareDetectionEnabled(context, prefs);
-        boolean screenOffBlock = prefs.getBoolean(Prefs.PREF_FIREWALL_SCREEN_OFF_BLOCK, false);
-        boolean useSysDns = prefs.getBoolean(Prefs.PREF_USE_SYSTEM_DNS, true);
-        String dnsV4 = Prefs.getDnsServerV4(prefs);
-        boolean secureDns = !useSysDns && (dnsV4 != null && !dnsV4.isEmpty() && !dnsV4.equals("8.8.8.8"));
         boolean autoScan = prefs.getBoolean(DailyDeepScanWorker.PREF_AUTO_DAILY_DEEP_SCAN, true);
 
-        return fwOn && avOn && screenOffBlock && secureDns && autoScan;
+        return fwOn && avOn && autoScan;
     }
 
     /**
@@ -103,16 +99,16 @@ public class DefenderManager {
         editor.putBoolean(DailyDeepScanWorker.PREF_AUTO_DAILY_DEEP_SCAN, true);
 
         // 3. Screen-Off Background Traffic Lockdown (prevents covert telemetry leaks)
-        editor.putBoolean(Prefs.PREF_FIREWALL_SCREEN_OFF_BLOCK, true);
+        // Screen-off restrictions remain an explicit user preference.
 
         // 4. High-Performance DNS: Cloudflare (1.1.1.1)
         DnsProvider cloudflare = DnsProvider.findById("cloudflare");
-        if (cloudflare != null) {
+        if (prefs.getBoolean(Prefs.PREF_USE_SYSTEM_DNS, true) && cloudflare != null) {
             editor.putBoolean(Prefs.PREF_USE_SYSTEM_DNS, false)
                     .putString(Prefs.PREF_DNS_SERVER_V4, cloudflare.getPrimaryIpv4())
                     .putString(Prefs.PREF_DNS_SERVER_V6, cloudflare.getPrimaryIpv6() != null ? cloudflare.getPrimaryIpv6() : "2606:4700:4700::1111")
                     .putString(Prefs.PREF_ADBLOCK_DOH_PROVIDER, cloudflare.getId());
-        } else {
+        } else if (prefs.getBoolean(Prefs.PREF_USE_SYSTEM_DNS, true)) {
             editor.putBoolean(Prefs.PREF_USE_SYSTEM_DNS, false)
                     .putString(Prefs.PREF_DNS_SERVER_V4, "1.1.1.1")
                     .putString(Prefs.PREF_DNS_SERVER_V6, "2606:4700:4700::1111")
@@ -289,10 +285,10 @@ public class DefenderManager {
             b.setMessage("Your device is currently fully guarded:\n\n"
                     + "✔ Real-Time Antivirus: Scanning apps & downloads\n"
                     + "✔ Smart Firewall: Blocking unauthorized connections\n"
-                    + "✔ Threat-Blocking DNS: Quad9 (9.9.9.9) active\n"
-                    + "✔ Screen-Off Guard: Background data leaks prevented\n"
+                    + "✔ DNS: " + Prefs.getDnsServerV4(PreferenceManager.getDefaultSharedPreferences(activity)) + "\n"
+                    + "✔ Screen-off restrictions follow your firewall settings\n"
                     + "✔ Daily Deep Scan: Automated scheduled defense\n"
-                    + "✔ VPN Security Tunnel: Encrypting device traffic\n\n"
+                    + "✔ Local VPN: Inspecting connections on this device\n\n"
                     + "All defenses are operating autonomously.");
 
             b.setPositiveButton("Antivirus Scan", (dialog, which) -> {
@@ -311,15 +307,15 @@ public class DefenderManager {
             b.setMessage("Enable complete device protection with zero configuration:\n\n"
                     + "1. Smart Firewall: Auto-blocks malicious hosts & trackers\n"
                     + "2. Real-Time Antivirus: Arms heuristic scanning & daily deep audits\n"
-                    + "3. Threat-Blocking DNS: Enforces Quad9 encrypted clean DNS\n"
-                    + "4. Screen-Off Guard: Stops apps from communicating when phone is locked\n"
-                    + "5. Active Shield: Launches secure VPN inspection tunnel\n\n"
+                    + "3. DNS: Uses Cloudflare when system DNS is selected\n"
+                    + "4. Screen-off restrictions follow your firewall settings\n"
+                    + "5. Active Shield: Starts local VPN inspection with Android consent\n\n"
                     + "Zero technical setup required. Designed for complete peace of mind.");
 
             b.setPositiveButton("Arm All & Protect Now", (dialog, which) -> {
                 armAllDefensesAndStart(activity);
                 if (onUpdated != null) onUpdated.run();
-                Toast.makeText(activity, "🛡️ KotSafe Active! Full protection is running.", Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, "Protection start requested. Check the dashboard for its current status.", Toast.LENGTH_LONG).show();
             });
 
             if (!armed) {
@@ -333,6 +329,32 @@ public class DefenderManager {
             b.setNegativeButton("Cancel", null);
         }
 
+        b.setView(buildAutopilotControls(activity));
         b.show();
+    }
+
+    private static android.view.View buildAutopilotControls(Activity activity) {
+        android.widget.LinearLayout controls = new android.widget.LinearLayout(activity);
+        controls.setOrientation(android.widget.LinearLayout.VERTICAL);
+        controls.setPadding(32, 12, 32, 12);
+        android.widget.CheckBox automatic = new android.widget.CheckBox(activity);
+        automatic.setText("Automatically block confirmed malicious hosts");
+        com.kotsafe.security.ai.AiConfig config = new com.kotsafe.security.ai.AiConfig(activity);
+        automatic.setChecked(config.isAutopilotEnabled());
+        automatic.setOnCheckedChangeListener((button, checked) -> {
+            PreferenceManager.getDefaultSharedPreferences(activity).edit()
+                    .putBoolean(PREF_DEFENDER_AUTO_PILOT, checked).apply();
+            config.setAutopilotEnabled(checked);
+        });
+        android.widget.CheckBox screenOff = new android.widget.CheckBox(activity);
+        screenOff.setText("Restrict background traffic while screen is off (may delay messages; KotSafe P2P transport excluded)");
+        screenOff.setChecked(PreferenceManager.getDefaultSharedPreferences(activity)
+                .getBoolean(Prefs.PREF_FIREWALL_SCREEN_OFF_BLOCK, false));
+        screenOff.setOnCheckedChangeListener((button, checked) ->
+                PreferenceManager.getDefaultSharedPreferences(activity).edit()
+                        .putBoolean(Prefs.PREF_FIREWALL_SCREEN_OFF_BLOCK, checked).apply());
+        controls.addView(automatic);
+        controls.addView(screenOff);
+        return controls;
     }
 }

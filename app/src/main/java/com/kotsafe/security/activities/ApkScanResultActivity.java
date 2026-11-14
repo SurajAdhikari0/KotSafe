@@ -261,6 +261,8 @@ public class ApkScanResultActivity extends AppCompatActivity {
         } else if (r.tiSuspicious) {
             mTvTiResult.setText("⚠ SUSPICIOUS [" + r.tiProvider + "] " + r.tiDetails);
             mTvTiResult.setTextColor(Color.parseColor("#FF9800"));
+        } else if (!r.tiVerifiedClean) {
+            mTvTiResult.setText("No cloud verdict");
         } else {
             mTvTiResult.setText("✓ Clean [" + r.tiProvider + "]");
             mTvTiResult.setTextColor(Color.parseColor("#4CAF50"));

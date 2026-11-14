@@ -103,7 +103,7 @@ public class URLhausProvider implements ThreatIntelProvider {
                 report.confidence = 0.95f;
                 return report;
             } else if ("no_results".equalsIgnoreCase(status)) {
-                return ThreatReport.clean(getProviderName(), url, "URL");
+                return ThreatReport.error(getProviderName(), url);
             } else {
                 return ThreatReport.error(getProviderName(), url);
             }
@@ -163,7 +163,7 @@ public class URLhausProvider implements ThreatIntelProvider {
                 report.confidence = 0.90f;
                 return report;
             } else if ("no_results".equalsIgnoreCase(status)) {
-                return ThreatReport.clean(getProviderName(), host, iocType);
+                return ThreatReport.error(getProviderName(), host);
             } else {
                 return ThreatReport.error(getProviderName(), host);
             }
@@ -206,7 +206,7 @@ public class URLhausProvider implements ThreatIntelProvider {
                 report.confidence = 0.98f;
                 return report;
             } else if ("no_results".equalsIgnoreCase(status)) {
-                return ThreatReport.clean(getProviderName(), sha256, "HASH");
+                return ThreatReport.error(getProviderName(), sha256);
             } else {
                 return ThreatReport.error(getProviderName(), sha256);
             }

@@ -1239,16 +1239,16 @@
     <string name="advanced_mode_category">Advanced &amp; Developer Mode</string>
     <string name="advanced_mode_title">Enable Advanced Features</string>
     <string name="advanced_mode_summary">Unlock low-level packet capture, TLS decryption, raw packet exporters, Wireshark extensions and developer tools</string>
-    <string name="advanced_mode_enable_all">Enable All Advanced Tools</string>
-    <string name="advanced_mode_enable_all_summary">One-tap activate full packet payload, PCAPng dumps, Wireshark extensions and aggressive deep inspection</string>
-    <string name="advanced_mode_dialog_title">Activate All Advanced Tools?</string>
-    <string name="advanced_mode_dialog_msg">This will turn on:\n\n• Full packet payload capture\n• PCAPng capture format\n• Wireshark App Name/UID extensions\n• Aggressive QUIC UDP suppression\n• Auto-block Private DNS leaks\n• Automatic daily deep scan\n\nRecommended for security analysts and advanced troubleshooting.</string>
-    <string name="advanced_mode_all_enabled_toast">All Advanced Cyber Tools are now active!</string>
+    <string name="advanced_mode_enable_all">Show All Advanced Tools</string>
+    <string name="advanced_mode_enable_all_summary">Reveal the complete settings interface. Configure individual tools separately.</string>
+    <string name="advanced_mode_dialog_title">Show All Advanced Tools?</string>
+    <string name="advanced_mode_dialog_msg">Show capture, decryption, proxy, export and enterprise settings. Choose which tools to activate from their own controls.</string>
+    <string name="advanced_mode_all_enabled_toast">Advanced settings are now visible.</string>
 
     <!-- KotSafe Shield & 1-Tap Total Safety -->
     <string name="defender_mode_category">KotSafe Shield (Auto-Pilot Safety)</string>
-    <string name="defender_mode_title">1-Tap Total Safety (KotSafe Auto-Pilot)</string>
-    <string name="defender_mode_summary">Automatically arms Firewall, Real-time Antivirus, and Threat-blocking DNS whenever protection is started</string>
+    <string name="defender_mode_title">Autopilot protection</string>
+    <string name="defender_mode_summary">Prepares firewall, antivirus and scheduled scans when protection starts. Configure automatic blocking below.</string>
     <string name="defender_status_active">TOTAL DEFENSE ACTIVE • ALL SYSTEMS SAFE</string>
     <string name="defender_status_unarmed">1-TAP TOTAL SAFETY: ARM ALL DEFENSES</string>
     <string name="defender_tap_to_protect">TAP TO PROTECT</string>

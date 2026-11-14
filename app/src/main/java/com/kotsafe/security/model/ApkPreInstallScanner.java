@@ -123,6 +123,7 @@ public class ApkPreInstallScanner {
 
         // TI result
         public boolean tiQueried        = false;
+        public boolean tiVerifiedClean  = false;
         public boolean tiMalicious      = false;
         public boolean tiSuspicious     = false;
         public int     tiRiskScore      = 0;
@@ -188,7 +189,10 @@ public class ApkPreInstallScanner {
             hasYaraMalicious   = in.readByte() != 0;
             hasYaraSuspicious  = in.readByte() != 0;
             yaraHitsCount      = in.readInt();
-            tiQueried          = in.readByte() != 0;
+            // Older parcels recorded only whether a query was attempted.
+            byte lookupState = in.readByte();
+            tiQueried = lookupState != 0;
+            tiVerifiedClean = lookupState == 2;
             tiMalicious        = in.readByte() != 0;
             tiSuspicious       = in.readByte() != 0;
             tiRiskScore        = in.readInt();
@@ -249,7 +253,7 @@ public class ApkPreInstallScanner {
             dest.writeByte((byte) (hasYaraMalicious   ? 1 : 0));
             dest.writeByte((byte) (hasYaraSuspicious  ? 1 : 0));
             dest.writeInt(yaraHitsCount);
-            dest.writeByte((byte) (tiQueried   ? 1 : 0));
+            dest.writeByte((byte) (tiVerifiedClean ? 2 : tiQueried ? 1 : 0));
             dest.writeByte((byte) (tiMalicious ? 1 : 0));
             dest.writeByte((byte) (tiSuspicious? 1 : 0));
             dest.writeInt(tiRiskScore);
@@ -578,7 +582,8 @@ public class ApkPreInstallScanner {
                 ThreatIntelRouter router = ThreatIntelRouter.getInstance(context);
                 ThreatIntelProvider.ThreatReport tiReport = router.queryHash(report.sha256);
 
-                if (tiReport != null) {
+                if (tiReport != null && tiReport.hasVerdict()) {
+                    report.tiVerifiedClean = tiReport.isVerifiedClean();
                     report.tiMalicious     = tiReport.isMalicious;
                     report.tiSuspicious    = tiReport.isSuspicious;
                     report.tiRiskScore     = tiReport.riskScore;
@@ -601,6 +606,8 @@ public class ApkPreInstallScanner {
                                 "Checked by " + tiReport.provider + " — no known threats",
                                 AntivirusEvidenceItem.SEVERITY_CLEAN);
                     }
+                } else {
+                    addEvidence(report, "No cloud verdict", "Local scan findings retained.", AntivirusEvidenceItem.SEVERITY_LOW);
                 }
             } else {
                 addEvidence(report, "TI Lookup: Offline / Skipped",
@@ -612,12 +619,12 @@ public class ApkPreInstallScanner {
 
             // ── Phase 5: Compute final risk score & verdict ───────────────────
             notifyPhase(listener, "Computing verdict & MITRE alignment…", 90);
-            boolean tiVerifiedClean = report.tiQueried && !report.tiMalicious && !report.tiSuspicious && report.tiRiskScore == 0;
+
             report.riskScore = Math.max(report.riskScore, computeFinalRiskScore(report));
             // Preserve explicit hash/package policy blocks and update-signature failures.
             if (!VERDICT_THREAT.equals(report.verdict)) {
                 report.verdict = scoreToVerdict(report.riskScore, report.tiMalicious,
-                        report.hasYaraMalicious, report.updateSafetyVerdict, tiVerifiedClean);
+                        report.hasYaraMalicious, report.updateSafetyVerdict, report.tiVerifiedClean);
             }
 
             // ── Phase 6: Persist hash to FileHashDbHelper ─────────────────────
@@ -637,9 +644,17 @@ public class ApkPreInstallScanner {
                     entry.scanPriority     = FileHashEntry.PRIORITY_CRITICAL;
                     entry.scanStatus       = FileHashEntry.SCAN_STATUS_DONE;
                     entry.isSystemApp      = false;
-                    entry.threatStatus     = report.tiMalicious ? FileHashEntry.THREAT_MALICIOUS
-                            : report.tiSuspicious ? FileHashEntry.THREAT_SUSPICIOUS
-                            : FileHashEntry.THREAT_CLEAN;
+                    entry.threatStatus     = report.tiMalicious || VERDICT_THREAT.equals(report.verdict) ? FileHashEntry.THREAT_MALICIOUS
+                            : report.tiSuspicious || VERDICT_SUSPICIOUS.equals(report.verdict) ? FileHashEntry.THREAT_SUSPICIOUS
+                            : report.tiVerifiedClean ? FileHashEntry.THREAT_CLEAN : FileHashEntry.THREAT_UNKNOWN;
+                    if (FileHashEntry.THREAT_UNKNOWN.equals(entry.threatStatus)) {
+                        FileHashEntry previous = hashDb.getEntryByHash(report.sha256);
+                        if (previous != null && (FileHashEntry.THREAT_MALICIOUS.equals(previous.threatStatus)
+                                || FileHashEntry.THREAT_SUSPICIOUS.equals(previous.threatStatus))) {
+                            entry.threatStatus = previous.threatStatus;
+                            entry.threatDetails = previous.threatDetails;
+                        }
+                    }
                     hashDb.upsertFileHash(entry);
                 } catch (Exception e) {
                     Log.w(TAG, "Could not persist hash to DB: " + e.getMessage());
@@ -699,7 +714,7 @@ public class ApkPreInstallScanner {
     /**
      * Weighted risk score combining DEX heuristic, capability analysis, IOCs, and TI scores.
      */
-    private static int computeFinalRiskScore(PreInstallReport r) {
+    static int computeFinalRiskScore(PreInstallReport r) {
         // Signature mismatch is a critical compromise
         if ("SIGNATURE_MISMATCH".equals(r.updateSafetyVerdict)) {
             return 100;
@@ -712,10 +727,8 @@ public class ApkPreInstallScanner {
             score += (int)(r.tiRiskScore * 0.5f);
         }
 
-        // If Threat Intelligence verified this hash as clean (0 pulses / risk score 0),
-        // apply anti-false-positive damping to capability and string heuristics
-        boolean tiVerifiedClean = r.tiQueried && !r.tiMalicious && !r.tiSuspicious && r.tiRiskScore == 0;
-        float heuristicDamping = tiVerifiedClean ? 0.5f : 1.0f;
+        // Only an explicit clean report can reduce local heuristic weights.
+        float heuristicDamping = r.tiVerifiedClean ? 0.5f : 1.0f;
 
         // DEX heuristic adds up to 30 points
         score += (int)(r.dexConfidenceScore * 0.3f * heuristicDamping);

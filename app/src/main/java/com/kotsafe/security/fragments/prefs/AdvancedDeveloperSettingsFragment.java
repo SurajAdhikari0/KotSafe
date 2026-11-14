@@ -24,6 +24,11 @@ public class AdvancedDeveloperSettingsFragment extends SettingsSubFragment {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.pref_advanced_developer, rootKey);
+        SwitchPreference advanced = findPreference(Prefs.PREF_ENABLE_ADVANCED_FEATURES);
+        advanced.setOnPreferenceChangeListener((preference, value) -> {
+            com.kotsafe.security.model.AdvancedSettingsVisibility.apply(getPreferenceScreen(), (Boolean) value);
+            return true;
+        });
 
         Preference enableAll = findPreference("pref_enable_all_advanced_now");
         if (enableAll != null) {
@@ -126,20 +131,11 @@ public class AdvancedDeveloperSettingsFragment extends SettingsSubFragment {
                 .setPositiveButton(R.string.advanced_mode_enable_all, (dialog, which) -> {
                     SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(requireContext());
                     p.edit()
-                            .putBoolean(Prefs.PREF_FULL_PAYLOAD, true)
-                            .putBoolean(Prefs.PREF_PCAPNG_ENABLED, true)
-                            .putBoolean(Prefs.PREF_DUMP_EXTENSIONS, true)
-                            .putBoolean(Prefs.PREF_AUTO_BLOCK_PRIVATE_DNS, true)
-                            .putString(Prefs.PREF_BLOCK_QUIC, "always")
-                            .putBoolean("pref_auto_daily_deep_scan", true)
-                            .putBoolean("pref_detection_rules_enabled", true)
+                            .putBoolean(Prefs.PREF_ENABLE_ADVANCED_FEATURES, true)
                             .apply();
-
-                    SwitchPreference fullPayload = findPreference("full_payload");
-                    if (fullPayload != null) fullPayload.setChecked(true);
-
-                    SwitchPreference autoBlockDns = findPreference("auto_block_private_dns");
-                    if (autoBlockDns != null) autoBlockDns.setChecked(true);
+                    SwitchPreference mode = findPreference(Prefs.PREF_ENABLE_ADVANCED_FEATURES);
+                    if (mode != null) mode.setChecked(true);
+                    com.kotsafe.security.model.AdvancedSettingsVisibility.apply(getPreferenceScreen(), true);
 
                     Toast.makeText(requireContext(), R.string.advanced_mode_all_enabled_toast, Toast.LENGTH_LONG).show();
                 })

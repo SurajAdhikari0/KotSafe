@@ -61,6 +61,15 @@ public interface ThreatIntelProvider {
         public long firstSeen;
         public long lastSeen;
 
+        public boolean isVerifiedClean() {
+            return !isMalicious && !isSuspicious && riskScore == 0
+                    && ("SAFE".equalsIgnoreCase(verdict) || "CLEAN".equalsIgnoreCase(verdict));
+        }
+
+        public boolean hasVerdict() {
+            return isMalicious || isSuspicious || isVerifiedClean();
+        }
+
         public static ThreatReport clean(String provider, String ioc, String iocType) {
             ThreatReport r = new ThreatReport();
             r.provider = provider;

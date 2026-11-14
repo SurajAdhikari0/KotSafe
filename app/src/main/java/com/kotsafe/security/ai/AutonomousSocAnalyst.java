@@ -18,14 +18,18 @@ import com.kotsafe.security.model.SiemTelemetryForwarder;
 
 import java.util.Locale;
 import java.util.UUID;
+import java.util.LinkedHashMap;
+import android.os.SystemClock;
+import com.kotsafe.security.CaptureService;
+import com.kotsafe.security.model.KotSafeCloudProvider;
+import com.kotsafe.security.model.ThreatIntelProvider;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Autonomous AI SOC Incident Analyst & SOAR Engine (Security Orchestration, Automation, and Response).
  * Continuously audits threat signals (Mercenary Spyware, C2 beacons, high-entropy exfiltration,
  * zero-click bursts, and malicious flow anomalies), generates threat assessments,
- * and automatically executes kernel-level remediation when confidence is high.
+ * and saves firewall rules for network indicators confirmed by KotSafe intelligence.
  */
 public class AutonomousSocAnalyst {
 
@@ -37,8 +41,12 @@ public class AutonomousSocAnalyst {
     private final SecurityRulesDb mRulesDb;
     private final AlertStore mAlertStore;
     private final SecurityNotificationHub mNotificationHub;
-    private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService mExecutor = new java.util.concurrent.ThreadPoolExecutor(
+            1, 1, 0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+            new java.util.concurrent.ArrayBlockingQueue<>(64));
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+    private final LinkedHashMap<String, Long> mRecentIncidents = new LinkedHashMap<>();
+    private static final long INCIDENT_COOLDOWN_MS = 5 * 60 * 1000L;
 
     public static class ThreatIncident {
         public final String ioc;                // Domain, IP, Package Name, or Hash
@@ -66,7 +74,7 @@ public class AutonomousSocAnalyst {
 
     public static class RemediationVerdict {
         public final boolean autoResolved;
-        public final String actionTaken;        // BLOCKED_FIREWALL | QUARANTINED | NOTIFIED_USER | MONITORED
+        public final String actionTaken;        // BLOCK_LOADED | RULE_SAVED | NOTIFIED_USER | MONITORED
         public final String summaryMessage;
 
         public RemediationVerdict(boolean autoResolved, String actionTaken, String summaryMessage) {
@@ -110,35 +118,83 @@ public class AutonomousSocAnalyst {
             return;
         }
 
-        mExecutor.execute(() -> {
-            boolean isAutopilot = mAiConfig.isAutopilotEnabled();
-            boolean isHighConfidence = incident.maliciousProbability >= 75;
+        try {
+            mExecutor.execute(() -> {
+                String key = incident.iocType + ":" + incident.ioc.trim().toLowerCase(Locale.ROOT)
+                        + ":" + (incident.maliciousProbability >= 90) + ":" + mAiConfig.isAutopilotEnabled();
+                RemediationVerdict verdict;
+                try {
+                    long now = SystemClock.elapsedRealtime();
+                    Long previous = mRecentIncidents.get(key);
+                    if (previous != null && now - previous < INCIDENT_COOLDOWN_MS) {
+                        if (callback != null) mMainHandler.post(() -> callback.onRemediationCompleted(
+                                new RemediationVerdict(false, "DUPLICATE", "This incident was recently reviewed. Check alert history.")));
+                        return;
+                    }
+                    boolean isAutopilot = mAiConfig.isAutopilotEnabled();
+                    boolean isHighConfidence = incident.maliciousProbability >= 90 && incident.maliciousProbability <= 100;
 
-            Log.i(TAG, String.format(Locale.ROOT,
-                    "[AI SOC] Triaging %s (%s) from %s - Score: %d%% - Autopilot: %b",
-                    incident.ioc, incident.threatCategory, incident.sourceApp,
-                    incident.maliciousProbability, isAutopilot));
+                    Log.i(TAG, String.format(Locale.ROOT,
+                            "[AI SOC] Triaging %s (%s) from %s - Score: %d%% - Autopilot: %b",
+                            incident.ioc, incident.threatCategory, incident.sourceApp,
+                            incident.maliciousProbability, isAutopilot));
 
-            RemediationVerdict verdict;
+                    if (isAutopilot && isHighConfidence && hasConfirmedNetworkEvidence(incident)) {
+                        // Autonomous Resolution (SOAR Autopilot Action)
+                        verdict = executeAutoRemediation(incident);
+                    } else if (incident.maliciousProbability >= 50) {
+                        // Suspicious (Interactive Human-in-the-Loop Alert)
+                        verdict = executeInteractiveAlert(incident);
+                    } else {
+                        // Low risk / Informational
+                        verdict = new RemediationVerdict(false, "MONITORED", "Low-confidence signal reviewed without a blocking action.");
+                    }
 
-            if (isAutopilot && isHighConfidence) {
-                // Autonomous Resolution (SOAR Autopilot Action)
-                verdict = executeAutoRemediation(incident);
-            } else if (incident.maliciousProbability >= 50) {
-                // Suspicious (Interactive Human-in-the-Loop Alert)
-                verdict = executeInteractiveAlert(incident);
-            } else {
-                // Low risk / Informational
-                verdict = new RemediationVerdict(false, "MONITORED", "Threat logged for background surveillance.");
-            }
+                    // Always forward incident telemetry to SIEM if enabled
+                    forwardToSiem(incident, verdict);
+                    if (mRecentIncidents.size() >= 256) mRecentIncidents.remove(mRecentIncidents.keySet().iterator().next());
+                    mRecentIncidents.put(key, now);
+                } catch (RuntimeException failure) {
+                    Log.e(TAG, "Autopilot response failed: " + failure.getClass().getSimpleName());
+                    verdict = new RemediationVerdict(false, "FAILED", "Autopilot could not complete this action. Review the incident and retry.");
+                }
 
-            // Always forward incident telemetry to SIEM if enabled
-            forwardToSiem(incident, verdict);
+                if (callback != null) {
+                    RemediationVerdict completed = verdict;
+                    mMainHandler.post(() -> callback.onRemediationCompleted(completed));
+                }
+            });
+        } catch (java.util.concurrent.RejectedExecutionException busy) {
+            if (callback != null) mMainHandler.post(() -> callback.onRemediationCompleted(
+                    new RemediationVerdict(false, "BUSY", "Autopilot is processing other incidents. Please retry.")));
+        }
+    }
 
-            if (callback != null) {
-                mMainHandler.post(() -> callback.onRemediationCompleted(verdict));
-            }
-        });
+    private boolean hasConfirmedNetworkEvidence(ThreatIncident incident) {
+        if (!isNetworkTarget(incident.iocType, incident.ioc)) return false;
+        KotSafeCloudProvider provider = new KotSafeCloudProvider(mContext);
+        if (!provider.isAvailable()) return false;
+        ThreatIntelProvider.ThreatReport report;
+        switch (incident.iocType) {
+            case "IP": report = provider.queryIp(incident.ioc); break;
+            case "DOMAIN": report = provider.queryDomain(incident.ioc); break;
+            default: return false;
+        }
+        return confirmsMalicious(report);
+    }
+
+    static boolean confirmsMalicious(ThreatIntelProvider.ThreatReport report) {
+        return report != null && report.isMalicious && !report.isSuspicious
+                && report.confidence >= 0.9f && report.confidence <= 1.0f
+                && report.riskScore >= 90 && report.riskScore <= 100;
+    }
+
+    static boolean isNetworkTarget(String type, String value) {
+        if (value == null || !value.equals(value.trim())) return false;
+        if ("IP".equals(type)) return android.util.Patterns.IP_ADDRESS.matcher(value).matches();
+        return "DOMAIN".equals(type) && value.length() <= 253 && value.contains(".")
+                && !android.util.Patterns.IP_ADDRESS.matcher(value).matches()
+                && value.matches("(?i)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?");
     }
 
     /**
@@ -146,7 +202,7 @@ public class AutonomousSocAnalyst {
      * and notifies user of successful autonomous defense.
      */
     private RemediationVerdict executeAutoRemediation(ThreatIncident incident) {
-        String blockReason = "Autonomous AI SOC: Neutralized " + incident.threatCategory + " (" + incident.mitreTechnique + ")";
+        String blockReason = "Autopilot: confirmed malware indicator (" + incident.mitreTechnique + ")";
 
         com.kotsafe.security.model.SecurityBlocklistManager secMgr =
                 com.kotsafe.security.model.SecurityBlocklistManager.getInstance(mContext);
@@ -158,45 +214,48 @@ public class AutonomousSocAnalyst {
         }
 
         // 1. Enforce Firewall Block Rule via SecurityBlocklistManager
-        if ("IP".equalsIgnoreCase(incident.iocType)) {
-            secMgr.blockIp(incident.ioc, blockReason, SecurityRulesDb.SOURCE_HEURISTIC);
-        } else if ("APP".equalsIgnoreCase(incident.iocType)) {
-            secMgr.blockApp(incident.ioc, blockReason, SecurityRulesDb.SOURCE_HEURISTIC);
+        long ruleId;
+        if ("IP".equals(incident.iocType)) {
+            ruleId = secMgr.blockIp(incident.ioc, blockReason, SecurityRulesDb.SOURCE_HEURISTIC);
+        } else if ("DOMAIN".equals(incident.iocType)) {
+            ruleId = secMgr.blockDomain(incident.ioc, blockReason, SecurityRulesDb.SOURCE_HEURISTIC);
         } else {
-            // Default to DOMAIN
-            secMgr.blockDomain(incident.ioc, blockReason, SecurityRulesDb.SOURCE_HEURISTIC);
+            return executeInteractiveAlert(incident);
         }
+        if (ruleId < 0 || mRulesDb.getRule(ruleId) == null) return executeInteractiveAlert(incident);
 
         // Instantly reload in-memory firewall fast blocklist to halt traffic on active threads
-        try {
-            secMgr.reloadCache();
-        } catch (Exception ignored) {}
+        secMgr.reloadCache();
+        boolean loaded = false;
+        com.kotsafe.security.model.Blocklist blocklist = com.kotsafe.security.KotSafe.getInstance().getBlocklist();
+        if (blocklist != null) loaded = "DOMAIN".equals(incident.iocType)
+                ? blocklist.matchesHost(incident.ioc) : blocklist.matchesExactIP(incident.ioc);
+        boolean active = CaptureService.isFirewallRunning() && loaded;
+        String status = active ? "BLOCK_LOADED" : "RULE_SAVED";
+        String description = active ? "Block rule loaded into the active firewall." : "Block rule saved. Firewall activation or rule loading is pending.";
 
         // 2. Persist Incident in AlertStore
         mAlertStore.add(
                 AlertRecord.Severity.HIGH,
                 AlertRecord.AlertType.MALWARE,
-                "🛡️ [AUTO-RESOLVED] " + incident.headline,
-                "Threat automatically neutralized by KotSafe AI SOC Analyst. "
-                        + "Outbound connection to " + incident.ioc + " blocked at firewall level. "
+                "Autopilot: " + incident.headline,
+                description + " Target: " + incident.ioc + ". "
                         + incident.technicalDetails,
                 incident.sourceApp
         );
 
         // 3. Post High-Priority Notification via SecurityNotificationHub
         mNotificationHub.postThreatAlert(
-                "🛡️ Auto-Resolved: " + incident.headline,
+                "Autopilot: " + status + " · " + incident.headline,
                 incident.ioc,
                 incident.threatCategory,
                 "MALICIOUS"
         );
 
-        String summary = String.format(Locale.ROOT,
-                "Autonomous AI SOC blocked %s (%s). Egress traffic halted immediately.",
-                incident.ioc, incident.threatCategory);
+        String summary = description + " Target: " + incident.ioc;
 
         Log.w(TAG, "[AUTO-REMEDIATION EXECUTED] " + summary);
-        return new RemediationVerdict(true, "BLOCKED_FIREWALL", summary);
+        return new RemediationVerdict(active, status, summary);
     }
 
     /**
@@ -264,6 +323,10 @@ public class AutonomousSocAnalyst {
      */
     public void preTriageAlertAsync(AlertRecord alert) {
         if (alert == null || alert.isResolved()) return;
-        mExecutor.execute(() -> preTriageAlert(alert));
+        try {
+            mExecutor.execute(() -> preTriageAlert(alert));
+        } catch (java.util.concurrent.RejectedExecutionException busy) {
+            Log.w(TAG, "Autopilot queue is full; the original alert remains available for review.");
+        }
     }
 }

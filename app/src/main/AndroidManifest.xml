@@ -94,6 +94,18 @@
             android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop" />
         <activity
+            android:name=".activities.SharedLinkActivity"
+            android:label="@string/shared_link_title"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".activities.TvLinkActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar"

@@ -100,6 +100,33 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportFragmentManager().registerFragmentLifecycleCallbacks(new androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
+            @Override
+            public void onFragmentCreated(@NonNull androidx.fragment.app.FragmentManager manager,
+                    @NonNull androidx.fragment.app.Fragment fragment, Bundle state) {
+                applySettingsVisibility(fragment);
+            }
+
+            @Override
+            public void onFragmentViewCreated(@NonNull androidx.fragment.app.FragmentManager manager,
+                    @NonNull androidx.fragment.app.Fragment fragment, @NonNull android.view.View view, Bundle state) {
+                applySettingsVisibility(fragment);
+            }
+
+            @Override
+            public void onFragmentResumed(@NonNull androidx.fragment.app.FragmentManager manager,
+                    @NonNull androidx.fragment.app.Fragment fragment) {
+                applySettingsVisibility(fragment);
+            }
+
+            private void applySettingsVisibility(androidx.fragment.app.Fragment fragment) {
+                if (fragment instanceof PreferenceFragmentCompat) {
+                    com.kotsafe.security.model.AdvancedSettingsVisibility.apply(
+                            ((PreferenceFragmentCompat) fragment).getPreferenceScreen(),
+                            Prefs.isAdvancedFeaturesEnabled(PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this)));
+                }
+            }
+        }, true);
         setTitle(R.string.title_activity_settings); // note: setting via manifest does not honor custom locale
         displayBackAction();
         setContentView(R.layout.fragment_activity);
@@ -426,6 +453,8 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
         @Override
         public void onResume() {
             super.onResume();
+            com.kotsafe.security.model.AdvancedSettingsVisibility.apply(getPreferenceScreen(),
+                    Prefs.isAdvancedFeaturesEnabled(PreferenceManager.getDefaultSharedPreferences(requireContext())));
 
             Preference devPref = findPreference("advanced_developer_settings");
             if (devPref != null) {
@@ -567,26 +596,10 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
                     .setPositiveButton(R.string.advanced_mode_enable_all, (dialog, which) -> {
                         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(requireContext());
                         p.edit()
-                                .putBoolean(Prefs.PREF_FULL_PAYLOAD, true)
-                                .putBoolean(Prefs.PREF_PCAPNG_ENABLED, true)
-                                .putBoolean(Prefs.PREF_DUMP_EXTENSIONS, true)
-                                .putBoolean(Prefs.PREF_AUTO_BLOCK_PRIVATE_DNS, true)
-                                .putString(Prefs.PREF_BLOCK_QUIC, "always")
-                                .putBoolean("pref_auto_daily_deep_scan", true)
-                                .putBoolean("pref_detection_rules_enabled", true)
+                                .putBoolean(Prefs.PREF_ENABLE_ADVANCED_FEATURES, true)
                                 .apply();
-
-                        if (mFullPayloadEnabled != null) mFullPayloadEnabled.setChecked(true);
-                        if (mPcapngEnabled != null) mPcapngEnabled.setChecked(true);
-                        if (mDumpExtensions != null) mDumpExtensions.setChecked(true);
-                        if (mAutoBlockPrivateDNS != null) mAutoBlockPrivateDNS.setChecked(true);
-                        if (mBlockQuic != null) mBlockQuic.setValue("always");
-
-                        SwitchPreference dailyScan = findPreference("pref_auto_daily_deep_scan");
-                        if (dailyScan != null) dailyScan.setChecked(true);
-
-                        SwitchPreference detectRules = findPreference("pref_detection_rules_enabled");
-                        if (detectRules != null) detectRules.setChecked(true);
+                        if (mAdvancedFeaturesSwitch != null) mAdvancedFeaturesSwitch.setChecked(true);
+                        com.kotsafe.security.model.AdvancedSettingsVisibility.apply(getPreferenceScreen(), true);
 
                         Toast.makeText(requireContext(), R.string.advanced_mode_all_enabled_toast, Toast.LENGTH_LONG).show();
                     })

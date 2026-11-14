@@ -95,6 +95,11 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
         }
 
         String cleanIoc = ioc.trim();
+        if ("URL".equalsIgnoreCase(type) || "DOMAIN".equalsIgnoreCase(type)) {
+            cleanIoc = ThreatIntelRouter.reputationHost(cleanIoc);
+            if (cleanIoc == null) return null;
+            type = android.util.Patterns.IP_ADDRESS.matcher(cleanIoc).matches() ? "IP" : "DOMAIN";
+        }
         if ("IP".equalsIgnoreCase(type)) {
             cleanIoc = ThreatIntelManager.cleanIp(cleanIoc);
             if (ThreatIntelManager.isPrivateOrLocalIp(cleanIoc)) {
@@ -188,7 +193,12 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
         new Thread(() -> {
             try {
                 URL url = new URL(getEndpointUrl());
+                if (!"https".equalsIgnoreCase(url.getProtocol())) {
+                    callback.onError("Cloud endpoint requires HTTPS.");
+                    return;
+                }
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod("POST");
                 conn.setConnectTimeout(6000);
                 conn.setReadTimeout(6000);

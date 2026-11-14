@@ -1145,6 +1145,10 @@ public class AntivirusScanEngine {
                 }
                 if (report != null) {
                     queriesCount++;
+                    if (!report.hasVerdict()) {
+                        item.details = (item.details == null || item.details.isEmpty() ? "" : item.details + "\n") + "No cloud verdict";
+                        continue;
+                    }
                     boolean isSys = item.isSystemApp || Utils.isSystemApp(context, item.packageName)
                             || SecurityBlocklistManager.getInstance(context).isSystemWhitelisted(item.iocValue);
                     boolean isAllowlisted = isVerifiedCuratedThirdPartyApp(context, item.packageName);
@@ -1175,7 +1179,7 @@ public class AntivirusScanEngine {
                         item.severity = AntivirusEvidenceItem.SEVERITY_SUSPICIOUS;
                         item.details = "[" + report.provider + "] Suspicious score: " + report.riskScore;
                         result.suspiciousDetected++;
-                    } else if (!report.isMalicious && !report.isSuspicious && report.riskScore == 0) {
+                    } else if (report.isVerifiedClean()) {
                         // Threat Intelligence verified clean (0 OTX pulses / clean community intelligence)
                         boolean wasThreat = AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(item.severity);
                         boolean wasSuspicious = AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equals(item.severity);

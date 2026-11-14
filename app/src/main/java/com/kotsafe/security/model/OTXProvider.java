@@ -119,10 +119,10 @@ public class OTXProvider implements ThreatIntelProvider {
             JSONObject root = new JSONObject(json);
 
             // Parse pulse count (main malicious indicator in OTX)
-            int pulseCount = 0;
+            int pulseCount = -1;
             if (root.has("pulse_info")) {
                 JSONObject pulseInfo = root.getJSONObject("pulse_info");
-                pulseCount = pulseInfo.optInt("count", 0);
+                pulseCount = pulseInfo.optInt("count", -1);
             }
             // For file hashes, check "malware_families"
             if ("HASH".equals(iocType) && root.has("malware_families")) {
@@ -144,7 +144,8 @@ public class OTXProvider implements ThreatIntelProvider {
                 }
             }
 
-            report.details = pulseCount + " OTX pulse(s)";
+            if (pulseCount < 0 && !report.isMalicious) return ThreatReport.error(getProviderName(), iocValue);
+            report.details = Math.max(0, pulseCount) + " OTX pulse(s)";
             report.verdict = report.isMalicious ? "MALICIOUS"
                     : report.isSuspicious ? "SUSPICIOUS" : "SAFE";
             report.confidence = 0.85f;

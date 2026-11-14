@@ -26,7 +26,7 @@ import com.kotsafe.security.Log;
 public class TiCacheDb extends SQLiteOpenHelper {
     private static final String TAG = "TiCacheDb";
     public static final String DB_NAME = "cache.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public static final String TABLE_CACHE = "ti_cache";
     public static final String COL_ID = "_id";
@@ -95,7 +95,10 @@ public class TiCacheDb extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int old, int nv) {}
+    public void onUpgrade(SQLiteDatabase db, int old, int nv) {
+        // Older merged zero-score rows could represent multiple provider failures.
+        if (old < 2) db.delete(TABLE_CACHE, "is_malicious=0 AND is_suspicious=0", null);
+    }
 
     // ─── Write ────────────────────────────────────────────────────────────────
 
