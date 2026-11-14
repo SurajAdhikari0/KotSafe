@@ -319,3 +319,31 @@ Recent commits:
 75ca3c0f feat(threat-intel): centralize APK threat lookups through KotSafe Cloud Intelligence API
 8959561e docs(ai-collab): initialize AI collaboration memory and record Threat Intel architecture handoff
 1c689511 feat(intelligence): add opt-in v2 signed intelligence manifest verifier and coordinator
+
+## 2026-11-12 08:48 IST | Codex | Task completed: T004
+
+Full and pre-install scans preserve local evidence on UNKNOWN; old ambiguous neutral cache entries invalidated. Regression tests passed.
+
+## 2026-11-12 08:48 IST | Codex | Inconclusive cloud results
+
+Tested provider outage, retry, and local APK warning-score preservation. Fixed debug APK assembled. Published release and test phone still use the preceding build.
+
+## 2026-11-12 08:52 IST | Codex | Measured Full Scan on OPPO
+
+Started Full Scan through the installed app and followed the same service thread to its final report. Total 29.38 s; first TI router event at 26.63 s, storage at 27.63 s, 15 cache hits and zero cloud responses/timeouts. Prior Deep Scan spent ~140 s between its first router event and storage, including a timeout. No code changes.
+
+## 2026-11-12 15:10 IST | Codex | Task completed: T005
+
+Autopilot hardened, full suite 530 tests passed and final focused tests plus debug APK build succeeded.
+
+## 2026-11-12 15:10 IST | Codex | Autopilot improvement handoff
+
+Core logic and setup controls completed. Existing unrelated worktree changes preserved. Automatic network action depends on published cloud records and is reviewed when cloud unavailable. App and hash incidents do not create domain rules. No physical device currently attached.
+
+## 2026-11-12 16:00 IST | Codex | Simple settings visibility
+
+Full existing layout returns in advanced mode. Everyday controls remain visible. Bulk reveal action no longer activates packet capture options. Focused test verifies original hidden capability state is restored correctly.
+
+## 2026-11-14 11:59 IST | Antigravity | Task completed: T006
+
+Updated monitor baseline, verified Python intelligence update staging suite, deployed to Oracle VPS without P2P interruption, verified delivery.

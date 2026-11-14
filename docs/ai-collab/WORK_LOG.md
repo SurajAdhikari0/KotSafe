@@ -16,6 +16,333 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-14 17:55 | Antigravity
+- **My prompt:** Complete Option A (Hostinger gateway), Option B (Android build & verification), and Option C (GitHub push prep)
+- **Plan:** Deploy matching STIX review gateway to Hostinger, run full test suites, assemble Android debug/release APKs, sync downloads, and prepare GitHub push.
+- **Changes:** Deployed `IntelligenceGatewayController.php`, `PublicIntelligenceController.php`, `ThreatDeltaService.php`, `ThreatIndicator.php`, `TrustedDomain.php`, `AdminMiddleware.php`, migrations, and route configurations to Hostinger. Cleared and re-cached Laravel config and routes. Ran 537 Android unit tests and assembled `KotSafe-standard-debug.apk`, `KotSafe-fullPower-debug.apk`, and signed release variants. Re-computed SHA256 checksums and synced release APKs to `https://kotsafe.com/downloads/`. Committed local changes in `KotSafe` (commit `dbb8a044`) and `kotsafe-site` (commit `8dd56b6`).
+- **Result:** 150 backend tests passed (627 assertions). All 13 intelligence routes registered on Hostinger. 537 Android unit tests passed with 0 failures. Fresh signed release APKs live on Hostinger downloads. Both repos committed cleanly; HTTPS push awaiting GitHub Personal Access Token or SSH key addition.
+- **Stopped at:** Ready for GitHub push token and live device testing.
+- **Next:** Push commits to GitHub upon receiving PAT or SSH key authorization.
+
+
+### 2026-11-14 17:43 | Codex
+- **My prompt:** Verify Oracle threat intelligence rollout and monitoring
+- **Plan:** Preserve workspace state, test isolated grants and withdrawal, verify production and P2P.
+- **Changes:** Migrated workspace to Neon, deployed private Hostinger gateway, enabled reviewed distribution, added per-service RAM peaks and corrected partial-month accounting.
+- **Result:** Production PostgreSQL reachable and signing configured. Isolated Android/public grants and withdrawal verified. Signed publisher succeeded with zero indicators. P2P containers running with zero restarts.
+- **Stopped at:** Phone receipt and end-to-end P2P peer call were not tested in this server check.
+- **Next:** Review a real source and authorize sharing before expecting a non-empty signed update.
+### 2026-11-14 15:35 | Codex
+- **My prompt:** Check whether Oracle and website rollout is complete
+- **Plan:** Read-only verification of running service, collector, publisher, P2P and live Hostinger assets/routes.
+- **Changes:** Audit only.
+- **Result:** Oracle venv contains reviewed engine methods, live health memory. Publisher succeeded with zero indicators. Portal JS includes Import review but deployed Laravel lacks stix/distribution operations and import detail route. Workspace distribution false. Monitor partial month incorrectly false for Nov 11 start; service peaks absent in sample. Three P2P containers running with zero restarts, tunnel active.
+- **Stopped at:** End-to-end production rollout incomplete. Do not restart memory-backed service without preserving current evidence.
+- **Next:** Preserve active workspace, verify and enable Neon persistence, deploy matching gateway, verify distribution paths and correct monitor coverage.
+### 2026-11-14 14:25 | Antigravity
+- **My prompt:** Deploy Swap memory meter and backend ingestion to Hostinger production
+- **Plan:** Configure passwordless SSH to Hostinger, sync updated React admin bundle and Laravel backend controller, clear and warm application caches, verify live ingestion and frontend rendering.
+- **Changes:** Installed Kali public key into Hostinger `~/.ssh/authorized_keys`. Synchronized compiled `admin/` bundle (`index-BeYoHAQU.js` and `ResourceMonitor-CM8VL3S-.js`) via rsync. Deployed `backend/app/Http/Controllers/ResourceMonitorController.php` (with `swap_used` and `swap_total` fields) and `backend/config/resource_monitor.php`. Cleared and cached Laravel routes and config on Hostinger. Triggered on-demand Oracle monitor sample.
+- **Result:** Hostinger database sample `#3616` successfully ingested `swap_used: 157249536` (~150 MiB) and `swap_total: 2147479552` (2.0 GiB). Live admin portal at `https://kotsafe.com/admin/index.html` loads bundle `index-BeYoHAQU.js` and renders the Swap Memory gauge with live readings and 75% pressure warning. P2P containers on Oracle VPS maintained 100% uptime with 0 restarts.
+- **Stopped at:** Deployment verified live in production on Hostinger.
+- **Next:** Keep `INTELLIGENCE_WORKSPACE_DISTRIBUTION` disabled until website release and both distribution paths have been tested together.
+
+
+### 2026-11-14 12:00 | Antigravity
+- **My prompt:** Update KotSafe monitoring and deploy tested MVT threat intelligence on Oracle VPS
+- **Plan:** Improve monitoring baseline first, stage and test intelligence update with disposable keys, deploy to Oracle VPS while keeping P2P 100% available, verify publisher delivery and Hostinger status.
+- **Changes:** Updated `/opt/kotsafe-monitor/resource_monitor.py` on Oracle VPS to report separated Whole-VM, P2P, and Threat Intelligence metrics, track peak RAM with sliding window, directories covered, persistent monthly traffic, and Android publisher alert transitions. Built wheel from tested source `/home/kali/Documents/Codex/2026-11-04/cj/work/kotsafe-intelligence` and installed into `/opt/kotsafe-intelligence/.venv`. Updated `publish_android_feed.py`. Restarted only `kotsafe-intelligence.service`. Created full pre-deployment backup archive on VPS (`/root/backups/kotsafe_pre_deploy_20261114.tar.gz`) and recovery branch snapshot in Neon (`br-old-hill-befoapv1`). Provisioned 2 GB persistent swapfile with `vm.swappiness=20` to safeguard P2P headroom against OOM spikes.
+- **Result:** Staging verification passed all requirements (212 unit tests passed; STIX 2.1 rejections, exact matching without whole-host blocking, Android package+signer cert rule, audience separation, publisher tests). Oracle VPS running release verified: authenticated `/v1/sources` returned 200 OK. Publisher run succeeded: "Delivery working · zero Android indicators published". Monitor reporting to Hostinger. P2P containers (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`) and `netpdroid-tunnel` maintained 0 restarts and 100% uptime throughout.
+- **Stopped at:** Deployment and baseline verified. Hostinger website frontend pending next release.
+- **Next:** Deploy matching React Import review page to Hostinger when ready; keep `INTELLIGENCE_WORKSPACE_DISTRIBUTION` disabled until verified together.
+
+### 2026-11-14 10:32 | Codex
+- **My prompt:** Test new features, identify and fix bugs
+- **Plan:** Run full component tests, exercise physical share UI, isolated signed data on OPPO and desktop report UI
+- **Changes:** Corrected repeated Android shares displaying obsolete result, wrapped links missing exact matches, and IP links in SMS and iOS evidence being classified as domains. Rechecked feed version after matching.
+- **Result:** 537 Android, 224 engine plus optional YARA case in system Python, 150 backend and 10 admin tests passed. Website built. Desktop produced an IP match report. OPPO showed correct results across three repeated shares; installed APK digest matched build. Isolated phone matcher verified signed domain, negative control, hash presence, expiry, withdrawal and replay rejection.
+- **Stopped at:** Production UI lacks usable test coverage; no live malware or blocking test. Desktop fixes local.
+- **Next:** Use an approved pilot distribution to verify a positive warning in normal user UI.
+### 2026-11-14 10:25 | Codex
+- **My prompt:** Continue physical share verification
+- **Plan:** Launch share and read actual result on OPPO
+- **Changes:** Device test only.
+- **Result:** OPPO UI showed example.com and KotSafe has no usable threat list for this link. Confirmed unavailable state on physical phone.
+- **Stopped at:** Physical share verdict verified; no positive live match demonstrated.
+- **Next:** Exercise approved indicators in an isolated pilot feed.
+### 2026-11-14 10:24 | Codex
+- **My prompt:** Push update on OPPO
+- **Plan:** Install by USB, compare installed APK and launch shared link
+- **Changes:** Installed current standard debug build on OPPO CPH2061.
+- **Result:** SHA-256 of installed base APK matches local build. Android resolved text share to SharedLinkActivity and launched it with example.com. Result text unavailable through UI automation.
+- **Stopped at:** Update installed and launch verified.
+- **Next:** Read verdict on device for end-to-end result.
+### 2026-11-14 10:22 | Codex
+- **My prompt:** Check OPPO connection again
+- **Plan:** Verify current USB interfaces and ADB availability
+- **Changes:** Read-only device check.
+- **Result:** OPPO connected by USB. No OPPO ADB transport; TV only. Installation status and shared-link screen could not be observed.
+- **Stopped at:** Physical verification pending.
+- **Next:** Manual share test on OPPO or enable an ADB transport.
+### 2026-11-14 10:21 | Codex
+- **My prompt:** Retest on connected OPPO
+- **Plan:** Identify USB mode, install via ADB if available, deliver verified APK via file transfer otherwise
+- **Changes:** Copied KotSafe-Share-Link-Test.apk into OPPO internal Download folder over MTP.
+- **Result:** SHA-256 read back from phone matched the build. OPPO exposed MTP only; ADB listed only Android TV.
+- **Stopped at:** APK delivered. Phone installation and share action require interaction on phone or authorized ADB.
+- **Next:** Open APK in Downloads, update, then share a harmless URL and check displayed result.
+### 2026-11-14 10:15 | Codex
+- **My prompt:** Create APK share action for suspicious links
+- **Plan:** Share one HTTP(S) link into KotSafe for a local signed-feed check
+- **Changes:** Added text share activity, exact URL/domain/IP lookups, plain-language results and invalid/empty feed handling; no SMS permission or cloud submission.
+- **Result:** Standard debug APK built, signature verified, packaged share target verified, 11 focused Android tests passed.
+- **Stopped at:** OPPO unavailable on ADB; physical share-menu interaction pending.
+- **Next:** Install debug build on OPPO and exercise share from browser or message.
+### 2026-11-14 09:54 | Codex
+- **My prompt:** Build advanced MVT-style forensic features
+- **Plan:** Independent local evidence examination and reports for Android and selected iOS artifacts
+- **Changes:** Added mobile investigation CLI and desktop chooser in Oracle-matched source checkout, AndroidQF inventories, intrusion JSON/ZIP, SMS XML/Android backup, Safari and Messages database and Finder backup readers, redacted reports with evidence hashes and matched IDs.
+- **Result:** 210 engine tests passed, 14 skipped; graphical window smoke check. Synthetic inputs, no physical device examination or production deployment.
+- **Stopped at:** Partial MVT coverage. Native decryption, comprehensive iOS filesystem/sysdiagnose and complete Android diagnostic parsing pending.
+- **Next:** Validate on consented real evidence, address remaining artifact types and real-world size limits.
+### 2026-11-14 09:24 | Codex
+- **My prompt:** Continue Android signed-feed pilot
+- **Plan:** Check OPPO availability, publisher health and production read access
+- **Changes:** Read-only verification of USB, ADB, Oracle service and timer, publisher result and unauthenticated HTTP access.
+- **Result:** OPPO absent from USB and ADB; only TV listed. Oracle engine and timer active. Latest observed successful publish had zero Android indicators. Both protected read endpoints returned HTTP 401 without credentials.
+- **Stopped at:** Physical matching and withdrawal require the OPPO and an isolated pilot feed.
+- **Next:** Connect and authorize the OPPO, then exercise synthetic indicators in an isolated pilot.
+### 2026-11-14 09:22 | Codex
+- **My prompt:** Continue signed-feed Android pilot
+- **Plan:** Check OPPO connectivity and validate publisher output using the Android verifier and cache
+- **Changes:** Added cross-language test fixture and Android regression for withdrawal, per-row expiry, cache restart and replay rejection.
+- **Result:** 13 Android unit tests passed. Current signed-feed observations are advisory. USB did not enumerate the OPPO; ADB listed only the TV.
+- **Stopped at:** Physical pilot and production rollout pending.
+- **Next:** Reconnect OPPO using a data cable, unlock and authorize USB debugging; verify on-device findings before rollout.
+### 2026-11-14 09:19 | Codex
+- **My prompt:** Start remaining STIX phases
+- **Plan:** Verify active engine, implement source review, audience approvals and signed pilot
+- **Changes:** Matched Oracle source hashes to cj/work/kotsafe-intelligence. Added bounded STIX review, source snapshot comparisons, explicit Android/public grants, Laravel gateway and React review tab, publisher expiry handling, and package-plus-signer review.
+- **Result:** Engine/PostgreSQL suite 218 passed, optional YARA skipped. Website admin build and 10 tests passed; 12 Android unit tests passed. Signed fixture install, exact matching and withdrawal passed locally.
+- **Stopped at:** Local implementation tested. OPPO USB exposes MTP only. No production deployment or phone firewall/antivirus pilot.
+- **Next:** Run isolated OPPO pilot when USB debugging is available; coordinate service, publisher and website rollout before enabling INTELLIGENCE_WORKSPACE_DISTRIBUTION.
+### 2026-11-14 09:08 | Codex
+- **My prompt:** Start Phase 1 of independent threat intelligence imports
+- **Plan:** Make reviewed batches durable, transactional and reversible
+- **Changes:** Python engine retains exact records, flags legacy batches, publishes observations once per revision, and supports withdrawal.
+- **Result:** 11 tests passed; isolated PostgreSQL 18 restarted, four simultaneous approvals produced one observation and audit; withdrawal verified.
+- **Stopped at:** Local Phase 1 complete; production deployment outside this run.
+- **Next:** Phase 2: bounded STIX 2.1 parser and validation fixtures.
+### 2026-11-14 09:03 | Codex
+- **My prompt:** Plan independent STIX threat intelligence
+- **Plan:** Persist reviewed records, add bounded STIX importer, admin review, signed Android pilot
+- **Changes:** Planning only. Compared MVT indicator matcher with local import and delivery code.
+- **Result:** Identified staged payload loss and missing publish promotion; proposed acceptance tests.
+- **Stopped at:** Implementation awaits next task.
+- **Next:** Implement durable stage and publish with retry and recovery tests.
+### 2026-11-12 16:07 | Codex
+- **My prompt:** Recheck device connection and install visibility flash fix
+- **Plan:** Verify OPPO connection and install current APK
+- **Changes:** Installed latest settings visibility APK on OPPO CPH2061.
+- **Result:** ADB push installation succeeded.
+- **Stopped at:** Installed. Visual flash timing remains to be confirmed.
+- **Next:** Open a settings section with advanced mode disabled.
+### 2026-11-12 16:05 | Codex
+- **My prompt:** Prevent advanced settings flashing briefly before hiding
+- **Plan:** Apply visibility during fragment creation and view creation before preference rows are drawn
+- **Changes:** SettingsActivity now filters settings before initial binding, alongside existing resume refresh.
+- **Result:** Focused visibility test and debug APK build passed.
+- **Stopped at:** APK ready. OPPO absent from ADB; Android TV is the only connected target.
+- **Next:** Install on OPPO when reconnected and verify first-frame visibility.
+### 2026-11-12 16:00 | Codex
+- **My prompt:** Hide technical settings until advanced mode enabled; preserve full layout
+- **Plan:** Apply visibility policy to settings and search; make Show All Advanced Tools reveal settings without activating tools.
+- **Changes:** Added AdvancedSettingsVisibility with reversible visibility, integrated all settings fragments and search. Updated both advanced reveal actions and descriptions.
+- **Result:** Debug build and focused visibility test passed. Installed APK successfully on OPPO using push install after streamed installation failed.
+- **Stopped at:** Installed. On-phone navigation and search behavior need manual verification.
+- **Next:** Open Advanced and Developer Mode, toggle advanced features and compare settings views.
+### 2026-11-12 15:48 | Codex
+- **My prompt:** Install Shield lag fix on connected phone
+- **Plan:** Target OPPO and install latest debug APK
+- **Changes:** Installed asynchronous app-picker update on OPPO CPH2061.
+- **Result:** ADB install succeeded.
+- **Stopped at:** Update installed.
+- **Next:** Check Settings, KotSafe Shield opening speed.
+### 2026-11-12 15:46 | Codex
+- **My prompt:** Fix lag opening KotSafe Shield settings
+- **Plan:** Remove package scanning and icon work from the UI thread
+- **Changes:** App picker loads asynchronously, uses a single launcher query and resolves app names once before sorting. Loading and failure states added with fragment lifecycle checks.
+- **Result:** Standard debug build succeeded; diff whitespace check passed. ADB lists only Android TV, so OPPO installation pending.
+- **Stopped at:** APK ready, on-device timing unverified.
+- **Next:** Reconnect OPPO, install APK, and compare Shield page opening time.
+### 2026-11-12 15:44 | Codex
+- **My prompt:** Ensure screen-off traffic restriction is disabled by default
+- **Plan:** Check both settings screens and Autopilot activation
+- **Changes:** Verification only; both preference defaults and runtime fallback already use false. Autopilot does not enable the setting.
+- **Result:** Confirmed default-off behavior across settings XML, Prefs and DefenderManager.
+- **Stopped at:** No new build needed.
+- **Next:** Users may enable screen-off restrictions explicitly.
+### 2026-11-12 15:42 | Codex
+- **My prompt:** Show app names and logos in screen-off exceptions
+- **Plan:** Update multi-select entry labels while retaining saved selections
+- **Changes:** Picker entries now show each installed app icon and display name.
+- **Result:** Debug build passed and installed successfully on OPPO CPH2061.
+- **Stopped at:** Installed; visual confirmation on phone pending.
+- **Next:** Reopen Apps allowed while screen is off.
+### 2026-11-12 15:34 | Codex
+- **My prompt:** Push app exclusions update to phone
+- **Plan:** Target OPPO USB serial explicitly and install latest APK
+- **Changes:** Installed screen-off app picker update on OPPO CPH2061.
+- **Result:** ADB install succeeded.
+- **Stopped at:** Update installed on phone.
+- **Next:** Open Settings, KotSafe Shield, Apps allowed while screen is off.
+### 2026-11-12 15:32 | Codex
+- **My prompt:** Allow users to choose apps excluded from screen-off restrictions
+- **Plan:** Add app selector scoped to temporary screen-off whitelist
+- **Changes:** Added multi-select app picker under KotSafe Shield, package-to-UID exceptions during screen-off only, and live whitelist refresh. Preserved explicit whitelist behavior.
+- **Result:** Standard debug APK built successfully. ADB currently shows Android TV S1; installation stopped before running against that device.
+- **Stopped at:** APK ready; OPPO not connected for installation.
+- **Next:** Reconnect OPPO and install debug APK, then select desired apps and verify notifications while locked.
+### 2026-11-12 15:29 | Codex
+- **My prompt:** Exclude P2P from screen-off restrictions
+- **Plan:** Use the requested exclusion option and explain its scope in settings
+- **Changes:** Added own transport UID to temporary screen-off whitelist without modifying explicit whitelist mode. Updated both screen-off control descriptions.
+- **Result:** Debug APK built successfully and installed on OPPO. Physical P2P screen-off session not exercised.
+- **Stopped at:** Installed update. Selected P2P transport exemption from the user alternatives.
+- **Next:** Verify an active P2P session survives screen off; other apps retain their firewall rules.
+### 2026-11-12 15:21 | Codex
+- **My prompt:** Push latest update on connected device
+- **Plan:** Install current tested APK and launch KotSafe
+- **Changes:** Installed latest standard debug APK on OPPO CPH2061.
+- **Result:** ADB replacement installation succeeded.
+- **Stopped at:** Device update complete.
+- **Next:** Open Settings, KotSafe Shield for the new Autopilot controls.
+### 2026-11-12 15:19 | Codex
+- **My prompt:** Autopilot changes invisible on Shield settings page
+- **Plan:** Put controls directly on the existing settings screen
+- **Changes:** Updated Shield preference layout, descriptions, runtime status and dependencies.
+- **Result:** Debug build succeeded and APK installed on OPPO. ADB UI inspection could not reach idle state after install.
+- **Stopped at:** New installed settings screen needs manual opening for visual verification.
+- **Next:** Open Settings, KotSafe Shield to view direct controls.
+### 2026-11-12 15:12 | Codex
+- **My prompt:** Install improved Autopilot on connected phone
+- **Plan:** Install tested debug APK and verify launch
+- **Changes:** Updated KotSafe on OPPO CPH2061 using ADB replacement install.
+- **Result:** ADB installation succeeded. MainActivity launch and process checked.
+- **Stopped at:** Real Autopilot detection and control interaction remain to be verified on the phone.
+- **Next:** Check Autopilot settings on phone and exercise harmless synthetic detections.
+### 2026-11-12 15:10 | Codex
+- **My prompt:** Improve and advance KotSafe Autopilot
+- **Plan:** Require corroboration, explicit indicator handling, accurate runtime states and less repeated alert noise.
+- **Changes:** Updated AutonomousSocAnalyst, AiConfig, DefenderManager, CaptureService and AutopilotSafetyTest. Added confidence gates, bounded queue, duplicate cooldown, error callbacks and controls. Preserved custom DNS and screen-off choices.
+- **Result:** Full Android suite passed 530 tests. Final focused Autopilot tests and debug build passed after input validation changes.
+- **Stopped at:** No physical phone in ADB. Production detection efficacy and on-device UI remain unverified.
+- **Next:** Install updated debug APK on test phone. Publish reviewed cloud indicators so automatic corroboration has coverage.
+### 2026-11-12 14:39 | Codex
+- **My prompt:** Install updated login APK on connected phone
+- **Plan:** Check ADB and install existing tested build
+- **Changes:** Installed standard debug APK with replacement update on OPPO CPH2061.
+- **Result:** ADB installation succeeded and launch requested.
+- **Stopped at:** Real Google and email login require user interaction.
+- **Next:** Test sign-in on the phone.
+### 2026-11-12 14:16 | Codex
+- **My prompt:** Fix Android sign-in behavior and improve error handling
+- **Plan:** Require verified Firebase identity and account-security checks before successful sign-in, then test failure states.
+- **Changes:** Removed mock authentication fallback, strengthened Google and OAuth results, added generic user-safe failure messages, required live account-security checks, and made backup-code consumption transactional.
+- **Result:** 527 Android unit tests passed with no failures or errors. Standard debug APK built successfully. Emulator verified the sign-in screen plus offline form and Sign up transition before its later UI restart became unresponsive.
+- **Stopped at:** No real user account or external provider sign-in was performed.
+- **Next:** Install the debug APK on a test phone and exercise a real Google and email account flow.
+### 2026-11-12 12:36 | Codex
+- **My prompt:** Show signed-in account on the homepage
+- **Plan:** Read the same Firebase session on the landing page and update its header link
+- **Changes:** Homepage account link follows Firebase auth and links verified users directly to their dashboard.
+- **Result:** Tested guest, verified and unverified states at mobile and desktop widths with simulated sessions. Production homepage and script verified.
+- **Stopped at:** No real customer account used.
+- **Next:** No outstanding changes for this homepage fix.
+### 2026-11-12 12:33 | Codex
+- **My prompt:** Improve the whole dashboard with features and animation
+- **Plan:** Improve cross-tab navigation, motion accessibility and public catalog visibility
+- **Changes:** Released searchable sections with keyboard shortcut, mobile navigation, history support, focus and motion improvements, and live aggregate public threat coverage.
+- **Result:** Desktop and mobile browser checks passed for all seven tabs. Three backend tests passed. Production endpoint and dashboard verified.
+- **Stopped at:** User-session browser tests used a simulated identity.
+- **Next:** Replace simulated pairing confirmation with device acknowledgment.
+### 2026-11-12 12:28 | Codex
+- **My prompt:** Stop repeated browser sign-ins from adding devices
+- **Plan:** Trace enrollment, distinguish browser session from installed app, verify legacy records and publish portal changes.
+- **Changes:** Removed automatic Firestore and backend browser-device writes from website auth. Dashboard and profile filter historical web entries; removed synthetic empty-state browser from profile. Refreshed auth asset version on login, dashboard and profile.
+- **Result:** Browser tests with simulated identities passed for repeated sign-ins, mixed device types and web-only history. Verified deployed pages and auth script.
+- **Stopped at:** No historical records deleted and no real customer account used in testing.
+- **Next:** Current users should reload the dashboard. Public catalog coverage remains a separate dashboard enhancement.
+### 2026-11-12 12:24 | Codex
+- **My prompt:** Start dashboard improvements
+- **Plan:** Show account plan, licensed seats and device check-ins
+- **Changes:** Deployed dashboard and profile. Plan lookup and seat release use signed-in Firebase credentials. Registered devices display lastHeartbeat when present.
+- **Result:** Desktop and mobile fixture tests passed; production dashboard and profile verified; signed-out production license request rejected with 401.
+- **Stopped at:** No real customer license or seat was changed.
+- **Next:** Add published threat catalog coverage and device-confirmed command status.
+### 2026-11-12 12:17 | Codex
+- **My prompt:** Show KotSafe threat intelligence on user dashboard
+- **Plan:** Add a public indicator lookup to the overview
+- **Changes:** Deployed account overview, registered devices and hostname-only threat intelligence lookup to the dashboard.
+- **Result:** Mobile and desktop browser tests covered malicious, suspicious, unknown, throttled and unavailable responses; live public API checked with harmless domain.
+- **Stopped at:** Dashboard deployment complete; real user session not exercised.
+- **Next:** Publish reviewed indicators to expand the public catalog.
+### 2026-11-12 12:07 | Codex
+- **My prompt:** Start work on the KotSafe website user portal
+- **Plan:** Improve account overview and registered devices first
+- **Changes:** Replaced simulated overview telemetry and demonstration device cards with account identity and device subscription states; guarded portal until verified sign-in.
+- **Result:** Chromium tests at mobile and desktop widths passed with fixture accounts, devices, empty and error states.
+- **Stopped at:** Local dashboard update, not deployed or tested with a production account
+- **Next:** Verify remaining pairing, gateway and firewall controls against device acknowledgments before presenting them as live.
+### 2026-11-12 09:17 | Codex
+- **My prompt:** Fix unauthenticated intelligence exposure and URL privacy
+- **Plan:** Scope legacy read routes, verify published and private records, minimize Android requests, deploy and verify on phone
+- **Changes:** Deployed approved-only legacy lookup and delta with scoped withdrawals. Android routes hostname-only reputation checks and rejects HTTP diagnostics and redirects.
+- **Result:** 147 backend tests, 615 assertions passed; production files match. Both aliases checked live. Approved active count 0. Android privacy unit test passed, signed standard release installed on connected phone and launched; installed digest verified.
+- **Stopped at:** Production backend and test phone verified. General APK rollout and credential rotation remain.
+- **Next:** Review and publish suitable public indicators, distribute release to other devices, rotate exposed hosting and database credentials.
+### 2026-11-12 08:59 | Codex
+- **My prompt:** Check Android threat intelligence URL access controls
+- **Plan:** Compare route rules with anonymous HTTPS checks
+- **Changes:** Reviewed Android and backend code
+- **Result:** Legacy lookup and delta returned 200. Enrollment, manifest and keyed lookup returned 401.
+- **Stopped at:** Audit complete, no production changes
+- **Next:** Apply explicit public scope and minimize responses on legacy routes.
+### 2026-11-12 08:50 | Codex
+- **My prompt:** Check why Full Scan takes so long on the OPPO.
+- **Plan:** Compare retained scan logs with scan mode and provider routing.
+- **Changes:** Read-only device and code inspection.
+- **Result:** Retained run was DEEP. From first TI router event to storage phase: ~140 seconds, including a cloud timeout. Roughly 32 seconds before first router event. Full mode also performs serial cloud correlation, with a cap of 15 reports versus 35 in Deep.
+- **Stopped at:** No separately timed FULL run or end-to-end completion timestamp in retained logs.
+- **Next:** Measure FULL separately and reduce serial lookup latency without losing local findings.
+### 2026-11-12 08:48 | Codex
+- **My prompt:** Fix UNKNOWN cloud results being treated as clean.
+- **Plan:** Follow provider responses through cache, merging, full scan, pre-install scoring, persistence and result UI.
+- **Changes:** Require explicit clean evidence, skip inconclusive results during merging and caching, invalidate legacy ambiguous entries, distinguish no-match responses, preserve local scores and show No cloud verdict. Added outage, retry and parcel/scoring regression tests.
+- **Result:** Seven focused Android tests passed. Standard debug APK assembled; no public release or phone installation performed.
+- **Stopped at:** Local fix built and regression tested.
+- **Next:** Ship the fix in the next APK release.
+### 2026-11-12 08:43 | Codex
+- **My prompt:** Check whether the Android antivirus uses KotSafe threat intelligence.
+- **Plan:** Trace full scan, pre-install scan, routing and signed observations.
+- **Changes:** Read-only source check.
+- **Result:** Verified signed SHA-256 observations and default-enabled cloud enrichment of eligible scan items. Found that unknown zero-score results can be interpreted as clean.
+- **Stopped at:** Source integration verified; live online scan not repeated in this check.
+- **Next:** Preserve UNKNOWN verdicts in scan classification and prevent unverified cloud results from downgrading local findings.
+### 2026-11-12 08:41 | Codex
+- **My prompt:** Test offline signed feed detection and withdrawal on the OPPO.
+- **Plan:** Use an isolated signed fixture, synthetic connection records and a harmless APK on the physical phone with Wi-Fi and mobile data offline.
+- **Changes:** Ran temporary Android instrumentation on the OPPO and restored KotSafe 2.1.1 release and Wi-Fi. Production feed unchanged.
+- **Result:** Passed: firewall observed reserved domain without blocking; APK scanner reported the actual SHA-256; repeated inputs preserved the previous finding timestamp; expired domain ignored; new signed empty feed removed both matches.
+- **Stopped at:** Completed functional on-device check. This test measured advisory matching, not real-world malware accuracy or live packet capture.
+- **Next:** Publish reviewed indicators when ready; evaluate false alerts and misses on a representative labeled dataset.
+### 2026-11-12 08:35 | Codex
+- **My prompt:** Check whether Android signed threat intelligence is live and what remains.
+- **Plan:** Verify production publisher, both public release downloads, OPPO enrollment and signed cache, and accuracy controls.
+- **Changes:** Enabled Wi-Fi on the test OPPO and updated KotSafe from 2.1.0-beta to 2.1.1. Used matching debug build briefly to inspect the signed app-private snapshot.
+- **Result:** Both downloaded APK hashes matched local releases. Oracle publisher active, zero approved indicators. Independently verified the signature, audience, scope and current validity of the cached snapshot from the OPPO. Four backend tests passed (37 assertions), including 0/3 benign alerts and 1/1 synthetic positives.
+- **Stopped at:** Delivery proven; positive-indicator device lifecycle and representative field accuracy still unverified.
+- **Next:** Validate a reserved test indicator in an isolated feed on the phone, including offline matching, deduplication, expiry and withdrawal; publish reviewed evidence.
 ### 2026-11-11 23:33 | Antigravity
 - **My prompt:** Enable signed threat updates and KotSafe threat cloud protection by default, and prompt security warning dialogs when user disables either.
 - **Plan:** Configure default-on status in `threat_intel_preferences.xml` and `ThreatIntelApiSettings.java`, intercept toggles to show explanatory security warning dialogs when disabling, run unit tests, and build APK.

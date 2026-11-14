@@ -25,5 +25,32 @@
     "status": "ready",
     "created": "2026-11-11 22:55 IST",
     "updated": "2026-11-11 22:55 IST"
+  },
+  {
+    "id": "T004",
+    "title": "Preserve inconclusive cloud verdicts in antivirus scans",
+    "detail": "",
+    "owner": "Codex",
+    "status": "done",
+    "created": "2026-11-12 08:45 IST",
+    "updated": "2026-11-12 08:48 IST"
+  },
+  {
+    "id": "T005",
+    "title": "Harden Autopilot evidence, response status and repeated alerts",
+    "detail": "",
+    "owner": "Codex",
+    "status": "done",
+    "created": "2026-11-12 15:03 IST",
+    "updated": "2026-11-12 15:10 IST"
+  },
+  {
+    "id": "T006",
+    "title": "Update KotSafe monitoring and deploy tested MVT threat intelligence on Oracle VPS",
+    "detail": "",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-14 11:40 IST",
+    "updated": "2026-11-14 11:59 IST"
   }
 ]
