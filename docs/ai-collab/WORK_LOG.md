@@ -16,6 +16,18 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 19:35 | Antigravity
+- **My prompt:** Remove test malware and clean up device state.
+- **Plan:** Remove quarantined test file from app internal vault, delete temporary screen dumps/logs on `/sdcard/`, and clear test threat notifications.
+- **Changes:**
+  - Verified original `/storage/emulated/0/Download/malware_payload.sh` was unlinked during quarantine.
+  - Purged encrypted vault copy `files/.quarantine_vault/vault_1794751238397_8c484584.kotvault` using `run-as com.kotsafe.security`.
+  - Removed temporary screen captures and UI dumps from `/sdcard/`.
+  - Collapsed notification shade and verified only legitimate persistent service notifications remain.
+- **Result:** Device is completely clean with zero leftover test artifacts or lingering alerts.
+- **Stopped at:** Device cleanup completed.
+- **Next:** Push git commits across repositories to remote when GitHub credentials (PAT or SSH) are provided.
+
 ### 2026-11-15 19:32 | Antigravity
 - **My prompt:** Test with malware on connected physical device (OPPO CPH2061).
 - **Plan:**
