@@ -16,6 +16,26 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 18:30 | Antigravity
+- **My prompt:** Deploy Task T008 live to Oracle VPS and Hostinger production servers.
+- **Plan:**
+  1. Upload `kotsafe_intelligence-0.1.0-py3-none-any.whl` to Oracle VPS, install in `/opt/kotsafe-intelligence/.venv`, restart `kotsafe-intelligence.service`, and verify P2P container uptime.
+  2. Deploy `ThreatIntelController.php` and supporting models/routes to Hostinger production backend.
+  3. Upload fresh release APKs and `SHA256SUMS.txt` to Hostinger downloads.
+  4. Clear and cache Laravel config and routes on Hostinger.
+  5. Verify live public endpoints via HTTP requests.
+- **Changes:**
+  - Oracle VPS: Re-installed `kotsafe-intelligence 0.1.0` wheel into `/opt/kotsafe-intelligence/.venv`. Restarted `kotsafe-intelligence.service`. Verified local HTTP 200 on port 8787. Verified 0 restarts across all Docker P2P containers.
+  - Hostinger: Uploaded `ThreatIntelController.php`, `ThreatIndicator.php`, `TrustedDomain.php`, `ThreatDeltaService.php`, and `routes/api.php` to `~/domains/kotsafe.com/public_html/backend/`.
+  - Downloads: Uploaded `KotSafe.apk`, `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`, and `SHA256SUMS.txt` to `~/domains/kotsafe.com/public_html/downloads/`.
+  - Cache: Ran `php artisan optimize:clear && php artisan config:cache && php artisan route:cache` on Hostinger.
+- **Result:**
+  - `sha256sum -c SHA256SUMS.txt` on Hostinger: all APKs returned `OK`.
+  - Live APK download `https://kotsafe.com/downloads/KotSafe.apk` returned HTTP/2 200.
+  - Live threat lookup `https://kotsafe.com/api/v1/threat-intel/lookup` with type `url` returned HTTP 200 with instant response.
+- **Stopped at:** Production deployment complete and verified live.
+- **Next:** Push commits to GitHub when credentials are provided.
+
 ### 2026-11-15 18:25 | Antigravity
 - **My prompt:** Expand KotSafe threat intelligence with Abuse.ch URLhaus live threat provider, multi-tier URL/domain lookup, eliminate shared hosting blind spot, and verify across Android client, engine, and backend (Task T008).
 - **Plan:**

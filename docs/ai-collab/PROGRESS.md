@@ -2,6 +2,21 @@
 
 Short updates from each AI or contributor.
 
+## 2026-11-15 18:30 IST | Antigravity | Live Deployment of Task T008 to Oracle VPS & Hostinger
+
+- **Completed Deployment:** Task T008 deployed live to production infrastructure.
+- **Oracle VPS (`130.210.16.110`)**:
+  - Installed updated `kotsafe_intelligence-0.1.0-py3-none-any.whl` (94,479 bytes) into `/opt/kotsafe-intelligence/.venv`.
+  - Restarted `kotsafe-intelligence.service` (verified active HTTP 200).
+  - All 3 P2P containers (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`) maintained 100% uptime with 0 restarts.
+- **Hostinger (`kotsafe.com`)**:
+  - Deployed updated `ThreatIntelController.php` (multi-tier URL lookup), `ThreatIndicator.php`, `TrustedDomain.php`, `ThreatDeltaService.php`, and `api.php`.
+  - Synced fresh release APKs (`KotSafe.apk`, `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) and `SHA256SUMS.txt`. Checksum verification on host returned `OK`.
+  - Cleared and re-warmed Laravel config and route caches (`php artisan optimize:clear && php artisan config:cache && php artisan route:cache`).
+  - Verified live public endpoints: `https://kotsafe.com/downloads/SHA256SUMS.txt` (HTTP 200), `https://kotsafe.com/downloads/KotSafe.apk` (HTTP/2 200), and `https://kotsafe.com/api/v1/threat-intel/lookup` (HTTP 200).
+- **Remaining / Next Actions:**
+  - Push local git commits across repositories to remote when GitHub credentials (PAT or SSH key) are ready.
+
 ## 2026-11-15 18:25 IST | Antigravity | Completion of Task T008 (Abuse.ch URLhaus & Exact URL Defense)
 
 - **Completed Task:** T008 [done] Expand Threat Intelligence Engine with Abuse.ch URLhaus Provider and Exact URL Defense across Android and Backend.

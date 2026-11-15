@@ -1,20 +1,26 @@
 # Current State
-Last updated: 2026-11-15 18:25 IST by Antigravity
+Last updated: 2026-11-15 18:30 IST by Antigravity
 
 ## Goal right now
-Expand KotSafe Threat Intelligence with Abuse.ch URLhaus live threat provider, unified multi-tier full URL/domain lookup, eliminate shared hosting blind spots, verify all test suites, and assemble production APKs.
+Production deployment of Abuse.ch URLhaus threat intelligence, exact multi-tier URL defense, and fresh release APKs across Oracle VPS and Hostinger.
 
 ## Stopped at
-- Task T008 completed:
-  1. Abuse.ch URLhaus Live Threat Provider: Implemented `kotsafe_intelligence/providers/urlhaus.py` with caching and async HTTP queries against URLhaus API (`/v1/url/` and `/v1/host/`).
-  2. Threat Intelligence Server & Service: Exposed `@app.post("/v1/lookup/url")` in `server.py` and enabled `ObservableType.URL` in `public_lookup` in `service.py`. Python unit tests passing (12/12 in `test_intelligence.py` and 215/215 in full test suite).
-  3. Backend Multi-Tier Lookup: Enhanced `deviceLookup` in `ThreatIntelController.php` on Hostinger backend with Tier 1 (exact URL query against URL indicators) and Tier 2 (fallback to parsed host domain/IP reputation). Backend test suite fully passing (150/150 tests, 627 assertions).
-  4. Android Client Exact URL Defense: Updated `ThreatIntelApiClient.java` and `KotSafeCloudProvider.java` to preserve full URLs without prematurely stripping to domain names, closing the blind spot on shared hosting (e.g., Discord, Firebase, Google Drive). 541/541 Android unit tests passing (100%).
-  5. Distribution & Assembly: Built `kotsafe_intelligence-0.1.0-py3-none-any.whl` (94 KB). Built `assembleStandardDebug`, `assembleStandardRelease`, and `assembleFullPowerRelease`. Updated `downloads/` and `SHA256SUMS.txt` across `KotSafe` and `kotsafe-website`.
+- Task T008 fully implemented, tested, and deployed live to production:
+  1. Oracle VPS Deployment:
+     - Built fresh Python distribution wheel `kotsafe_intelligence-0.1.0-py3-none-any.whl` (94,479 bytes) with URLhaus provider.
+     - Installed into `/opt/kotsafe-intelligence/.venv` and restarted `kotsafe-intelligence.service` (verified active HTTP 200).
+     - Preserved 100% uptime for all P2P containers (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`).
+  2. Hostinger Production Deployment:
+     - Deployed updated multi-tier URL lookup in `ThreatIntelController.php`, `ThreatIndicator.php`, `TrustedDomain.php`, `ThreatDeltaService.php`, and `api.php`.
+     - Uploaded fresh release APKs (`KotSafe.apk`, `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) and `SHA256SUMS.txt`. Checksum verification on host returned `OK`.
+     - Cleared and re-warmed Laravel config and route caches (`php artisan optimize:clear && php artisan config:cache && php artisan route:cache`).
+     - Verified live public endpoints: `https://kotsafe.com/downloads/SHA256SUMS.txt` (HTTP 200), `https://kotsafe.com/downloads/KotSafe.apk` (HTTP/2 200), and `https://kotsafe.com/api/v1/threat-intel/lookup` (HTTP 200).
+  3. Git Repositories:
+     - `KotSafe`, `kotsafe-intelligence`, `backend`, and `kotsafe-site` working trees are completely clean with changes committed.
 
 ## Next steps
-1. Deploy wheel `dist/kotsafe_intelligence-0.1.0-py3-none-any.whl` to `/opt/kotsafe-intelligence/.venv` on Oracle VPS and restart `kotsafe-intelligence.service`.
-2. Push git commits across repositories once GitHub authentication credentials (PAT or SSH) are provided.
+1. Push git commits across repositories to remote when GitHub credentials (PAT or SSH) are provided.
+2. Install updated APK via ADB when physical Android phone is connected.
 3. Keep `INTELLIGENCE_WORKSPACE_DISTRIBUTION` disabled until website release and both distribution paths have been tested together.
 
 ## Decisions made
