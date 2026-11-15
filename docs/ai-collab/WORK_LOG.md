@@ -16,6 +16,27 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 19:57 | Antigravity
+- **My prompt:** Complete remaining build, bundle, and device deployment tasks.
+- **Plan:**
+  1. Assemble signed production release APKs (`assembleStandardRelease`, `assembleFullPowerRelease`) and Google Play Store App Bundle (`bundleStandardRelease`).
+  2. Populate `downloads/` with fresh signed binaries and recompute `SHA256SUMS.txt`.
+  3. Sync `SHA256SUMS.txt` to `kotsafe-site`.
+  4. Install signed production release APK (`KotSafe-standard-release.apk`) directly onto OPPO CPH2061 (`7f55c189`) and verify launch.
+- **Changes:**
+  - Assembled `KotSafe-standard-release.apk` (12 MB), `KotSafe-fullPower-release.apk` (12 MB), and `KotSafe-standard-release.aab` (17 MB).
+  - Checksums updated:
+    - `KotSafe.apk`: `fb79aff6c92147d6a7b5a134faf0e441fa362d911184d21e1188f81638c2d45f`
+    - `KotSafe-standard-release.apk`: `fb79aff6c92147d6a7b5a134faf0e441fa362d911184d21e1188f81638c2d45f`
+    - `KotSafe-fullPower-release.apk`: `71ebe0ed4916fec83abd86271ade7805bf9c5b61ae6c7a71b5940ba33fba1690`
+    - `KotSafe-standard-release.aab`: `e81ca10911f3fab7e0d03519d2f8028450a8b6a2f5c846cc38d9f3182384383d`
+  - Stream-installed production release onto OPPO CPH2061 via ADB (`Success`), started `MainActivity`, confirmed active process `PID: 5789`.
+- **Result:**
+  - Production release binaries and Play Store bundle fully assembled and verified.
+  - Test phone is running the official signed production release build with silent notifications.
+- **Stopped at:** All engineering and build tasks completed.
+- **Next:** Push commits to GitHub when credentials (PAT/SSH) are provided. Play Store upload can proceed using `KotSafe-standard-release.aab`.
+
 ### 2026-11-15 19:35 | Antigravity
 - **My prompt:** Remove test malware and clean up device state.
 - **Plan:** Remove quarantined test file from app internal vault, delete temporary screen dumps/logs on `/sdcard/`, and clear test threat notifications.
