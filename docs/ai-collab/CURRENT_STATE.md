@@ -13,7 +13,7 @@ All engineering tasks T001–T009, hardware testing, silent notifications, relea
   5. Clean Test Cleanup: Quarantined test files, temporary dumps, and notifications removed. Device and app are in a completely clean state.
   6. Hostinger Downloads Live: Uploaded all signed binaries and `SHA256SUMS.txt` to `https://kotsafe.com/downloads/` and verified with `sha256sum -c SHA256SUMS.txt` (all returned OK).
   7. GitHub Remote Push Complete: All commits pushed and up to date across all repositories and branches:
-     - `KotSafe`: `main` -> `origin/main` (up to date).
+     - `KotSafe`: `main` -> `origin/main` and `private/main` (`KotSafe-Private.git`) (both up to date).
      - `kotsafe-website/backend`: `master` -> `origin/backend` (up to date).
      - `kotsafe-website/frontend`: `frontend` -> `origin/frontend` (up to date).
      - `kotsafe-website/kotsafe-site`: `main` -> `origin/main` (up to date).
