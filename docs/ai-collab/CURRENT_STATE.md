@@ -1,25 +1,21 @@
 # Current State
-Last updated: 2026-11-15 19:17 IST by Antigravity
+Last updated: 2026-11-15 19:32 IST by Antigravity
 
 ## Goal right now
-Implement Microsoft Defender-grade immediate threat detection, interactive notification remediation, and download sentinel (Task T009).
+Implement Microsoft Defender-grade immediate threat detection, interactive notification remediation, and download sentinel (Task T009) — Hardware Tested with Live Malware Payload on Physical Phone.
 
 ## Stopped at
-- Task T009 completed and verified:
-  1. Interactive In-Notification Remediation Actions: Enhanced `SecurityNotificationHub.java` and `ActionReceiver.java` to support 1-click remediation directly from notifications:
-     - `[ ⚡ Uninstall ]`: Launches Android system uninstallation confirmation prompt (`Intent.ACTION_UNINSTALL_PACKAGE`) for detected malicious apps/stalkerware.
-     - `[ 🛡️ Quarantine ]`: Quarantines downloaded malicious APKs/files directly into `QuarantineVaultManager` (encrypted `.kotsafe_quarantine/` vault).
-     - `[ 🚫 Block ]`: Immediately writes firewall block rule to `SecurityRulesDb` for hostile C2s/domains.
-  2. In-Flight Network Alerting: Connected `ConnectionsRegister.java` to dispatch real-time heads-up alerts when the VPN firewall engine drops malicious C2 or URLhaus indicators.
-  3. On-Access Download Sentinel: Enhanced `DownloadFolderWatcher.java` to evaluate newly saved files and dispatch immediate notifications with direct quarantine action.
-  4. Antivirus Scan Engine Integration: Wired Phase 5b (accessibility stalkerware) and Phase 1 (malware app detection) directly into the Defender notification hub.
+- Task T009 hardware testing completed and verified on physical handset (OPPO CPH2061 / `7f55c189`):
+  1. Live Malware Ingestion & Sentinel Detection: Dropped test reverse-shell/destructive payload (`malware_payload.sh`) into `/storage/emulated/0/Download/`. `DownloadFolderWatcher` triggered within milliseconds, evaluated via `YaraRuleEngine` (`Script_Malicious_Shell_Reverse`), and dispatched `SecurityNotificationHub` threat card.
+  2. Zero Notification Noise Verification: Audited system notification record via `dumpsys notification --noredact`. Confirmed `sound=null`, `vibrate=null`, `defaults=0x0`, and `muted=true` on channel `kot_chan_threats`. Zero audible noise or vibration emitted.
+  3. Interactive Remediation Card on Screen: Captured on-device screenshot and UI hierarchy dump showing Defender-grade notification card with buttons `[ 🛡️ Quarantine ]`, `[ Review Findings ]`, and `[ Dismiss ]`.
+  4. Real-Time Hardware Vault Quarantine: Tapped `[ 🛡️ Quarantine ]` on the handset screen. `ActionReceiver` handled `ACTION_QUARANTINE_THREAT`, `QuarantineVaultManager` isolated the file into `/data/user/0/com.kotsafe.security/files/.quarantine_vault/vault_...kotvault`, and confirmed `/storage/emulated/0/Download/malware_payload.sh` was completely removed from storage.
   5. Test Suite Verification: 541/541 Android unit tests passed (0 failures, 0 errors, 0 skipped).
   6. Build & Production Deployment: Assembled updated release APKs (`KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) and synced to Hostinger downloads. Verified via `sha256sum -c SHA256SUMS.txt` on Hostinger.
 
 ## Next steps
 1. Push git commits across repositories to remote when GitHub credentials (PAT or SSH) are provided.
-2. Install updated APK via ADB when physical Android phone is connected.
-3. Keep `INTELLIGENCE_WORKSPACE_DISTRIBUTION` disabled until website release and both distribution paths have been tested together.
+2. Keep `INTELLIGENCE_WORKSPACE_DISTRIBUTION` disabled until website release and both distribution paths have been tested together.
 
 ## Decisions made
 - Adopted Amnesty International MVT capability model for mobile forensics:

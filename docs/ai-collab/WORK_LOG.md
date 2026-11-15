@@ -16,6 +16,28 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 19:32 | Antigravity
+- **My prompt:** Test with malware on connected physical device (OPPO CPH2061).
+- **Plan:**
+  1. Commit silent notification channel configuration (`sound=null`, `vibrate=null`, `.setSilent(true)`).
+  2. Assemble fresh `KotSafe-standard-debug.apk` and stream-install onto OPPO CPH2061 (`7f55c189`).
+  3. Drop live test reverse-shell/destructive payload (`malware_payload.sh`) into `/storage/emulated/0/Download/`.
+  4. Verify instant on-access sentinel detection via `DownloadFolderWatcher` and `YaraRuleEngine` (`Script_Malicious_Shell_Reverse`).
+  5. Audit notification channel properties in `dumpsys notification` to verify zero audible noise or vibration.
+  6. Dump UI hierarchy and pull screenshot of interactive Microsoft Defender-style remediation card.
+  7. Trigger `[ 🛡️ Quarantine ]` button directly on device screen and verify isolated vault storage and removal of the malware file.
+- **Changes:**
+  - `SecurityNotificationHub.java`: enforced silent channel (`setSound(null, null)`, `enableVibration(false)`, `setSilent(true)`).
+  - Built and installed `KotSafe-standard-debug.apk`.
+  - Tested on-device malware detection and quarantine flow.
+- **Result:**
+  - Real-time sentinel detection fired within milliseconds upon file drop.
+  - Handset stayed completely silent (verified `sound=null`, `vibrate=null`, `muted=true` in dumpsys).
+  - Notification displayed with `[ 🛡️ Quarantine ]`, `[ Review Findings ]`, and `[ Dismiss ]`.
+  - Tapping `[ 🛡️ Quarantine ]` successfully quarantined `malware_payload.sh` into hardware-backed encrypted vault (`/data/user/0/com.kotsafe.security/files/.quarantine_vault/vault_1794751238397_8c484584.kotvault`) and removed original file from `/storage/emulated/0/Download/` (`No such file or directory`).
+- **Stopped at:** On-device physical malware detection and remediation test completed and verified.
+- **Next:** Push git commits across repositories to remote when GitHub credentials (PAT or SSH) are provided.
+
 ### 2026-11-15 19:17 | Antigravity
 - **My prompt:** Implement Microsoft Defender-grade immediate threat detection, interactive notification remediation, and download sentinel (Task T009).
 - **Plan:**
