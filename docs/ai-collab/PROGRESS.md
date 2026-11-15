@@ -2,6 +2,22 @@
 
 Short updates from each AI or contributor.
 
+## 2026-11-15 10:10 IST | Antigravity | Completion of Task T007 (Advanced MVT Capabilities)
+
+- **Completed Task:** T007 [done] Inherited advanced MVT capabilities across the Android client and sovereign Python threat intelligence engine.
+- **Files Changed:**
+  - `KotSafe`: `app/src/main/java/com/kotsafe/security/model/AccessibilityStalkerwareDetector.java` (new), `app/src/main/java/com/kotsafe/security/model/AntivirusScanEngine.java` (Phase 5b integration), `app/src/test/java/com/kotsafe/security/model/AccessibilityStalkerwareDetectorTest.java` (new).
+  - `kotsafe-intelligence`: `src/kotsafe_intelligence/mobile_forensics.py` (`chrome_records` and `shutdown_records`), `src/kotsafe_intelligence/__main__.py` (`--chrome` and `--shutdown` flags), `tests/test_mobile_forensics.py`.
+- **Actual Tests Run & Passed:**
+  - `KotSafe`: 541 Android unit tests passed (100% success rate, 0 failures, 0 skipped).
+  - `kotsafe-intelligence`: 215 unit tests passed (0 failures, 13 skipped, 100% passing).
+  - APK Build: `KotSafe-standard-debug.apk`, `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk` cleanly assembled and signed.
+  - Server Sync: Release APKs and `SHA256SUMS.txt` uploaded to Hostinger downloads and verified via HTTP 200 curl.
+- **Remaining / Next Actions:**
+  - Push clean local git commits in `KotSafe` and `kotsafe-site` to GitHub when user provides Personal Access Token or SSH key.
+  - Perform live USB physical device check if phone is connected.
+
+
 ## 2026-11-11 07:06 IST | Codex | Completion reporting preference
 
 User requests shared Aiteam records be updated after every completed task. Record files changed, actual tests, remaining work and next action. Never copy credentials into these notes.
@@ -347,3 +363,7 @@ Full existing layout returns in advanced mode. Everyday controls remain visible.
 ## 2026-11-14 11:59 IST | Antigravity | Task completed: T006
 
 Updated monitor baseline, verified Python intelligence update staging suite, deployed to Oracle VPS without P2P interruption, verified delivery.
+
+## 2026-11-15 10:06 IST | Antigravity | Task completed: T007
+
+Inherited advanced MVT capabilities: Live Android accessibility stalkerware watcher in KotSafe client, and iOS shutdown.log Pegasus parser plus Chrome history SQLite parser in kotsafe-intelligence engine. 541 Android unit tests passed (100%), 215 engine unit tests passed (100%), fresh debug/release APKs assembled.
