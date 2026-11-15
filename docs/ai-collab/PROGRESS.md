@@ -2,6 +2,23 @@
 
 Short updates from each AI or contributor.
 
+## 2026-11-15 18:25 IST | Antigravity | Completion of Task T008 (Abuse.ch URLhaus & Exact URL Defense)
+
+- **Completed Task:** T008 [done] Expand Threat Intelligence Engine with Abuse.ch URLhaus Provider and Exact URL Defense across Android and Backend.
+- **Files Changed:**
+  - `kotsafe-intelligence`: `kotsafe_intelligence/providers/urlhaus.py` (new), `kotsafe_intelligence/server.py`, `src/kotsafe_intelligence/service.py`, `tests/test_intelligence.py`, `dist/kotsafe_intelligence-0.1.0-py3-none-any.whl` (built).
+  - `kotsafe-website`: `backend/app/Http/Controllers/ThreatIntelController.php` (multi-tier URL lookup), `kotsafe-site/downloads/*`.
+  - `KotSafe`: `app/src/main/java/com/kotsafe/security/ThreatIntelApiClient.java`, `app/src/main/java/com/kotsafe/security/model/KotSafeCloudProvider.java`, `downloads/*`, `docs/ai-collab/PLAN.md`, `docs/ai-collab/TASKS.json`, `docs/ai-collab/CURRENT_STATE.md`, `docs/ai-collab/PROGRESS.md`, `docs/ai-collab/WORK_LOG.md`.
+- **Actual Tests Run & Passed:**
+  - `kotsafe-intelligence`: 12/12 tests in `test_intelligence.py` passed; 215 tests passed (13 skipped) in full test suite.
+  - `kotsafe-website/backend`: 150/150 tests passed (627 assertions).
+  - `KotSafe`: 541/541 Android unit tests passed (0 failures, 0 errors, 0 skipped).
+  - APK Build: `KotSafe-standard-debug.apk`, `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk` cleanly assembled and signed.
+  - Checksums: SHA256 checksums recalculated and synced to `downloads/SHA256SUMS.txt`.
+- **Remaining / Next Actions:**
+  - Deploy wheel to Oracle VPS `/opt/kotsafe-intelligence/.venv`.
+  - Push commits to GitHub when credentials are provided.
+
 ## 2026-11-15 10:10 IST | Antigravity | Completion of Task T007 (Advanced MVT Capabilities)
 
 - **Completed Task:** T007 [done] Inherited advanced MVT capabilities across the Android client and sovereign Python threat intelligence engine.

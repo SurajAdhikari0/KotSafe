@@ -61,5 +61,14 @@
     "status": "done",
     "created": "2026-11-14 22:13 IST",
     "updated": "2026-11-15 10:06 IST"
+  },
+  {
+    "id": "T008",
+    "title": "Expand threat intelligence engine with Abuse.ch URLhaus provider, unified multi-source URL/domain lookup, and test suite",
+    "detail": "Add URLhaus live threat provider to kotsafe-intelligence, expose /v1/lookup/url with multi-source correlation, and verify with unit tests.",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-15 18:05 IST",
+    "updated": "2026-11-15 18:25 IST"
   }
 ]

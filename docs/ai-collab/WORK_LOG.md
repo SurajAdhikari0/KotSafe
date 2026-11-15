@@ -16,6 +16,30 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 18:25 | Antigravity
+- **My prompt:** Expand KotSafe threat intelligence with Abuse.ch URLhaus live threat provider, multi-tier URL/domain lookup, eliminate shared hosting blind spot, and verify across Android client, engine, and backend (Task T008).
+- **Plan:**
+  1. Add `kotsafe_intelligence/providers/urlhaus.py` with caching and async HTTP queries against URLhaus API.
+  2. Expose `/v1/lookup/url` in FastAPI server and support `ObservableType.URL` in `public_lookup`.
+  3. Update Hostinger backend `deviceLookup` in `ThreatIntelController.php` with Tier 1 (exact URL query) and Tier 2 (fallback to host domain/IP).
+  4. Update Android client `ThreatIntelApiClient.java` and `KotSafeCloudProvider.java` to preserve full URLs.
+  5. Run unit tests across Python engine, Laravel backend, and Android client.
+  6. Assemble production APKs and update checksums.
+- **Changes:**
+  - Added `kotsafe_intelligence/providers/urlhaus.py` and updated `server.py`, `service.py`, `models.py`, `cli.py`, `test_intelligence.py` in `kotsafe-intelligence`.
+  - Updated `deviceLookup` in `ThreatIntelController.php` in `kotsafe-website/backend`.
+  - Updated `ThreatIntelApiClient.java` and `KotSafeCloudProvider.java` in `KotSafe`.
+  - Built distribution wheel `dist/kotsafe_intelligence-0.1.0-py3-none-any.whl` (size 94,479 bytes).
+  - Built `KotSafe-standard-debug.apk`, `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`.
+  - Updated `downloads/SHA256SUMS.txt` across `KotSafe` and `kotsafe-website/kotsafe-site`.
+- **Result:**
+  - `kotsafe-intelligence`: 12/12 tests passed in `test_intelligence.py`; 215 tests passed in full test suite (13 skipped, 0 failures).
+  - `kotsafe-website/backend`: 150/150 tests passed (627 assertions, 0 failures).
+  - `KotSafe`: 541/541 Android unit tests passed (0 failures, 0 errors, 0 skipped).
+  - All release APKs assembled and verified with SHA256 checksums.
+- **Stopped at:** Task T008 complete. Local files and downloads updated. Ready for deployment and git push.
+- **Next:** Deploy wheel to Oracle VPS and push git commits when PAT/SSH key is available.
+
 ### 2026-11-15 10:10 | Antigravity
 - **My prompt:** Inherit advanced MVT capabilities: Live Android accessibility stalkerware watcher, iOS shutdown.log Pegasus parser, and Chrome history SQLite parser (Task T007)
 - **Plan:** Implement real-time Android accessibility & stalkerware detection with screen-scraping/keylogging/overlay heuristics and commercial stalkerware catalog. Implement iOS `shutdown.log` forensic parser for reboot anomalies and lingering client injection. Implement Chrome/Chromium `History` SQLite parser with epoch conversion and redirect chain analysis. Test all components and assemble production APKs.

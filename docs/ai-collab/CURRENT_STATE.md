@@ -1,21 +1,20 @@
 # Current State
-Last updated: 2026-11-15 10:10 IST by Antigravity
+Last updated: 2026-11-15 18:25 IST by Antigravity
 
 ## Goal right now
-Inherit advanced MVT capabilities (Live Android accessibility stalkerware watcher, iOS shutdown.log Pegasus parser, and Chrome history SQLite parser), verify test suites, assemble and sync production APKs, and prepare for GitHub push.
+Expand KotSafe Threat Intelligence with Abuse.ch URLhaus live threat provider, unified multi-tier full URL/domain lookup, eliminate shared hosting blind spots, verify all test suites, and assemble production APKs.
 
 ## Stopped at
-- Task T007 completed:
-  1. Live Android Accessibility & Stalkerware Watcher: Implemented `AccessibilityStalkerwareDetector.java` with commercial stalkerware signature catalog, screen-scraping/keylogging/overlay/stealth capability heuristics, and integrated into Phase 5b of `AntivirusScanEngine.java`. 541 Android unit tests passing (100%).
-  2. iOS `shutdown.log` Pegasus Parser: Added `shutdown_records` in `mobile_forensics.py` detecting reboot anomalies, non-system execution from `/private/var/` or staging paths, and correlated terminations.
-  3. Chromium / Chrome `History` SQLite Parser: Added `chrome_records` in `mobile_forensics.py` with epoch microsecond conversion, redirect chain analysis, and STIX indicator matching.
-  4. Engine Verification: 215 unit tests passing in `kotsafe-intelligence`. Fresh wheel package built (`kotsafe_intelligence-0.1.0-py3-none-any.whl`, 93 KB).
-  5. Assembled debug and signed production release APKs (`KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) with updated checksums synced to `https://kotsafe.com/downloads/` (verified HTTP 200).
-- Option C ready: Local commits prepared in `KotSafe` (commit `6c97de9b`) and `kotsafe-site` (commit `8dd56b6`). Ready to push once GitHub Personal Access Token (PAT) or SSH key is provided.
+- Task T008 completed:
+  1. Abuse.ch URLhaus Live Threat Provider: Implemented `kotsafe_intelligence/providers/urlhaus.py` with caching and async HTTP queries against URLhaus API (`/v1/url/` and `/v1/host/`).
+  2. Threat Intelligence Server & Service: Exposed `@app.post("/v1/lookup/url")` in `server.py` and enabled `ObservableType.URL` in `public_lookup` in `service.py`. Python unit tests passing (12/12 in `test_intelligence.py` and 215/215 in full test suite).
+  3. Backend Multi-Tier Lookup: Enhanced `deviceLookup` in `ThreatIntelController.php` on Hostinger backend with Tier 1 (exact URL query against URL indicators) and Tier 2 (fallback to parsed host domain/IP reputation). Backend test suite fully passing (150/150 tests, 627 assertions).
+  4. Android Client Exact URL Defense: Updated `ThreatIntelApiClient.java` and `KotSafeCloudProvider.java` to preserve full URLs without prematurely stripping to domain names, closing the blind spot on shared hosting (e.g., Discord, Firebase, Google Drive). 541/541 Android unit tests passing (100%).
+  5. Distribution & Assembly: Built `kotsafe_intelligence-0.1.0-py3-none-any.whl` (94 KB). Built `assembleStandardDebug`, `assembleStandardRelease`, and `assembleFullPowerRelease`. Updated `downloads/` and `SHA256SUMS.txt` across `KotSafe` and `kotsafe-website`.
 
 ## Next steps
-1. Push `KotSafe` and `kotsafe-site` commits to GitHub upon receiving PAT/SSH key.
-2. Verify physical phone testing if test device is plugged in via USB.
+1. Deploy wheel `dist/kotsafe_intelligence-0.1.0-py3-none-any.whl` to `/opt/kotsafe-intelligence/.venv` on Oracle VPS and restart `kotsafe-intelligence.service`.
+2. Push git commits across repositories once GitHub authentication credentials (PAT or SSH) are provided.
 3. Keep `INTELLIGENCE_WORKSPACE_DISTRIBUTION` disabled until website release and both distribution paths have been tested together.
 
 ## Decisions made
