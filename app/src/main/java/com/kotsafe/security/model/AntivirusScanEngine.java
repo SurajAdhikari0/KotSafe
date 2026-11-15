@@ -1398,80 +1398,59 @@ public class AntivirusScanEngine {
             }
         }
 
-        // Phase 5b: System Security Posture & Accessibility Hijack Audit
+        // Phase 5b: System Security Posture & Accessibility Stalkerware Audit
         if (mode == ScanModeConfig.ScanMode.FULL || mode == ScanModeConfig.ScanMode.DEEP) {
-            if (listener != null) listener.onPhaseChanged("Auditing System Accessibility & Overlay Posture...", 92);
+            if (listener != null) listener.onPhaseChanged("Auditing System Accessibility & Stalkerware Posture...", 92);
             try {
-                AccessibilityManager am = (AccessibilityManager) context.getSystemService(Context.ACCESSIBILITY_SERVICE);
-                if (am != null) {
-                    List<AccessibilityServiceInfo> enabledServices =
-                            am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
-                    if (enabledServices != null) {
-                        for (AccessibilityServiceInfo sInfo : enabledServices) {
-                            if (sInfo.getResolveInfo() != null && sInfo.getResolveInfo().serviceInfo != null) {
-                                String sPkg = sInfo.getResolveInfo().serviceInfo.packageName;
-                                String sName = sInfo.getResolveInfo().serviceInfo.name;
-                                CharSequence labelChar = sInfo.getResolveInfo().loadLabel(context.getPackageManager());
-                                String sLabel = labelChar != null ? labelChar.toString() : sName;
-                                boolean isSys = Utils.isSystemApp(context, sPkg)
-                                    || Utils.isVerifiedGoogleTrustedService(context, sPkg);
-                                boolean isSelf = context.getPackageName().equals(sPkg)
-                                        || (sPkg != null && (sPkg.startsWith("com.kotsafe.security") || sPkg.startsWith("com.kotsafe.security")));
-                                AntivirusEvidenceItem accItem = new AntivirusEvidenceItem();
-                                accItem.type = AntivirusEvidenceItem.TYPE_SERVICE_HASH;
-                                accItem.title = "Accessibility Service: " + sLabel;
-                                accItem.subtitle = sPkg + " (" + sName + ")";
-                                accItem.packageName = sPkg;
-                                accItem.isSystemApp = isSys;
-                                try {
-                                    ApplicationInfo ai = context.getPackageManager().getApplicationInfo(sPkg, 0);
-                                    if (ai != null && ai.sourceDir != null) {
-                                        accItem.filePath = ai.sourceDir;
-                                    }
-                                } catch (Exception ignored) {}
-                                if (isSelf) {
-                                    accItem.isWhitelisted = true;
-                                    accItem.systemReason = "KotSafe Web Protection Provider (Authorized)";
-                                    accItem.severity = AntivirusEvidenceItem.SEVERITY_CLEAN;
-                                    accItem.details = "Legitimate KotSafe Browser Protection Service for real-time web URL defense (" + sPkg + ")";
-                                    result.systemAppsProtected++;
-                                } else if (isSys) {
-                                    accItem.isWhitelisted = true;
-                                    accItem.systemReason = "System Accessibility Provider (Whitelisted)";
-                                    accItem.severity = AntivirusEvidenceItem.SEVERITY_CLEAN;
-                                    accItem.details = "Verified Android OS Accessibility Component (" + sPkg + ")";
-                                    result.systemAppsProtected++;
-                                } else {
-                                    PackageInfo aPi = null;
-                                    try {
-                                        aPi = context.getPackageManager().getPackageInfo(sPkg, PackageManager.GET_PERMISSIONS);
-                                    } catch (Exception ignored) {}
-                                    AppTrustEvaluator.TrustProfile aProfile = (aPi != null) ? AppTrustEvaluator.profile(context, aPi) : null;
-                                    boolean isVetted = (aProfile != null && (aProfile.isVettedInstall || aProfile.isPlatformSigned));
-                                    boolean isDangerousCombo = (aProfile != null && aProfile.isSideloaded
-                                            && (aProfile.requestsOverlayPermission || aProfile.declaresSmsReceiver || !aProfile.hasLauncherIcon));
-
-                                    if (isVetted) {
-                                        accItem.isWhitelisted = true;
-                                        accItem.systemReason = "Verified App Accessibility Provider";
-                                        accItem.severity = AntivirusEvidenceItem.SEVERITY_CLEAN;
-                                        accItem.details = "Verified Accessibility Service from vetted store application (" + sPkg + ").";
-                                        result.systemAppsProtected++;
-                                    } else if (isDangerousCombo) {
-                                        accItem.severity = AntivirusEvidenceItem.SEVERITY_MALICIOUS;
-                                        accItem.details = "Path: " + (accItem.filePath.isEmpty() ? "N/A" : accItem.filePath) + "\nPackage: " + sPkg + "\nService: " + sName + "\nRisk: Sideloaded Accessibility Service combined with Overlay/SMS permissions (Critical Banking Trojan / Screenjacking Profile).";
-                                        result.threatsDetected++;
-                                        result.behavioralAnomaliesCount++;
-                                    } else {
-                                        accItem.severity = AntivirusEvidenceItem.SEVERITY_LOW;
-                                        accItem.details = "Path: " + (accItem.filePath.isEmpty() ? "N/A" : accItem.filePath) + "\nPackage: " + sPkg + "\nService: " + sName + "\nNote: Active third-party Accessibility Service. Monitored for baseline security.";
-                                        result.lowRiskCount++;
-                                    }
-                                }
-                                items.add(accItem);
-                            }
-                        }
+                List<AccessibilityStalkerwareDetector.StalkerwareThreat> stalkerwareThreats =
+                        AccessibilityStalkerwareDetector.scanActiveServices(context);
+                for (AccessibilityStalkerwareDetector.StalkerwareThreat threat : stalkerwareThreats) {
+                    AntivirusEvidenceItem accItem = new AntivirusEvidenceItem();
+                    accItem.type = AntivirusEvidenceItem.TYPE_SERVICE_HASH;
+                    accItem.title = "Accessibility Service: " + threat.appLabel;
+                    accItem.subtitle = threat.packageName + " (" + threat.serviceName + ")";
+                    accItem.packageName = threat.packageName;
+                    accItem.isSystemApp = threat.isSystemApp;
+                    accItem.filePath = threat.filePath != null ? threat.filePath : "";
+                    accItem.severity = threat.severity;
+                    if (threat.forensicDetails != null) {
+                        accItem.forensicReasons.addAll(threat.forensicDetails);
                     }
+
+                    if (threat.isWhitelisted) {
+                        accItem.isWhitelisted = true;
+                        accItem.systemReason = threat.isSystemApp ? "System Accessibility Provider (Whitelisted)" : "Authorized Service Provider";
+                        accItem.details = threat.recommendation;
+                        result.systemAppsProtected++;
+                    } else if (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(threat.severity)) {
+                        accItem.details = "Path: " + (accItem.filePath.isEmpty() ? "N/A" : accItem.filePath)
+                                + "\nPackage: " + threat.packageName
+                                + "\nService: " + threat.serviceName
+                                + "\nRisk Score: " + threat.riskScore + "/100"
+                                + "\nDetails: " + android.text.TextUtils.join(" • ", threat.forensicDetails)
+                                + "\nRecommendation: " + threat.recommendation;
+                        if (threat.isKnownStalkerwareFamily) {
+                            accItem.malwareFamily = threat.stalkerwareFamily;
+                            accItem.threatCategory = "Stalkerware / Spyware";
+                        }
+                        result.threatsDetected++;
+                        result.behavioralAnomaliesCount++;
+                    } else if (AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equals(threat.severity)) {
+                        accItem.details = "Path: " + (accItem.filePath.isEmpty() ? "N/A" : accItem.filePath)
+                                + "\nPackage: " + threat.packageName
+                                + "\nService: " + threat.serviceName
+                                + "\nRisk Score: " + threat.riskScore + "/100"
+                                + "\nDetails: " + android.text.TextUtils.join(" • ", threat.forensicDetails)
+                                + "\nRecommendation: " + threat.recommendation;
+                        result.suspiciousDetected++;
+                    } else {
+                        accItem.details = "Path: " + (accItem.filePath.isEmpty() ? "N/A" : accItem.filePath)
+                                + "\nPackage: " + threat.packageName
+                                + "\nService: " + threat.serviceName
+                                + "\nNote: Active third-party Accessibility Service. Monitored for baseline security.";
+                        result.lowRiskCount++;
+                    }
+                    items.add(accItem);
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error auditing accessibility services: " + e.getMessage());
