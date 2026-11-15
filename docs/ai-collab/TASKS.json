@@ -70,5 +70,14 @@
     "status": "done",
     "created": "2026-11-15 18:05 IST",
     "updated": "2026-11-15 18:25 IST"
+  },
+  {
+    "id": "T009",
+    "title": "Implement Microsoft Defender-grade immediate threat detection, interactive notification remediation, and download sentinel",
+    "detail": "Add in-notification direct actions ([Uninstall], [Quarantine], [Block App]), real-time network C2 alert dispatch, and on-access download inspection.",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-15 19:05 IST",
+    "updated": "2026-11-15 19:17 IST"
   }
 ]

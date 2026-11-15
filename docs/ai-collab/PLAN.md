@@ -12,6 +12,16 @@
 - [ ] Assign one assistant to implement; use the other for review or a separate task.
 - [ ] Record focused build/test results and hand off the checkpoint.
 
+## 2026-11-15 19:05 IST | Antigravity | Task T009: Microsoft Defender-Grade Immediate Threat Detection & Remediation
+
+### Objective
+Upgrade KotSafe's real-time threat response and notification architecture to match Microsoft Defender:
+1. In-notification 1-click remediation actions: `[ ⚡ Uninstall ]`, `[ 🛡️ Quarantine ]`, `[ 🚫 Block ]`.
+2. Connect `ActionReceiver.java` to handle direct package uninstallation via Android system intent, direct quarantine via `QuarantineVaultManager`, and direct firewall blocking via `SecurityRulesDb`.
+3. In-flight network alert integration in `ConnectionsRegister.java` when malicious IOCs or URLhaus indicators are blocked.
+4. On-access download sentinel connection in `DownloadFolderWatcher.java` dispatching direct quarantine notifications.
+5. Verify with `./gradlew testStandardDebugUnitTest` and assemble updated APKs.
+
 ## 2026-11-15 18:05 IST | Antigravity | Task T008: Expand Threat Intelligence Engine with Abuse.ch URLhaus & Exact URL Defense
 
 ### Objective

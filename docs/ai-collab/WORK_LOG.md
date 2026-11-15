@@ -16,6 +16,28 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 19:17 | Antigravity
+- **My prompt:** Implement Microsoft Defender-grade immediate threat detection, interactive notification remediation, and download sentinel (Task T009).
+- **Plan:**
+  1. Add `REQUEST_DELETE_PACKAGES` permission and `ActionReceiver` intent actions in `AndroidManifest.xml`.
+  2. Implement `ACTION_UNINSTALL_THREAT`, `ACTION_QUARANTINE_THREAT`, and `ACTION_BLOCK_APP_THREAT` in `ActionReceiver.java`.
+  3. Update `SecurityNotificationHub.java` with 1-click in-notification actions (`[ ⚡ Uninstall ]`, `[ 🛡️ Quarantine ]`, `[ 🚫 Block ]`).
+  4. Wire real-time C2 dropping alert in `ConnectionsRegister.java` and on-access download alert in `DownloadFolderWatcher.java`.
+  5. Run Android unit test suite and assemble updated APKs.
+  6. Deploy updated APKs to Hostinger and verify checksums.
+- **Changes:**
+  - `AndroidManifest.xml`: added `android.permission.REQUEST_DELETE_PACKAGES` and ActionReceiver actions.
+  - `ActionReceiver.java`: added handlers for uninstall, quarantine, and block actions.
+  - `SecurityNotificationHub.java`: added overloaded `postThreatAlert` with type and action payload, dynamic remediation actions in `publishAggregatedThreatCard`, and scan result threat extraction.
+  - `ConnectionsRegister.java`: added real-time alert dispatch when dropping malicious connections.
+  - `DownloadFolderWatcher.java`: added alert dispatch upon detecting malicious downloaded payloads.
+  - `AntivirusScanEngine.java`: added stalkerware alert dispatch in Phase 5b.
+- **Result:**
+  - 541/541 Android unit tests passed (0 failures, 0 errors, 0 skipped).
+  - All release APKs assembled and verified with SHA256 checksums on Hostinger (`sha256sum -c SHA256SUMS.txt`: all OK).
+- **Stopped at:** Task T009 complete and deployed.
+- **Next:** Push commits to GitHub when credentials are provided.
+
 ### 2026-11-15 18:40 | Antigravity
 - **My prompt:** Complete all remaining tasks and package frontend admin portal.
 - **Plan:** Verify and close all tasks in `TASKS.json` (marking T003 done), run frontend admin tests, build and package admin bundle with STIX source import review (`ImportReview.jsx`).

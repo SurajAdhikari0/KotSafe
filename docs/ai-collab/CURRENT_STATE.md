@@ -1,21 +1,20 @@
 # Current State
-Last updated: 2026-11-15 18:40 IST by Antigravity
+Last updated: 2026-11-15 19:17 IST by Antigravity
 
 ## Goal right now
-All project tasks T001–T008 completed, tested, and deployed. Frontend admin portal packaged with STIX source import review.
+Implement Microsoft Defender-grade immediate threat detection, interactive notification remediation, and download sentinel (Task T009).
 
 ## Stopped at
-- All collaboration tasks in `TASKS.json` (T001 through T008) are complete and verified:
-  1. T001 [done]: Centralize APK threat intelligence to KotSafe Admin/Backend API.
-  2. T002 [done]: Connect opt-in Android signed updates to authenticated device enrollment.
-  3. T003 [done]: Activate signed Android consumer feed and match reviewed indicators in observe-only mode.
-  4. T004 [done]: Preserve inconclusive cloud verdicts in antivirus scans.
-  5. T005 [done]: Harden Autopilot evidence, response status and repeated alerts.
-  6. T006 [done]: Update KotSafe monitoring and deploy tested MVT threat intelligence on Oracle VPS.
-  7. T007 [done]: Inherit advanced MVT capabilities (Live accessibility watcher, iOS shutdown.log, Chrome SQLite).
-  8. T008 [done]: Expand threat intelligence with Abuse.ch URLhaus, multi-tier URL defense, and live production deployment.
-- Frontend Admin Portal: Packaged admin bundle with STIX source import review (`ImportReview.jsx`). 10/10 admin tests passed.
-- All 4 repositories clean and committed locally. Ready for remote push when GitHub credentials are provided.
+- Task T009 completed and verified:
+  1. Interactive In-Notification Remediation Actions: Enhanced `SecurityNotificationHub.java` and `ActionReceiver.java` to support 1-click remediation directly from notifications:
+     - `[ ⚡ Uninstall ]`: Launches Android system uninstallation confirmation prompt (`Intent.ACTION_UNINSTALL_PACKAGE`) for detected malicious apps/stalkerware.
+     - `[ 🛡️ Quarantine ]`: Quarantines downloaded malicious APKs/files directly into `QuarantineVaultManager` (encrypted `.kotsafe_quarantine/` vault).
+     - `[ 🚫 Block ]`: Immediately writes firewall block rule to `SecurityRulesDb` for hostile C2s/domains.
+  2. In-Flight Network Alerting: Connected `ConnectionsRegister.java` to dispatch real-time heads-up alerts when the VPN firewall engine drops malicious C2 or URLhaus indicators.
+  3. On-Access Download Sentinel: Enhanced `DownloadFolderWatcher.java` to evaluate newly saved files and dispatch immediate notifications with direct quarantine action.
+  4. Antivirus Scan Engine Integration: Wired Phase 5b (accessibility stalkerware) and Phase 1 (malware app detection) directly into the Defender notification hub.
+  5. Test Suite Verification: 541/541 Android unit tests passed (0 failures, 0 errors, 0 skipped).
+  6. Build & Production Deployment: Assembled updated release APKs (`KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) and synced to Hostinger downloads. Verified via `sha256sum -c SHA256SUMS.txt` on Hostinger.
 
 ## Next steps
 1. Push git commits across repositories to remote when GitHub credentials (PAT or SSH) are provided.
