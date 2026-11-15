@@ -20,11 +20,11 @@
   {
     "id": "T003",
     "title": "Activate signed Android consumer feed and match reviewed indicators in observe-only mode",
-    "detail": "",
+    "detail": "Verified advisory matching on handset; firewall observes reserved domains without blocking; APK scanner evaluates SHA-256 with finding timestamps and signed snapshot verifier.",
     "owner": "Codex",
-    "status": "ready",
+    "status": "done",
     "created": "2026-11-11 22:55 IST",
-    "updated": "2026-11-11 22:55 IST"
+    "updated": "2026-11-15 18:39 IST"
   },
   {
     "id": "T004",
