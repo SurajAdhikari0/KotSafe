@@ -14,6 +14,7 @@
 package com.kotsafe.security.model;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.kotsafe.security.Log;
 
@@ -210,6 +211,16 @@ public class QuarantineVaultManager {
                     }
                 }
 
+                // Clean up from FileHashDbHelper so storage scan does not report it as active
+                try {
+                    FileHashDbHelper.getInstance(mContext).deleteByFilePath(originalPath);
+                    if (sha256 != null && !sha256.isEmpty()) {
+                        FileHashDbHelper.getInstance(mContext).deleteBySha256(sha256);
+                    }
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed cleaning up FileHashDb: " + e.getMessage());
+                }
+
                 // Record alert in AlertStore and post user-facing notification
                 try {
                     AlertRecord alert = AlertStore.getInstance(mContext).add(
@@ -231,6 +242,9 @@ public class QuarantineVaultManager {
                 } catch (Exception ex) {
                     Log.w(TAG, "Failed posting quarantine alert/notification: " + ex.getMessage());
                 }
+
+                // Reconcile in-memory scan result & recalculate score dynamically
+                reconcileScanResultWithQuarantine(originalPath, sha256);
 
                 Log.i(TAG, "Successfully quarantined file to hardware-backed vault " + originalPath + " -> " + vaultFile.getAbsolutePath());
                 return true;
@@ -389,6 +403,93 @@ public class QuarantineVaultManager {
 
     public int getQuarantinedCount() {
         return mDbHelper.getActiveQuarantineCount();
+    }
+
+    public synchronized boolean isFileOrHashQuarantined(String filePath, String sha256) {
+        List<QuarantineDbHelper.QuarantineRecord> list = getQuarantinedList();
+        if (list == null || list.isEmpty()) return false;
+        for (QuarantineDbHelper.QuarantineRecord rec : list) {
+            if (rec.isRestored) continue;
+            if (sha256 != null && !sha256.isEmpty() && sha256.equalsIgnoreCase(rec.sha256)) return true;
+            if (filePath != null && !filePath.isEmpty() && filePath.equalsIgnoreCase(rec.originalPath)) return true;
+        }
+        return false;
+    }
+
+    public synchronized void reconcileScanResultWithQuarantine(String originalPath, String sha256) {
+        try {
+            AntivirusScanEngine.ScanResult last = com.kotsafe.security.services.AntivirusScanService.getLastResult();
+            if (last != null && last.evidenceList != null) {
+                boolean changed = false;
+                for (AntivirusEvidenceItem ev : last.evidenceList) {
+                    if (ev == null || ev.isQuarantined || AntivirusEvidenceItem.SEVERITY_RESOLVED.equals(ev.severity)) {
+                        continue;
+                    }
+                    String p = ev.getDisplayPath();
+                    boolean matchSha = sha256 != null && !sha256.isEmpty() && sha256.equalsIgnoreCase(ev.sha256);
+                    boolean matchPath = originalPath != null && !originalPath.isEmpty() && originalPath.equalsIgnoreCase(p);
+                    if (matchSha || matchPath) {
+                        ev.isQuarantined = true;
+                        ev.severity = AntivirusEvidenceItem.SEVERITY_RESOLVED;
+                        ev.verdict = "QUARANTINED";
+                        ev.details = "[QUARANTINED IN ENCRYPTED VAULT] " + (ev.details != null ? ev.details : "");
+                        changed = true;
+                    }
+                }
+                if (changed) {
+                    int remainingThreats = 0;
+                    int remainingSuspicious = 0;
+                    for (AntivirusEvidenceItem ev : last.evidenceList) {
+                        if (ev == null || ev.isQuarantined || ev.isWhitelisted || ev.isSystemApp
+                                || AntivirusEvidenceItem.SEVERITY_RESOLVED.equals(ev.severity)
+                                || AntivirusEvidenceItem.SEVERITY_CLEAN.equals(ev.severity)) {
+                            continue;
+                        }
+                        if (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(ev.severity)) {
+                            remainingThreats++;
+                        } else if (AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equals(ev.severity)) {
+                            remainingSuspicious++;
+                        }
+                    }
+                    int newScore = 100 - (remainingThreats * 30) - (remainingSuspicious * 8);
+                    if (remainingThreats == 0 && remainingSuspicious == 0) newScore = 100;
+                    else if (newScore < 10 && (remainingThreats > 0 || remainingSuspicious > 0)) newScore = 15;
+                    else if (newScore < 0) newScore = 0;
+
+                    last.threatsDetected = remainingThreats;
+                    last.suspiciousDetected = remainingSuspicious;
+                    last.securityScore = newScore;
+                    com.kotsafe.security.services.AntivirusScanService.setLastResult(last);
+
+                    // Update latest report in ScanReportDbHelper if available
+                    try {
+                        ScanReportDbHelper db = ScanReportDbHelper.getInstance(mContext);
+                        List<ScanReportEntry> reports = db.getAllReports(1);
+                        if (reports != null && !reports.isEmpty()) {
+                            ScanReportEntry latestReport = reports.get(0);
+                            latestReport.securityScore = newScore;
+                            latestReport.threatsDetected = remainingThreats;
+                            latestReport.suspiciousDetected = remainingSuspicious;
+                            db.updateReport(latestReport);
+                        }
+                    } catch (Exception ex) {
+                        Log.w(TAG, "Failed updating latest ScanReport: " + ex.getMessage());
+                    }
+
+                    // Broadcast intent so open activities refresh their score display
+                    try {
+                        Intent intent = new Intent("com.kotsafe.security.ACTION_THREAT_QUARANTINED");
+                        intent.putExtra("originalPath", originalPath);
+                        intent.putExtra("sha256", sha256);
+                        intent.putExtra("newScore", newScore);
+                        intent.setPackage(mContext.getPackageName());
+                        mContext.sendBroadcast(intent);
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Failed reconciling scan result: " + e.getMessage());
+        }
     }
 
     /**

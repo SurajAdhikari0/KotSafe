@@ -168,4 +168,43 @@ public class QuarantineScoreReanalysisTest {
         Assert.assertEquals(42L, restoredAlert.quarantineRecordId);
         Assert.assertEquals("/sdcard/Download/malware.apk", restoredAlert.quarantinePath);
     }
+
+    @Test
+    public void testQuarantineVaultManager_ReconcilesScanResultAndScore() {
+        android.content.Context context = androidx.test.core.app.ApplicationProvider.getApplicationContext();
+        AntivirusScanEngine.ScanResult result = new AntivirusScanEngine.ScanResult();
+        result.totalStorageScanned = 5;
+        result.evidenceList = new ArrayList<>();
+
+        AntivirusEvidenceItem threat = new AntivirusEvidenceItem(
+                AntivirusEvidenceItem.TYPE_STORAGE_FILE,
+                "ReverseShell.sh",
+                "/storage/emulated/0/Download/malware_payload.sh",
+                "malware_payload.sh",
+                AntivirusEvidenceItem.SEVERITY_MALICIOUS,
+                "YARA matched reverse shell"
+        );
+        threat.filePath = "/storage/emulated/0/Download/malware_payload.sh";
+        threat.sha256 = "8c484584069788488507cdeafd5141209fb1d1ee9a7dfdea3639f39139f4b28a";
+        result.evidenceList.add(threat);
+        result.threatsDetected = 1;
+        result.securityScore = 70;
+
+        com.kotsafe.security.services.AntivirusScanService.setLastResult(result);
+
+        // Reconcile via QuarantineVaultManager
+        com.kotsafe.security.model.QuarantineVaultManager qm = com.kotsafe.security.model.QuarantineVaultManager.getInstance(context);
+        qm.reconcileScanResultWithQuarantine(
+                "/storage/emulated/0/Download/malware_payload.sh",
+                "8c484584069788488507cdeafd5141209fb1d1ee9a7dfdea3639f39139f4b28a"
+        );
+
+        AntivirusScanEngine.ScanResult updated = com.kotsafe.security.services.AntivirusScanService.getLastResult();
+        Assert.assertNotNull(updated);
+        Assert.assertEquals(100, updated.securityScore);
+        Assert.assertEquals(0, updated.threatsDetected);
+        Assert.assertTrue(threat.isQuarantined);
+        Assert.assertEquals(AntivirusEvidenceItem.SEVERITY_RESOLVED, threat.severity);
+        Assert.assertEquals("QUARANTINED", threat.verdict);
+    }
 }

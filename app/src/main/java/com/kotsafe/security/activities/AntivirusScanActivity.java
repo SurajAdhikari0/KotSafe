@@ -18,8 +18,10 @@
 package com.kotsafe.security.activities;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
@@ -807,12 +809,33 @@ public class AntivirusScanActivity extends BaseActivity {
         }
     }
 
+    private final BroadcastReceiver mQuarantineReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            runOnUiThread(() -> {
+                if (mLastResult != null) {
+                    reconcileWithQuarantineVault();
+                }
+            });
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
         updateVpnStatusBanner();
         syncScanServiceState();
         updateDetectionRulesCard();
+
+        try {
+            IntentFilter qFilter = new IntentFilter("com.kotsafe.security.ACTION_THREAT_QUARANTINED");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(mQuarantineReceiver, qFilter, Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                registerReceiver(mQuarantineReceiver, qFilter);
+            }
+        } catch (Exception ignored) {}
+        reconcileWithQuarantineVault();
 
         if (mTvWorkbenchQuarantineSubtitle != null) {
             int qCount = com.kotsafe.security.model.QuarantineVaultManager.getInstance(this).getQuarantinedCount();
@@ -835,6 +858,14 @@ public class AntivirusScanActivity extends BaseActivity {
                 beginScan();
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            unregisterReceiver(mQuarantineReceiver);
+        } catch (Exception ignored) {}
     }
 
     private void updateDetectionRulesCard() {
@@ -867,9 +898,51 @@ public class AntivirusScanActivity extends BaseActivity {
                 mBtnActionScan.setText("Stop Scan");
                 mBtnActionScan.setBackgroundTintList(ColorStateList.valueOf(0xFFF85149));
             }
-        } else if (mLastResult == null && AntivirusScanService.getLastResult() != null) {
-            mLastResult = AntivirusScanService.getLastResult();
-            displayResult(mLastResult);
+        } else if (AntivirusScanService.getLastResult() != null) {
+            AntivirusScanEngine.ScanResult latest = AntivirusScanService.getLastResult();
+            if (mLastResult == null || mLastResult != latest || latest.securityScore != mLastResult.securityScore) {
+                mLastResult = latest;
+                displayResult(mLastResult);
+            }
+            reconcileWithQuarantineVault();
+        } else if (mLastResult != null) {
+            reconcileWithQuarantineVault();
+        }
+    }
+
+    private void reconcileWithQuarantineVault() {
+        if (mLastResult == null || mLastResult.evidenceList == null) return;
+        QuarantineVaultManager qm = QuarantineVaultManager.getInstance(this);
+        int newlyResolved = 0;
+        for (AntivirusEvidenceItem ev : mLastResult.evidenceList) {
+            if (ev == null || ev.isQuarantined || AntivirusEvidenceItem.SEVERITY_RESOLVED.equals(ev.severity)) {
+                continue;
+            }
+            String p = ev.getDisplayPath();
+            String sha = ev.sha256;
+            if (qm.isFileOrHashQuarantined(p, sha)) {
+                ev.isQuarantined = true;
+                ev.severity = AntivirusEvidenceItem.SEVERITY_RESOLVED;
+                ev.verdict = "QUARANTINED";
+                ev.details = "[QUARANTINED IN ENCRYPTED VAULT] " + (ev.details != null ? ev.details : "");
+                newlyResolved++;
+            }
+        }
+        if (newlyResolved > 0 || (mLastResult.securityScore < 100 && (mLastResult.threatsDetected > 0 || mLastResult.suspiciousDetected > 0))) {
+            int remainingThreats = 0;
+            int remainingSuspicious = 0;
+            for (AntivirusEvidenceItem ev : mLastResult.evidenceList) {
+                if (ev == null || ev.isQuarantined || ev.isWhitelisted || ev.isSystemApp
+                        || AntivirusEvidenceItem.SEVERITY_RESOLVED.equals(ev.severity)
+                        || AntivirusEvidenceItem.SEVERITY_CLEAN.equals(ev.severity)) {
+                    continue;
+                }
+                if (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(ev.severity)) remainingThreats++;
+                else if (AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equals(ev.severity)) remainingSuspicious++;
+            }
+            if (remainingThreats != mLastResult.threatsDetected || remainingSuspicious != mLastResult.suspiciousDetected) {
+                reanalyzeAndDisplayScore(newlyResolved);
+            }
         }
     }
 
@@ -1267,6 +1340,12 @@ public class AntivirusScanActivity extends BaseActivity {
                             it.verdict = "QUARANTINED";
                             it.details = "[QUARANTINED IN ENCRYPTED VAULT] " + (it.details != null ? it.details : "");
                         }
+                    } else if (qm.isFileOrHashQuarantined(p, it.sha256)) {
+                        successCount++;
+                        it.isQuarantined = true;
+                        it.severity = AntivirusEvidenceItem.SEVERITY_RESOLVED;
+                        it.verdict = "QUARANTINED";
+                        it.details = "[QUARANTINED IN ENCRYPTED VAULT] " + (it.details != null ? it.details : "");
                     }
                 }
             }

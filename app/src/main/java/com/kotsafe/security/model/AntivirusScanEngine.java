@@ -1360,7 +1360,11 @@ public class AntivirusScanEngine {
                     if (!FileHashEntry.SCAN_TYPE_STORAGE.equals(h.scanType) && !FileHashEntry.SCAN_TYPE_DOWNLOAD.equals(h.scanType)) {
                         continue;
                     }
-                    if (h.filePath != null && !h.filePath.startsWith("Download/") && !h.filePath.startsWith("content:")) {
+                    if (QuarantineVaultManager.getInstance(context).isFileOrHashQuarantined(h.filePath, h.sha256)) {
+                        hashDb.deleteFileHash(h.id);
+                        continue;
+                    }
+                    if (h.filePath != null && !h.filePath.startsWith("content:")) {
                         File checkF = new File(h.filePath);
                         if (!checkF.exists()) {
                             hashDb.deleteFileHash(h.id);

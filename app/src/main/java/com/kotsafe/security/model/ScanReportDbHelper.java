@@ -105,6 +105,17 @@ public class ScanReportDbHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public synchronized boolean updateReport(ScanReportEntry entry) {
+        if (entry == null || entry.id <= 0) return false;
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_SECURITY_SCORE, entry.securityScore);
+        values.put(COL_THREATS_DETECTED, entry.threatsDetected);
+        values.put(COL_SUSPICIOUS_DETECTED, entry.suspiciousDetected);
+        int rows = db.update(TABLE_REPORTS, values, COL_ID + " = ?", new String[]{String.valueOf(entry.id)});
+        return rows > 0;
+    }
+
     public synchronized ScanReportEntry getLatestReport() {
         SQLiteDatabase db = getReadableDatabase();
         try (Cursor c = db.query(TABLE_REPORTS, null, null, null, null, null, COL_TIMESTAMP + " DESC", "1")) {

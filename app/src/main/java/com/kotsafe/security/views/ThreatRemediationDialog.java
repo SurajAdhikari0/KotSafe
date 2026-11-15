@@ -137,7 +137,23 @@ public class ThreatRemediationDialog {
             if (mitreContainer != null) mitreContainer.setVisibility(View.GONE);
         }
 
-        if (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(item.severity)) {
+        boolean alreadyQuarantined = item.isQuarantined
+                || AntivirusEvidenceItem.SEVERITY_RESOLVED.equals(item.severity)
+                || QuarantineVaultManager.getInstance(context).isFileOrHashQuarantined(dispPath, item.sha256);
+
+        if (alreadyQuarantined) {
+            item.isQuarantined = true;
+            item.severity = AntivirusEvidenceItem.SEVERITY_RESOLVED;
+            item.verdict = "QUARANTINED";
+            tvBadge.setText("QUARANTINED");
+            tvBadge.setTextColor(0xFF2EA44F);
+            tvBadge.setBackgroundResource(R.drawable.bg_badge_service);
+            if (item.details == null || !item.details.contains("[QUARANTINED")) {
+                item.details = "[QUARANTINED IN ENCRYPTED VAULT] " + (item.details != null ? item.details : "");
+                tvDetails.setText(item.details);
+            }
+            notifyActivityScoreUpdate(context);
+        } else if (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(item.severity)) {
             tvBadge.setTextColor(0xFFE91E63);
             tvBadge.setBackgroundResource(R.drawable.bg_badge_threat);
         } else if (AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equals(item.severity)) {
@@ -189,9 +205,7 @@ public class ThreatRemediationDialog {
                                 item.details = "[QUARANTINED IN ENCRYPTED VAULT] " + (item.details != null ? item.details : "");
                                 Toast.makeText(context, "File safely isolated in Quarantine Vault", Toast.LENGTH_SHORT).show();
                                 if (callback != null) callback.onActionCompleted();
-                                if (context instanceof com.kotsafe.security.activities.AntivirusScanActivity) {
-                                    ((com.kotsafe.security.activities.AntivirusScanActivity) context).reanalyzeAndDisplayScore(1);
-                                }
+                                notifyActivityScoreUpdate(context);
                             } else {
                                 Toast.makeText(context, "Failed to quarantine file", Toast.LENGTH_SHORT).show();
                             }
@@ -217,11 +231,15 @@ public class ThreatRemediationDialog {
                             item.severity = AntivirusEvidenceItem.SEVERITY_CLEAN;
                             item.verdict = "SHREDDED";
                             item.details = "[PERMANENTLY SHREDDED & DELETED] " + (item.details != null ? item.details : "");
+                            try {
+                                com.kotsafe.security.model.FileHashDbHelper.getInstance(context).deleteByFilePath(dispPath);
+                                if (item.sha256 != null && !item.sha256.isEmpty()) {
+                                    com.kotsafe.security.model.FileHashDbHelper.getInstance(context).deleteBySha256(item.sha256);
+                                }
+                            } catch (Exception ignored) {}
                             Toast.makeText(context, "File permanently shredded and deleted", Toast.LENGTH_SHORT).show();
                             if (callback != null) callback.onActionCompleted();
-                            if (context instanceof com.kotsafe.security.activities.AntivirusScanActivity) {
-                                ((com.kotsafe.security.activities.AntivirusScanActivity) context).reanalyzeAndDisplayScore(1);
-                            }
+                            notifyActivityScoreUpdate(context);
                         })
                         .setNegativeButton("Cancel", null)
                         .show();
@@ -308,5 +326,21 @@ public class ThreatRemediationDialog {
         });
 
         sheet.show();
+    }
+
+    private static void notifyActivityScoreUpdate(Context context) {
+        if (context == null) return;
+        android.app.Activity act = null;
+        Context c = context;
+        while (c instanceof android.content.ContextWrapper) {
+            if (c instanceof android.app.Activity) {
+                act = (android.app.Activity) c;
+                break;
+            }
+            c = ((android.content.ContextWrapper) c).getBaseContext();
+        }
+        if (act instanceof com.kotsafe.security.activities.AntivirusScanActivity) {
+            ((com.kotsafe.security.activities.AntivirusScanActivity) act).reanalyzeAndDisplayScore(1);
+        }
     }
 }

@@ -97,5 +97,14 @@
     "status": "done",
     "created": "2026-11-15 22:04 IST",
     "updated": "2026-11-15 22:19 IST"
+  },
+  {
+    "id": "T012",
+    "title": "Synchronize quarantine vault state with antivirus scan cache and live score recalculation",
+    "detail": "",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-15 22:40 IST",
+    "updated": "2026-11-15 23:00 IST"
   }
 ]

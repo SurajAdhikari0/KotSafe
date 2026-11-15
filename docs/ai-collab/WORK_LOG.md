@@ -16,6 +16,31 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 23:00 | Antigravity
+- **My prompt:** Fix score not changing after moving suspicious file to quarantine.
+- **Plan:**
+  1. Add `isFileOrHashQuarantined` and `reconcileScanResultWithQuarantine` to `QuarantineVaultManager.java`.
+  2. Clear threat from `FileHashDbHelper` and update `ScanReportDbHelper` when file is quarantined.
+  3. Register `ACTION_THREAT_QUARANTINED` receiver in `AntivirusScanActivity.java` and call `reconcileWithQuarantineVault()` in `onResume()`.
+  4. Ensure `AntivirusScanEngine.java` ignores already quarantined artifacts.
+  5. Unwrap `ContextWrapper` in `ThreatRemediationDialog.java` to ensure score re-analysis triggers.
+  6. Add unit test `testQuarantineVaultManager_ReconcilesScanResultAndScore` in `QuarantineScoreReanalysisTest.java`.
+  7. Re-assemble release APKs/bundle, install to connected OPPO device, and verify live.
+- **Changes:**
+  - `QuarantineVaultManager.java`: Added vault check, scan result reconciliation, and broadcast trigger.
+  - `AntivirusScanActivity.java`: Added lifecycle broadcast receiver and quarantine reconciliation.
+  - `AntivirusScanEngine.java`: Suppressed already quarantined artifacts during scans.
+  - `FileHashDbHelper.java`: Added `deleteBySha256`.
+  - `ScanReportDbHelper.java`: Added `updateReport`.
+  - `ThreatRemediationDialog.java`: Added already-quarantined detection and `ContextWrapper` unwrapping.
+  - `QuarantineScoreReanalysisTest.java`: Added unit test.
+- **Result:**
+  - Unit tests passed (543/543 passed).
+  - Production release APK installed on OPPO CPH2061 (`7f55c189`).
+  - Live on-device verification: Scan completed with 1471 scanned, 1471 safe, 0 threats, score restored to 100 (Device Fully Protected) with 1 isolated artifact in vault.
+- **Stopped at:** Task T012 completed.
+- **Next:** Push commits to remotes.
+
 ### 2026-11-15 22:25 | Antigravity
 - **My prompt:** Push update to physical test device (CPH2061).
 - **Plan:**

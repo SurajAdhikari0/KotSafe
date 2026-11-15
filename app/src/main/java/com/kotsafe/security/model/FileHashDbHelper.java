@@ -378,6 +378,12 @@ public class FileHashDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    public synchronized void deleteBySha256(String sha256) {
+        if (sha256 != null && !sha256.isEmpty()) {
+            getWritableDatabase().delete(TABLE_FILE_HASHES, COL_SHA256 + " = ?", new String[]{sha256});
+        }
+    }
+
     /**
      * Smart scan helper: returns true if the file at path has changed since last scan.
      * Comparison uses file_last_modified timestamp stored in DB.
