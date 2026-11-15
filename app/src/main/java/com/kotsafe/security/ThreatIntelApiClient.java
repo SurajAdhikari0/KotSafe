@@ -320,8 +320,10 @@ public class ThreatIntelApiClient {
         String cleanIoc = ioc;
         if ("IP".equalsIgnoreCase(type)) {
             cleanIoc = ThreatIntelManager.cleanIp(ioc);
-        } else if ("DOMAIN".equalsIgnoreCase(type) || "URL".equalsIgnoreCase(type)) {
+        } else if ("DOMAIN".equalsIgnoreCase(type)) {
             cleanIoc = ThreatIntelManager.cleanDomain(ioc);
+        } else if ("URL".equalsIgnoreCase(type)) {
+            cleanIoc = ioc.trim();
         } else if ("HASH".equalsIgnoreCase(type)) {
             cleanIoc = ThreatIntelManager.cleanHash(ioc);
         }

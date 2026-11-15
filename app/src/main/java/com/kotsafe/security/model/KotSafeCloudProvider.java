@@ -95,7 +95,10 @@ public class KotSafeCloudProvider implements ThreatIntelProvider {
         }
 
         String cleanIoc = ioc.trim();
-        if ("URL".equalsIgnoreCase(type) || "DOMAIN".equalsIgnoreCase(type)) {
+        if ("URL".equalsIgnoreCase(type)) {
+            // Keep full URL intact for exact multi-tier URLhaus and phishing threat lookup
+            cleanIoc = ioc.trim();
+        } else if ("DOMAIN".equalsIgnoreCase(type)) {
             cleanIoc = ThreatIntelRouter.reputationHost(cleanIoc);
             if (cleanIoc == null) return null;
             type = android.util.Patterns.IP_ADDRESS.matcher(cleanIoc).matches() ? "IP" : "DOMAIN";
