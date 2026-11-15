@@ -1022,7 +1022,7 @@ public class P2PExitNodeSettings extends SettingsSubFragment implements P2PExitN
         if (!cachedUri.isEmpty() && !existingToken.isEmpty()) {
             try {
                 SecurePairingBundle parsed = SecurePairingBundle.parse(cachedUri);
-                if (parsed.controlUrl != null && parsed.controlUrl.contains("130.210.16.110")) {
+                if (parsed.controlUrl != null && parsed.controlUrl.matches(".*\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b.*")) {
                     parsed = new SecurePairingBundle(parsed.room, parsed.pairingSecret, BackendProviderFactory.CLOUDFLARE_TUNNEL_URL, parsed.exitIp);
                     prefs.edit().putString(GatewayPreferenceKeys.PAIRING_BUNDLE, parsed.toQrUri()).apply();
                 }

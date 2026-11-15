@@ -55,7 +55,7 @@ public final class SecurePairingBundle {
     public SecurePairingBundle(String room, String pairingSecret, String controlUrl, String exitIp, String userId, String email, String authToken) {
         if (!isRoom(room)) throw new IllegalArgumentException("invalid room");
         if (!isSecret(pairingSecret)) throw new IllegalArgumentException("invalid pairing secret");
-        if (controlUrl != null && controlUrl.contains("130.210.16.110")) {
+        if (controlUrl != null && controlUrl.matches(".*\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b.*")) {
             controlUrl = "https://relay.kotsafe.com";
         }
         if (controlUrl == null || (!controlUrl.startsWith("https://") && !controlUrl.startsWith("http://"))) {

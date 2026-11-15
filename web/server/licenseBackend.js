@@ -28,8 +28,20 @@ const SALT = process.env.LICENSE_SALT || (process.env.NODE_ENV === 'production'
   ? (() => { throw new Error('FATAL: LICENSE_SALT environment variable is required in production.'); })()
   : 'kotsafe-dev-salt-2026');
 
-// In-memory license registry and device seat tracker
-const registeredLicenses = new Map([
+// Local development / mock test registry. In production, provide LICENSE_REGISTRY_JSON env var.
+const registeredLicenses = process.env.LICENSE_REGISTRY_JSON
+  ? new Map(Object.entries(JSON.parse(process.env.LICENSE_REGISTRY_JSON)).map(([k, v]) => [k, { ...v, activeDevices: new Set(v.activeDevices || []) }]))
+  : new Map([
+  [
+    'KOT-PRO-TEST0001-DEMO',
+    {
+      plan: 'pro',
+      maxSeats: 6,
+      expiresAt: new Date(Date.now() + 365 * 86400000).toISOString(),
+      activeDevices: new Set(),
+      status: 'active',
+    },
+  ],
   [
     'KOT-PRO-ABCD1234-EF56',
     {
@@ -51,7 +63,7 @@ const registeredLicenses = new Map([
     },
   ],
   [
-    'KOT-ENT-CORP9999-WXYZ',
+    'KOT-ENT-DEMO9999-TEST',
     {
       plan: 'enterprise',
       maxSeats: 50,

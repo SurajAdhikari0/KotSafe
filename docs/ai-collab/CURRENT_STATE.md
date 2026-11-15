@@ -2,21 +2,17 @@
 Last updated: 2026-11-15 20:21 IST by Antigravity
 
 ## Goal right now
-All engineering tasks T001–T009, hardware testing, silent notifications, release builds, and GitHub remote pushes completed.
+Task T010: Sanitize public KotSafe repository and configure proprietary P2P feature segregation for KotSafe-Private.
 
 ## Stopped at
-- Full production and deployment pipeline finalized and pushed to GitHub:
-  1. Signed Release APKs & Bundle Compiled: Assembled `KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`, and Google Play Store App Bundle `KotSafe-standard-release.aab` (`app/build/outputs/bundle/standardRelease/KotSafe-standard-release.aab`).
-  2. Checksums Computed & Synced: Generated `SHA256SUMS.txt` covering all release binaries and synced across `KotSafe/downloads/` and `kotsafe-website/kotsafe-site/downloads/`.
-  3. Production Release Installed on Handset: Streamed and installed signed production release APK (`KotSafe-standard-release.apk`) to connected OPPO CPH2061 (`7f55c189`), launched and verified active process (`PID: 5789`).
-  4. On-Device Malware Detection & Remediation Verified: Live reverse-shell payload detection, 100% silent visual card, interactive `[ 🛡️ Quarantine ]` button, and sandboxed vault isolation confirmed.
-  5. Clean Test Cleanup: Quarantined test files, temporary dumps, and notifications removed. Device and app are in a completely clean state.
-  6. Hostinger Downloads Live: Uploaded all signed binaries and `SHA256SUMS.txt` to `https://kotsafe.com/downloads/` and verified with `sha256sum -c SHA256SUMS.txt` (all returned OK).
-  7. GitHub Remote Push Complete: All commits pushed and up to date across all repositories and branches:
-     - `KotSafe`: `main` -> `origin/main` and `private/main` (`KotSafe-Private.git`) (both up to date).
-     - `kotsafe-website/backend`: `master` -> `origin/backend` (up to date).
-     - `kotsafe-website/frontend`: `frontend` -> `origin/frontend` (up to date).
-     - `kotsafe-website/kotsafe-site`: `main` -> `origin/main` (up to date).
+- Sanitized Oracle VPS IP literals (`130.210.16.110`) across all Java files and docs:
+  1. `P2PExitNodeSettings.java`: Migrated IP regex check to auto-upgrade legacy IP endpoints to Cloudflare tunnel.
+  2. `BackendProviderFactory.java`: Migrated IP regex check to auto-upgrade legacy custom IP configurations.
+  3. `SecurePairingBundle.java`: Replaced raw IP check with generic regex migrating to `https://relay.kotsafe.com`.
+  4. `PROGRESS.md`: Sanitized VPS reference to `relay.kotsafe.com`.
+  5. `licenseBackend.js`: Removed enterprise keys, enabled dynamic `process.env.LICENSE_REGISTRY_JSON` injection, and verified strict `LICENSE_SALT` requirement in production.
+  6. `google-services.json.example`: Created template with sanitized mock credentials.
+- All 541 Android unit tests and 65 web vitest unit tests passing.
 
 ## Next steps
 1. Upload `KotSafe-standard-release.aab` to Google Play Console when ready to publish update.

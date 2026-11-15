@@ -24,7 +24,7 @@ Short updates from each AI or contributor.
 ## 2026-11-15 18:30 IST | Antigravity | Live Deployment of Task T008 to Oracle VPS & Hostinger
 
 - **Completed Deployment:** Task T008 deployed live to production infrastructure.
-- **Oracle VPS (`130.210.16.110`)**:
+- **Oracle VPS (`relay.kotsafe.com`)**:
   - Installed updated `kotsafe_intelligence-0.1.0-py3-none-any.whl` (94,479 bytes) into `/opt/kotsafe-intelligence/.venv`.
   - Restarted `kotsafe-intelligence.service` (verified active HTTP 200).
   - All 3 P2P containers (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`) maintained 100% uptime with 0 restarts.

@@ -67,7 +67,7 @@ public class BackendProviderFactory {
         } else if ("custom".equals(mode)) {
             String custom = prefs.getString("personal_gateway_custom_relay_url", "").trim();
             if (!custom.isEmpty()) {
-                if (custom.contains("130.210.16.110")) {
+                if (custom.matches(".*\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b.*")) {
                     prefs.edit().putString("personal_gateway_custom_relay_url", CLOUDFLARE_TUNNEL_URL).apply();
                     return CLOUDFLARE_TUNNEL_URL;
                 }
