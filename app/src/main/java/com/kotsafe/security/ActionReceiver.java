@@ -41,6 +41,10 @@ public class ActionReceiver extends BroadcastReceiver {
     public static final String ACTION_SIMULATE_ATTACK = BuildConfig.APPLICATION_ID + ".SIMULATE_ATTACK";
     public static final String ACTION_SIMULATE_ATTACK_LEGACY = "com.kotsafe.security.SIMULATE_ATTACK";
     public static final String ACTION_DISMISS_THREATS = BuildConfig.APPLICATION_ID + ".DISMISS_THREATS";
+    public static final String ACTION_UNINSTALL_THREAT = BuildConfig.APPLICATION_ID + ".UNINSTALL_THREAT";
+    public static final String ACTION_QUARANTINE_THREAT = BuildConfig.APPLICATION_ID + ".QUARANTINE_THREAT";
+    public static final String ACTION_BLOCK_APP_THREAT = BuildConfig.APPLICATION_ID + ".BLOCK_APP_THREAT";
+    public static final String EXTRA_THREAT_TARGET = "extra_threat_target";
     public static final String ACTION_SET_PAIRING = BuildConfig.APPLICATION_ID + ".SET_PAIRING";
     public static final String ACTION_SET_PAIRING_LEGACY = "com.kotsafe.security.SET_PAIRING";
     public static final String ACTION_START_EXIT_NODE = BuildConfig.APPLICATION_ID + ".ACTION_START_EXIT_NODE";
@@ -143,6 +147,67 @@ public class ActionReceiver extends BroadcastReceiver {
 
         if (ACTION_DISMISS_THREATS.equals(action)) {
             com.kotsafe.security.model.SecurityNotificationHub.getInstance(context).clearThreatAlerts();
+            return;
+        }
+
+        if (ACTION_UNINSTALL_THREAT.equals(action)) {
+            String pkg = intent.getStringExtra(EXTRA_THREAT_TARGET);
+            if (pkg != null && !pkg.isEmpty()) {
+                Log.i(TAG, "Defender action: requesting uninstall for " + pkg);
+                try {
+                    Intent uninstall = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+                    uninstall.setData(android.net.Uri.parse("package:" + pkg));
+                    uninstall.putExtra(Intent.EXTRA_RETURN_RESULT, true);
+                    uninstall.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(uninstall);
+                } catch (Exception e) {
+                    try {
+                        Intent fallback = new Intent(Intent.ACTION_DELETE);
+                        fallback.setData(android.net.Uri.parse("package:" + pkg));
+                        fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(fallback);
+                    } catch (Exception ex) {
+                        Log.e(TAG, "Failed to launch package uninstaller: " + ex.getMessage());
+                    }
+                }
+            }
+            return;
+        }
+
+        if (ACTION_QUARANTINE_THREAT.equals(action)) {
+            String filePath = intent.getStringExtra(EXTRA_THREAT_TARGET);
+            if (filePath != null && !filePath.isEmpty()) {
+                Log.i(TAG, "Defender action: quarantining file " + filePath);
+                File file = new File(filePath);
+                if (file.exists()) {
+                    boolean ok = com.kotsafe.security.model.QuarantineVaultManager.getInstance(context)
+                            .quarantineFile(file, "Malware Quarantine", "Quarantined via Defender notification action");
+                    if (ok) {
+                        com.kotsafe.security.model.SecurityNotificationHub.getInstance(context).clearThreatAlerts();
+                    }
+                }
+            }
+            return;
+        }
+
+        if (ACTION_BLOCK_APP_THREAT.equals(action)) {
+            String target = intent.getStringExtra(EXTRA_THREAT_TARGET);
+            if (target != null && !target.isEmpty()) {
+                Log.i(TAG, "Defender action: blocking " + target);
+                if (target.contains(".") && !target.contains("/")) {
+                    com.kotsafe.security.model.SecurityRulesDb.getInstance(context)
+                            .blockApp(target, "Blocked via Defender Notification", "DEFENDER_ACTION");
+                    com.kotsafe.security.model.SecurityRulesDb.getInstance(context)
+                            .blockDomain(target, "Blocked via Defender Notification", "DEFENDER_ACTION");
+                } else if (target.startsWith("http")) {
+                    com.kotsafe.security.model.SecurityRulesDb.getInstance(context)
+                            .blockUrl(target, "Blocked via Defender Notification", "DEFENDER_ACTION");
+                } else {
+                    com.kotsafe.security.model.SecurityRulesDb.getInstance(context)
+                            .blockIp(target, "Blocked via Defender Notification", "DEFENDER_ACTION");
+                }
+                com.kotsafe.security.model.SecurityNotificationHub.getInstance(context).clearThreatAlerts();
+            }
             return;
         }
 

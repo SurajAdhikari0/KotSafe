@@ -82,12 +82,20 @@ public class SecurityNotificationHub {
         public String threatCategory; // "Spyware", "Ransomware Canary", "C2 Intrusion", "Root Exploit"
         public String severity; // "MALICIOUS" | "SUSPICIOUS"
         public long timestamp;
+        public String type; // "APP" | "FILE" | "NETWORK" | "AUTO"
+        public String actionPayload; // Package name, file path, or observable value
 
         public ThreatAlertItem(String title, String target, String threatCategory, String severity) {
+            this(title, target, threatCategory, severity, "AUTO", target);
+        }
+
+        public ThreatAlertItem(String title, String target, String threatCategory, String severity, String type, String actionPayload) {
             this.title = title;
             this.target = target;
             this.threatCategory = threatCategory;
             this.severity = severity;
+            this.type = (type != null) ? type : "AUTO";
+            this.actionPayload = (actionPayload != null) ? actionPayload : target;
             this.timestamp = System.currentTimeMillis();
         }
     }
@@ -223,6 +231,11 @@ public class SecurityNotificationHub {
      */
     @android.annotation.SuppressLint("MissingPermission")
     public synchronized void postThreatAlert(String title, String target, String category, String severity) {
+        postThreatAlert(title, target, category, severity, "AUTO", target);
+    }
+
+    @android.annotation.SuppressLint("MissingPermission")
+    public synchronized void postThreatAlert(String title, String target, String category, String severity, String type, String actionPayload) {
         if (!canPostNotification()) return;
         long now = SystemClock.elapsedRealtime();
         boolean malicious = "MALICIOUS".equals(severity);
@@ -235,6 +248,8 @@ public class SecurityNotificationHub {
                 if (escalated) {
                     existing.severity = severity;
                     existing.title = title;
+                    if (type != null) existing.type = type;
+                    if (actionPayload != null) existing.actionPayload = actionPayload;
                     // Keep the escalated finding visible in the latest inbox lines.
                     mActiveThreatAlerts.remove(existing);
                     mActiveThreatAlerts.add(existing);
@@ -257,7 +272,7 @@ public class SecurityNotificationHub {
             if (removable < 0 && !malicious) return;
             mActiveThreatAlerts.remove(removable >= 0 ? removable : 0);
         }
-        mActiveThreatAlerts.add(new ThreatAlertItem(title, target, category, severity));
+        mActiveThreatAlerts.add(new ThreatAlertItem(title, target, category, severity, type, actionPayload));
         publishAggregatedThreatCard(malicious);
     }
 
@@ -319,9 +334,62 @@ public class SecurityNotificationHub {
                 .setGroupSummary(true)
                 .setOnlyAlertOnce(!interrupt)
                 .setSilent(!interrupt)
-                .setAutoCancel(true)
-                .addAction(R.drawable.ic_search, "Review Findings", viewPi)
-                .addAction(R.drawable.ic_close, "Dismiss", dismissPi);
+                .setAutoCancel(true);
+
+        ThreatAlertItem primaryThreat = null;
+        for (int i = count - 1; i >= 0; i--) {
+            ThreatAlertItem it = mActiveThreatAlerts.get(i);
+            if ("MALICIOUS".equals(it.severity)) {
+                primaryThreat = it;
+                break;
+            }
+        }
+        if (primaryThreat == null) {
+            primaryThreat = latest;
+        }
+
+        if (primaryThreat != null) {
+            String actType = primaryThreat.type;
+            String actPayload = primaryThreat.actionPayload != null ? primaryThreat.actionPayload : primaryThreat.target;
+            String cat = primaryThreat.threatCategory != null ? primaryThreat.threatCategory.toLowerCase() : "";
+
+            boolean isApp = "APP".equalsIgnoreCase(actType)
+                    || cat.contains("stalkerware") || cat.contains("app install") || cat.contains("malware app")
+                    || (actPayload != null && actPayload.contains(".") && !actPayload.contains("/") && !actPayload.contains(" ") && !actPayload.endsWith(".apk") && !actPayload.startsWith("http"));
+
+            boolean isFile = "FILE".equalsIgnoreCase(actType)
+                    || cat.contains("storage") || cat.contains("download") || cat.contains("payload")
+                    || (actPayload != null && (actPayload.contains("/") || actPayload.endsWith(".apk") || actPayload.endsWith(".dex") || actPayload.endsWith(".sh")));
+
+            boolean isNetwork = "NETWORK".equalsIgnoreCase(actType)
+                    || cat.contains("c2") || cat.contains("phishing") || cat.contains("dns") || cat.contains("network");
+
+            if (isApp && actPayload != null && !actPayload.isEmpty()) {
+                Intent uninstallIntent = new Intent(mContext, ActionReceiver.class);
+                uninstallIntent.setAction(ActionReceiver.ACTION_UNINSTALL_THREAT);
+                uninstallIntent.putExtra(ActionReceiver.EXTRA_THREAT_TARGET, actPayload);
+                PendingIntent uninstallPi = PendingIntent.getBroadcast(mContext, 103, uninstallIntent,
+                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                b.addAction(R.drawable.ic_close, "⚡ Uninstall", uninstallPi);
+            } else if (isFile && actPayload != null && !actPayload.isEmpty()) {
+                Intent quarantineIntent = new Intent(mContext, ActionReceiver.class);
+                quarantineIntent.setAction(ActionReceiver.ACTION_QUARANTINE_THREAT);
+                quarantineIntent.putExtra(ActionReceiver.EXTRA_THREAT_TARGET, actPayload);
+                PendingIntent quarantinePi = PendingIntent.getBroadcast(mContext, 104, quarantineIntent,
+                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                b.addAction(R.drawable.ic_shield, "🛡️ Quarantine", quarantinePi);
+            } else if (isNetwork && actPayload != null && !actPayload.isEmpty()) {
+                Intent blockIntent = new Intent(mContext, ActionReceiver.class);
+                blockIntent.setAction(ActionReceiver.ACTION_BLOCK_APP_THREAT);
+                blockIntent.putExtra(ActionReceiver.EXTRA_THREAT_TARGET, actPayload);
+                PendingIntent blockPi = PendingIntent.getBroadcast(mContext, 105, blockIntent,
+                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                b.addAction(R.drawable.ic_block, "🚫 Block", blockPi);
+            }
+        }
+
+        b.addAction(R.drawable.ic_search, "Review Findings", viewPi);
+        b.addAction(R.drawable.ic_close, "Dismiss", dismissPi);
 
         try {
             mNotificationManagerCompat.notify(NOTIF_ID_THREAT_SUMMARY, b.build());
@@ -547,11 +615,36 @@ public class SecurityNotificationHub {
         }
         if (result.threatsDetected > 0) {
             // Threats detected -> publish aggregated high-priority threat card
+            String firstThreatTitle = "Deep Scan Found Threats";
+            String firstTarget = result.threatsDetected + " Threat(s) detected";
+            String threatType = "AUTO";
+            String payload = firstTarget;
+
+            if (result.evidenceList != null) {
+                for (AntivirusEvidenceItem item : result.evidenceList) {
+                    if (AntivirusEvidenceItem.SEVERITY_MALICIOUS.equals(item.severity)) {
+                        firstThreatTitle = item.title != null ? item.title : "Malicious App Detected";
+                        if (item.packageName != null && !item.packageName.isEmpty()) {
+                            firstTarget = item.packageName;
+                            threatType = "APP";
+                            payload = item.packageName;
+                        } else if (item.filePath != null && !item.filePath.isEmpty()) {
+                            firstTarget = item.filePath;
+                            threatType = "FILE";
+                            payload = item.filePath;
+                        }
+                        break;
+                    }
+                }
+            }
+
             postThreatAlert(
-                    "Deep Scan Found Threats",
-                    result.threatsDetected + " Threat(s) detected",
+                    firstThreatTitle,
+                    firstTarget,
                     "Scan Verdict",
-                    "MALICIOUS"
+                    "MALICIOUS",
+                    threatType,
+                    payload
             );
         } else if (result.suspiciousDetected > 0) {
             postThreatAlert("Scan found suspicious activity", "Latest device scan", "Scan Review", "SUSPICIOUS");

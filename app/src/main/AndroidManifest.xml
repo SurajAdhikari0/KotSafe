@@ -24,6 +24,7 @@
 
     <!-- Antivirus & Deep Malware Storage Protection (Declared under Google Play Antivirus Policy) -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -458,6 +459,10 @@
                 <action android:name="${applicationId}.SET_PAIRING" />
                 <action android:name="${applicationId}.ACTION_START_EXIT_NODE" />
                 <action android:name="${applicationId}.ACTION_STOP_EXIT_NODE" />
+                <action android:name="${applicationId}.DISMISS_THREATS" />
+                <action android:name="${applicationId}.UNINSTALL_THREAT" />
+                <action android:name="${applicationId}.QUARANTINE_THREAT" />
+                <action android:name="${applicationId}.BLOCK_APP_THREAT" />
             </intent-filter>
         </receiver>
 

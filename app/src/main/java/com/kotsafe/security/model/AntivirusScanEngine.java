@@ -1435,6 +1435,14 @@ public class AntivirusScanEngine {
                         }
                         result.threatsDetected++;
                         result.behavioralAnomaliesCount++;
+                        SecurityNotificationHub.getInstance(context).postThreatAlert(
+                                "Stalkerware Detected: " + threat.appLabel,
+                                threat.packageName,
+                                "Accessibility Stalkerware",
+                                "MALICIOUS",
+                                "APP",
+                                threat.packageName
+                        );
                     } else if (AntivirusEvidenceItem.SEVERITY_SUSPICIOUS.equals(threat.severity)) {
                         accItem.details = "Path: " + (accItem.filePath.isEmpty() ? "N/A" : accItem.filePath)
                                 + "\nPackage: " + threat.packageName

@@ -250,6 +250,19 @@ public class ConnectionsRegister {
                                 || (conn.dst_ip != null && !conn.dst_ip.isEmpty() && secMgr.isFastBlocked(conn.dst_ip))) {
                             conn.is_blocked = true;
                             conn.block_reason = "Malicious Host (Threat Blocklist)";
+                            try {
+                                AppDescriptor appDesc = (mAppsResolver != null) ? mAppsResolver.getAppByUid(conn.uid, 0) : null;
+                                String clientApp = (appDesc != null) ? appDesc.getPackageName() : (conn.uid > 0 ? "UID " + conn.uid : "system");
+                                String threatTarget = (conn.info != null && !conn.info.isEmpty()) ? conn.info : conn.dst_ip;
+                                com.kotsafe.security.model.SecurityNotificationHub.getInstance(mContext).postThreatAlert(
+                                        "Malicious Connection Blocked: " + threatTarget,
+                                        clientApp,
+                                        "C2 & Malicious Traffic",
+                                        "MALICIOUS",
+                                        "NETWORK",
+                                        clientApp
+                                );
+                            } catch (Exception ignored) {}
                         }
                     }
                 }

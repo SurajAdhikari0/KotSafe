@@ -103,7 +103,9 @@ public class SmartScreenManager {
                 "Malicious App: " + appName,
                 packageName,
                 "App Install Threat",
-                "MALICIOUS"
+                "MALICIOUS",
+                "APP",
+                packageName
         );
     }
 
@@ -120,7 +122,9 @@ public class SmartScreenManager {
                 "Hostile C2: " + iocValue,
                 appName,
                 "Network C2",
-                "MALICIOUS"
+                "MALICIOUS",
+                "NETWORK",
+                appName
         );
     }
 
@@ -135,7 +139,9 @@ public class SmartScreenManager {
                 "Suspicious " + iocType + ": " + iocValue,
                 appName,
                 "Network Warning",
-                "SUSPICIOUS"
+                "SUSPICIOUS",
+                "NETWORK",
+                appName
         );
     }
 
@@ -149,7 +155,9 @@ public class SmartScreenManager {
                 "Malicious File: " + fileName,
                 filePath,
                 "Storage Threat",
-                "MALICIOUS"
+                "MALICIOUS",
+                "FILE",
+                filePath
         );
     }
 

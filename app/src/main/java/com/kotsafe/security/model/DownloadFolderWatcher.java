@@ -197,6 +197,15 @@ public class DownloadFolderWatcher {
                         file.getName()
                 );
 
+                SecurityNotificationHub.getInstance(mContext).postThreatAlert(
+                        "Malicious Download: " + file.getName(),
+                        file.getAbsolutePath(),
+                        "Dangerous Download Payload",
+                        "MALICIOUS",
+                        "FILE",
+                        file.getAbsolutePath()
+                );
+
                 SmartScreenManager.getInstance(mContext).showSuspiciousWarning(
                         file.getName(),
                         sha256,
