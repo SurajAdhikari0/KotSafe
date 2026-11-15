@@ -2,22 +2,15 @@
 Last updated: 2026-11-15 20:21 IST by Antigravity
 
 ## Goal right now
-Tasks T001–T011 completed. Added Per-App Strict VPN-Only Lockdown mode and Home Screen P2P Gateway status card/pill.
+Tasks T001–T011 completed. Verified Per-App Strict VPN-Only Lockdown mode and Home Screen P2P Gateway status card/pill live on physical device.
 
 ## Stopped at
-- Implemented and verified Per-App VPN-Only Lockdown Mode:
-  1. `GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED`: Added preference constant for per-app strict lockdown.
-  2. `activity_p2p_app_routing.xml` & `P2PAppRoutingActivity.java`: Added dedicated "Strict VPN-Only Lockdown" switch card with real-time toggle handling.
-  3. `CaptureService.java`: Enforced dynamic firewall rule dropping packets (`ld.apps.add(uid)`) for all selected apps whenever the secure VPN/P2P tunnel is inactive/disconnected, guaranteeing selected apps pretend as "No Internet Connection" without cutting off other device apps.
-  4. Real-time Telemetry Observer: Registered listener in `CaptureService` to automatically trigger `reloadBlocklist()` the instant P2P status transitions between connected and disconnected.
-- Home Screen P2P Gateway & VPN-Only Cards:
-  1. Executive Posture Bar (Row 3): Added `status_posture_p2p` and `status_posture_vpn_only` interactive status pills with dynamic dot indicators.
-  2. Security Workbench (Row 4): Added `card_btn_p2p_mesh` and `card_btn_vpn_only_mode` cards providing 1-tap quick access to P2P Hub and App Lockdown Routing.
-- Verification:
-  1. Compiled clean with Gradle (0 errors, 0 warnings).
-  2. Passed all 542 Android unit tests (including new `VpnOnlyLockdownTest`).
-  3. Re-assembled signed production release APKs (`KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) and Play Store bundle (`KotSafe-standard-release.aab`).
-  4. Updated `downloads/SHA256SUMS.txt` and synced to `kotsafe-site`.
+- Installed signed release build (`KotSafe-standard-release.apk`) on physical OPPO CPH2061 (`7f55c189`) via ADB.
+- Launched `com.kotsafe.security/.activities.MainActivity` and verified live UI:
+  1. Executive Posture Bar displays dynamic `P2P: Exit Host` and `VPN-Only: Off` status pills.
+  2. Security Workbench displays `P2P Gateway` and `VPN-Only Apps` cards with spring touch animations.
+  3. Tapped `VPN-Only Apps` card and verified navigation into `P2PAppRoutingActivity`: "Strict VPN-Only Lockdown" switch card renders cleanly at top of screen with app routing selection.
+- Tested and verified on device.
 
 ## Next steps
 1. Upload `KotSafe-standard-release.aab` to Google Play Console when ready to publish update.

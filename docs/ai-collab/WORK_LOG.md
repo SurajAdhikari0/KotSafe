@@ -16,6 +16,23 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 22:25 | Antigravity
+- **My prompt:** Push update to physical test device (CPH2061).
+- **Plan:**
+  1. Restart ADB daemon to connect physical device (`7f55c189` OPPO CPH2061).
+  2. Install fresh signed release APK (`KotSafe-standard-release.apk`) using `adb install -r`.
+  3. Launch `com.kotsafe.security/.activities.MainActivity`.
+  4. Verify Home screen Executive Posture Bar pills (`P2P: Exit Host`, `VPN-Only: Off`) and Security Workbench cards (`P2P Gateway`, `VPN-Only Apps`).
+  5. Test tap navigation into `P2PAppRoutingActivity` to verify "Strict VPN-Only Lockdown" switch UI.
+- **Changes:** None (deployment and physical verification turn).
+- **Result:**
+  - `KotSafe-standard-release.apk` installed cleanly (`Success`).
+  - MainActivity launched and focused smoothly without crashes.
+  - Screencap verified Posture Bar (`P2P: Exit Host` and `VPN-Only: Off`) and Security Workbench cards.
+  - Tapped `VPN-Only Apps` card; verified `P2PAppRoutingActivity` with Strict VPN-Only Lockdown switch.
+- **Stopped at:** Verified live on physical handset.
+- **Next:** User testing or Play Store bundle submission.
+
 ### 2026-11-15 22:15 | Antigravity
 - **My prompt:** Implement per-app VPN-only lockdown mode and add P2P Gateway status card to Home page.
 - **Plan:**
