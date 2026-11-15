@@ -16,6 +16,25 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 10:10 | Antigravity
+- **My prompt:** Inherit advanced MVT capabilities: Live Android accessibility stalkerware watcher, iOS shutdown.log Pegasus parser, and Chrome history SQLite parser (Task T007)
+- **Plan:** Implement real-time Android accessibility & stalkerware detection with screen-scraping/keylogging/overlay heuristics and commercial stalkerware catalog. Implement iOS `shutdown.log` forensic parser for reboot anomalies and lingering client injection. Implement Chrome/Chromium `History` SQLite parser with epoch conversion and redirect chain analysis. Test all components and assemble production APKs.
+- **Changes:**
+  - Added `AccessibilityStalkerwareDetector.java` and `AccessibilityStalkerwareDetectorTest.java` in `KotSafe`. Integrated Phase 5b stalkerware audit in `AntivirusScanEngine.java`.
+  - Added `chrome_records` and `shutdown_records` in `kotsafe_intelligence/mobile_forensics.py` and updated CLI flags `--chrome` and `--shutdown` in `__main__.py`. Added comprehensive tests in `tests/test_mobile_forensics.py`.
+  - Built fresh Python distribution wheel `kotsafe_intelligence-0.1.0-py3-none-any.whl` (size 93,056 bytes).
+  - Executed Android unit test suite (`./gradlew testStandardDebugUnitTest`) and engine test suite (`pytest`).
+  - Assembled `KotSafe-standard-debug.apk`, `KotSafe-standard-release.apk`, and `KotSafe-fullPower-release.apk`.
+  - Synced release APKs and updated `SHA256SUMS.txt` to `https://kotsafe.com/downloads/` with HTTP 200 verification.
+- **Result:**
+  - 541 Android unit tests passed (0 failures, 100% success).
+  - 215 engine unit tests passed (13 skipped, 0 failures).
+  - Production release APKs signed with trusted release key and live on Hostinger downloads (SHA256: `0d7f3e52...` for standard release and `d73272fd...` for fullPower release).
+  - Marked Task T007 done via `aiteam.py`.
+- **Stopped at:** Task T007 completed and verified across all components.
+- **Next:** Push local commits to GitHub upon user providing Personal Access Token or SSH credentials.
+
+
 ### 2026-11-14 17:55 | Antigravity
 - **My prompt:** Complete Option A (Hostinger gateway), Option B (Android build & verification), and Option C (GitHub push prep)
 - **Plan:** Deploy matching STIX review gateway to Hostinger, run full test suites, assemble Android debug/release APKs, sync downloads, and prepare GitHub push.
