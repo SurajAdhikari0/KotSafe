@@ -184,6 +184,12 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
     private TextView mPostureFwText;
     private TextView mPostureAvText;
     private TextView mPostureAiText;
+    private TextView mPostureP2pText;
+    private ImageView mPostureP2pIcon;
+    private TextView mPostureVpnOnlyText;
+    private ImageView mPostureVpnOnlyIcon;
+    private TextView mCardP2pStatusSubtext;
+    private TextView mCardVpnOnlySubtext;
     private View mCardBtnOneTapHarden;
     private ImageView mIvHardenShield;
     private TextView mTvHardenStatus;
@@ -403,6 +409,12 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
         mPostureFwText = view.findViewById(R.id.posture_fw_text);
         mPostureAvText = view.findViewById(R.id.posture_av_text);
         mPostureAiText = view.findViewById(R.id.posture_ai_text);
+        mPostureP2pText = view.findViewById(R.id.posture_p2p_text);
+        mPostureP2pIcon = view.findViewById(R.id.posture_p2p_icon);
+        mPostureVpnOnlyText = view.findViewById(R.id.posture_vpn_only_text);
+        mPostureVpnOnlyIcon = view.findViewById(R.id.posture_vpn_only_icon);
+        mCardP2pStatusSubtext = view.findViewById(R.id.card_p2p_status_subtext);
+        mCardVpnOnlySubtext = view.findViewById(R.id.card_vpn_only_subtext);
 
         View postureAi = view.findViewById(R.id.status_posture_ai);
         if (postureAi != null) postureAi.setOnClickListener(v -> startActivity(new Intent(requireContext(), com.kotsafe.security.activities.AiAssistantActivity.class)));
@@ -412,6 +424,18 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
 
         View postureAv = view.findViewById(R.id.status_posture_antivirus);
         if (postureAv != null) postureAv.setOnClickListener(v -> showAntivirusToggleDialog());
+
+        View postureP2p = view.findViewById(R.id.status_posture_p2p);
+        if (postureP2p != null) {
+            AnimUtils.attachSpringTouch(postureP2p);
+            postureP2p.setOnClickListener(v -> openP2PHub());
+        }
+
+        View postureVpnOnly = view.findViewById(R.id.status_posture_vpn_only);
+        if (postureVpnOnly != null) {
+            AnimUtils.attachSpringTouch(postureVpnOnly);
+            postureVpnOnly.setOnClickListener(v -> startActivity(new Intent(requireContext(), com.kotsafe.security.activities.prefs.P2PAppRoutingActivity.class)));
+        }
 
         View cardFw = view.findViewById(R.id.card_btn_firewall);
         if (cardFw != null) cardFw.setOnClickListener(v -> startActivity(new Intent(requireContext(), FirewallActivity.class)));
@@ -430,6 +454,18 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
 
         View cardStorage = view.findViewById(R.id.card_btn_storage);
         if (cardStorage != null) cardStorage.setOnClickListener(v -> startActivity(new Intent(requireContext(), StorageManagementActivity.class)));
+
+        View cardP2p = view.findViewById(R.id.card_btn_p2p_mesh);
+        if (cardP2p != null) {
+            AnimUtils.attachSpringTouch(cardP2p);
+            cardP2p.setOnClickListener(v -> openP2PHub());
+        }
+
+        View cardVpnOnly = view.findViewById(R.id.card_btn_vpn_only_mode);
+        if (cardVpnOnly != null) {
+            AnimUtils.attachSpringTouch(cardVpnOnly);
+            cardVpnOnly.setOnClickListener(v -> startActivity(new Intent(requireContext(), com.kotsafe.security.activities.prefs.P2PAppRoutingActivity.class)));
+        }
 
         View cardAi = view.findViewById(R.id.card_btn_ai_assistant);
         if (cardAi != null) cardAi.setOnClickListener(v -> startActivity(new Intent(requireContext(), com.kotsafe.security.activities.AiAssistantActivity.class)));
@@ -1201,7 +1237,61 @@ public class StatusFragment extends Fragment implements AppStateListener, MenuPr
             mPostureAiText.setText("Ask AI");
             mPostureAiText.setTextColor(0xFFF6F3EC);
         }
+        if (mPostureP2pText != null) {
+            boolean isClient = mPrefs.getBoolean(GatewayPreferenceKeys.CLIENT_ENABLED, false);
+            boolean isExitNode = mPrefs.getBoolean(GatewayPreferenceKeys.EXIT_ENABLED, false);
+            boolean isOnline = com.kotsafe.security.p2p.GatewayTelemetry.getInstance().isHostOnline();
+            if (isClient && isOnline) {
+                mPostureP2pText.setText("P2P: Connected");
+                mPostureP2pText.setTextColor(ContextCompat.getColor(context, R.color.cardWorkbenchText));
+                if (mPostureP2pIcon != null) mPostureP2pIcon.setImageResource(R.drawable.dot_tactical_green);
+                if (mCardP2pStatusSubtext != null) mCardP2pStatusSubtext.setText("Connected to Gateway");
+            } else if (isClient) {
+                mPostureP2pText.setText("P2P: Standby");
+                mPostureP2pText.setTextColor(ContextCompat.getColor(context, R.color.warning));
+                if (mPostureP2pIcon != null) mPostureP2pIcon.setImageResource(R.drawable.dot_tactical_amber);
+                if (mCardP2pStatusSubtext != null) mCardP2pStatusSubtext.setText("Connecting / Standby");
+            } else if (isExitNode) {
+                mPostureP2pText.setText("P2P: Exit Host");
+                mPostureP2pText.setTextColor(ContextCompat.getColor(context, R.color.cardWorkbenchText));
+                if (mPostureP2pIcon != null) mPostureP2pIcon.setImageResource(R.drawable.dot_tactical_green);
+                if (mCardP2pStatusSubtext != null) mCardP2pStatusSubtext.setText("Sharing Gateway");
+            } else {
+                mPostureP2pText.setText("P2P Mesh ready");
+                mPostureP2pText.setTextColor(ContextCompat.getColor(context, R.color.cardWorkbenchText));
+                if (mPostureP2pIcon != null) mPostureP2pIcon.setImageResource(R.drawable.dot_tactical_green);
+                if (mCardP2pStatusSubtext != null) mCardP2pStatusSubtext.setText("Mesh & Exit Nodes");
+            }
+        }
+        if (mPostureVpnOnlyText != null) {
+            boolean vpnOnlyLockdown = mPrefs.getBoolean(GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED, false);
+            Set<String> selected = mPrefs.getStringSet(GatewayPreferenceKeys.SELECTED_APPS, java.util.Collections.emptySet());
+            if (vpnOnlyLockdown && !selected.isEmpty()) {
+                mPostureVpnOnlyText.setText("VPN-Only: " + selected.size() + " apps");
+                mPostureVpnOnlyText.setTextColor(ContextCompat.getColor(context, R.color.cardWorkbenchText));
+                if (mPostureVpnOnlyIcon != null) mPostureVpnOnlyIcon.setImageResource(R.drawable.dot_tactical_green);
+                if (mCardVpnOnlySubtext != null) mCardVpnOnlySubtext.setText(selected.size() + " Apps Locked to VPN");
+            } else if (vpnOnlyLockdown) {
+                mPostureVpnOnlyText.setText("VPN-Only: Active");
+                mPostureVpnOnlyText.setTextColor(ContextCompat.getColor(context, R.color.cardWorkbenchText));
+                if (mPostureVpnOnlyIcon != null) mPostureVpnOnlyIcon.setImageResource(R.drawable.dot_tactical_green);
+                if (mCardVpnOnlySubtext != null) mCardVpnOnlySubtext.setText("Strict Lockdown Active");
+            } else {
+                mPostureVpnOnlyText.setText("VPN-Only: Off");
+                mPostureVpnOnlyText.setTextColor(ContextCompat.getColor(context, R.color.cardWorkbenchText));
+                if (mPostureVpnOnlyIcon != null) mPostureVpnOnlyIcon.setImageResource(R.drawable.dot_tactical_amber);
+                if (mCardVpnOnlySubtext != null) mCardVpnOnlySubtext.setText("Strict Lockdown");
+            }
+        }
         updateHardeningButtonStatus();
+    }
+
+    private void openP2PHub() {
+        if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
+            com.kotsafe.security.model.KotSafeUserManager.redirectToLoginWithNotice(requireActivity(), "P2P Exit Gateway");
+            return;
+        }
+        startActivity(new Intent(requireContext(), com.kotsafe.security.activities.P2PHubActivity.class));
     }
 
     private void showFirewallToggleDialog() {

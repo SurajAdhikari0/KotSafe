@@ -2,17 +2,22 @@
 Last updated: 2026-11-15 20:21 IST by Antigravity
 
 ## Goal right now
-Task T010: Sanitize public KotSafe repository and configure proprietary P2P feature segregation for KotSafe-Private.
+Tasks T001–T011 completed. Added Per-App Strict VPN-Only Lockdown mode and Home Screen P2P Gateway status card/pill.
 
 ## Stopped at
-- Sanitized Oracle VPS IP literals (`130.210.16.110`) across all Java files and docs:
-  1. `P2PExitNodeSettings.java`: Migrated IP regex check to auto-upgrade legacy IP endpoints to Cloudflare tunnel.
-  2. `BackendProviderFactory.java`: Migrated IP regex check to auto-upgrade legacy custom IP configurations.
-  3. `SecurePairingBundle.java`: Replaced raw IP check with generic regex migrating to `https://relay.kotsafe.com`.
-  4. `PROGRESS.md`: Sanitized VPS reference to `relay.kotsafe.com`.
-  5. `licenseBackend.js`: Removed enterprise keys, enabled dynamic `process.env.LICENSE_REGISTRY_JSON` injection, and verified strict `LICENSE_SALT` requirement in production.
-  6. `google-services.json.example`: Created template with sanitized mock credentials.
-- All 541 Android unit tests and 65 web vitest unit tests passing.
+- Implemented and verified Per-App VPN-Only Lockdown Mode:
+  1. `GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED`: Added preference constant for per-app strict lockdown.
+  2. `activity_p2p_app_routing.xml` & `P2PAppRoutingActivity.java`: Added dedicated "Strict VPN-Only Lockdown" switch card with real-time toggle handling.
+  3. `CaptureService.java`: Enforced dynamic firewall rule dropping packets (`ld.apps.add(uid)`) for all selected apps whenever the secure VPN/P2P tunnel is inactive/disconnected, guaranteeing selected apps pretend as "No Internet Connection" without cutting off other device apps.
+  4. Real-time Telemetry Observer: Registered listener in `CaptureService` to automatically trigger `reloadBlocklist()` the instant P2P status transitions between connected and disconnected.
+- Home Screen P2P Gateway & VPN-Only Cards:
+  1. Executive Posture Bar (Row 3): Added `status_posture_p2p` and `status_posture_vpn_only` interactive status pills with dynamic dot indicators.
+  2. Security Workbench (Row 4): Added `card_btn_p2p_mesh` and `card_btn_vpn_only_mode` cards providing 1-tap quick access to P2P Hub and App Lockdown Routing.
+- Verification:
+  1. Compiled clean with Gradle (0 errors, 0 warnings).
+  2. Passed all 542 Android unit tests (including new `VpnOnlyLockdownTest`).
+  3. Re-assembled signed production release APKs (`KotSafe-standard-release.apk`, `KotSafe-fullPower-release.apk`) and Play Store bundle (`KotSafe-standard-release.aab`).
+  4. Updated `downloads/SHA256SUMS.txt` and synced to `kotsafe-site`.
 
 ## Next steps
 1. Upload `KotSafe-standard-release.aab` to Google Play Console when ready to publish update.

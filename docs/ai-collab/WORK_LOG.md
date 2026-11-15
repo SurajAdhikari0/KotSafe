@@ -16,6 +16,30 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-15 22:15 | Antigravity
+- **My prompt:** Implement per-app VPN-only lockdown mode and add P2P Gateway status card to Home page.
+- **Plan:**
+  1. Add `VPN_ONLY_LOCKDOWN_ENABLED` preference key in `GatewayPreferenceKeys.java`.
+  2. Implement "Strict VPN-Only Lockdown" switch card in `activity_p2p_app_routing.xml` and wire up in `P2PAppRoutingActivity.java`.
+  3. Enforce dynamic packet dropping in `CaptureService.java` for selected apps whenever the secure VPN/P2P tunnel is disconnected.
+  4. Register real-time telemetry observer in `CaptureService` to auto-trigger `reloadBlocklist()` on P2P connection transitions.
+  5. Add P2P Mesh Gateway and VPN-Only status pills in Executive Posture Bar and cards in Security Workbench grid on Home screen.
+  6. Add unit test `VpnOnlyLockdownTest` and verify all 542 tests pass.
+  7. Re-assemble signed release APKs and Google Play Store AAB bundle.
+- **Changes:**
+  - `GatewayPreferenceKeys.java`: Added `VPN_ONLY_LOCKDOWN_ENABLED`.
+  - `activity_p2p_app_routing.xml` & `P2PAppRoutingActivity.java`: Added lockdown switch card and real-time toggle handling.
+  - `CaptureService.java`: Added firewall lockdown rule and `GatewayTelemetry` listener.
+  - `status.xml` & `StatusFragment.java`: Added posture pills (`status_posture_p2p`, `status_posture_vpn_only`) and workbench cards (`card_btn_p2p_mesh`, `card_btn_vpn_only_mode`).
+  - `VpnOnlyLockdownTest.java`: Added unit test covering lockdown state transitions.
+  - Re-assembled release APKs, bundle, and recomputed `SHA256SUMS.txt`.
+- **Result:**
+  - 542 / 542 Android unit tests passed in 45s.
+  - Signed release APKs and bundle generated.
+  - P2P Gateway and VPN-Only features fully functional on Home screen and P2P routing.
+- **Stopped at:** Task T011 completed.
+- **Next:** Push changes to GitHub remotes.
+
 ### 2026-11-15 20:54 | Antigravity
 - **My prompt:** Sanitize public repository and configure proprietary code protection for KotSafe-Private.
 - **Plan:**

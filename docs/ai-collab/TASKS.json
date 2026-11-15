@@ -88,5 +88,14 @@
     "status": "done",
     "created": "2026-11-15 20:49 IST",
     "updated": "2026-11-15 20:54 IST"
+  },
+  {
+    "id": "T011",
+    "title": "Implement per-app VPN-only lockdown mode and add P2P Gateway status card to Home page",
+    "detail": "",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-15 22:04 IST",
+    "updated": "2026-11-15 22:19 IST"
   }
 ]

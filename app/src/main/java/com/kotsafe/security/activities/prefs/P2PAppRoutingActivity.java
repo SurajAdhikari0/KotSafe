@@ -87,7 +87,33 @@ public class P2PAppRoutingActivity extends BaseActivity {
                 .replace(R.id.fragment, mFragment)
                 .commit();
 
+        setupLockdownSwitch();
         setupPresetChips();
+    }
+
+    private void setupLockdownSwitch() {
+        androidx.appcompat.widget.SwitchCompat switchLockdown = findViewById(R.id.switch_vpn_only_lockdown);
+        if (switchLockdown != null) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean current = prefs.getBoolean(GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED, false);
+            switchLockdown.setChecked(current);
+            switchLockdown.setOnCheckedChangeListener((btn, isChecked) -> {
+                prefs.edit().putBoolean(GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED, isChecked).apply();
+                if (isChecked) {
+                    String mode = prefs.getString(GatewayPreferenceKeys.APP_ROUTING_MODE, GatewayPreferenceKeys.ROUTING_MODE_ALL);
+                    if (GatewayPreferenceKeys.ROUTING_MODE_ALL.equals(mode)) {
+                        prefs.edit().putString(GatewayPreferenceKeys.APP_ROUTING_MODE, GatewayPreferenceKeys.ROUTING_MODE_ONLY_SELECTED).apply();
+                    }
+                    Toast.makeText(this, "🔒 VPN-Only Lockdown Active: Selected apps will have NO internet when disconnected", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "VPN-Only Lockdown disabled", Toast.LENGTH_SHORT).show();
+                }
+                if (CaptureService.isServiceActive()) {
+                    CaptureService cs = CaptureService.getInstance();
+                    if (cs != null) cs.reloadBlocklist();
+                }
+            });
+        }
     }
 
     private void setupPresetChips() {

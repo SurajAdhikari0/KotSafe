@@ -58,5 +58,8 @@ public final class GatewayPreferenceKeys {
     public static final String HOST_PAUSE_ON_LOW_BATTERY = "personal_gateway_host_pause_on_low_battery";
     public static final String HOST_WIFI_ONLY = "personal_gateway_host_wifi_only";
 
+    // Strict Per-App VPN-Only Lockdown Mode
+    public static final String VPN_ONLY_LOCKDOWN_ENABLED = "personal_gateway_vpn_only_lockdown";
+
     private GatewayPreferenceKeys() { }
 }

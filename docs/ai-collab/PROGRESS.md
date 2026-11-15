@@ -422,3 +422,7 @@ Inherited advanced MVT capabilities: Live Android accessibility stalkerware watc
 ## 2026-11-15 20:54 IST | Antigravity | Task completed: T010
 
 Sanitize public KotSafe repository and split proprietary P2P to KotSafe-Private
+
+## 2026-11-15 22:19 IST | Antigravity | Task completed: T011
+
+Implement per-app VPN-only lockdown mode and add P2P Gateway status card to Home page

@@ -243,6 +243,15 @@ public class CaptureService extends VpnService implements Runnable {
             return vpn == null || vpn.protect(sock);
         });
 
+        // Listen for P2P telemetry updates to enforce VPN-Only Lockdown in real-time
+        com.kotsafe.security.p2p.GatewayTelemetry.getInstance().addListener(telemetry -> {
+            if (mPrefs != null && mPrefs.getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED, false)) {
+                if (mHandler != null) {
+                    mHandler.post(this::reloadBlocklist);
+                }
+            }
+        });
+
         // Initialize and start Inbound Port Scan Honeypot Detector asynchronously to avoid blocking VPN startup
         try {
             com.kotsafe.security.model.InboundScanDetector scanDetector =
@@ -2312,6 +2321,27 @@ public class CaptureService extends VpnService implements Runnable {
         for(int uid : dynamicBlockedUids) {
             if(!mBlocklist.isExemptedApp(uid) && !Utils.isSystemUid(uid) && !Utils.isSystemApp(this, uid)) {
                 ld.apps.add(Integer.toString(uid));
+            }
+        }
+
+        // Enforce Per-App VPN-Only Lockdown Mode
+        boolean vpnOnlyLockdown = mPrefs.getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.VPN_ONLY_LOCKDOWN_ENABLED, false);
+        if (vpnOnlyLockdown) {
+            Set<String> selectedApps = mPrefs.getStringSet(com.kotsafe.security.p2p.GatewayPreferenceKeys.SELECTED_APPS, Collections.emptySet());
+            boolean isP2PClient = mPrefs.getBoolean(com.kotsafe.security.p2p.GatewayPreferenceKeys.CLIENT_ENABLED, false);
+            boolean isSecureTunnelActive = isP2PClient && com.kotsafe.security.p2p.GatewayTelemetry.getInstance().isHostReachableOrGrace();
+
+            if (!isSecureTunnelActive && !selectedApps.isEmpty()) {
+                PackageManager pm = getPackageManager();
+                for (String pkg : selectedApps) {
+                    try {
+                        int appUid = Utils.getPackageUid(pm, pkg, 0);
+                        if (appUid > 0 && !mBlocklist.isExemptedApp(appUid) && !Utils.isSystemUid(appUid) && !Utils.isSystemApp(this, appUid)) {
+                            ld.apps.add(Integer.toString(appUid));
+                            Log.d(TAG, "[VPN-Only Lockdown] Blocked app " + pkg + " (UID " + appUid + ") because secure tunnel is inactive");
+                        }
+                    } catch (Exception ignored) {}
+                }
             }
         }
 
