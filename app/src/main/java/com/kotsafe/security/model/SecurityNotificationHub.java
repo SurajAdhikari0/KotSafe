@@ -130,14 +130,15 @@ public class SecurityNotificationHub {
             statusChan.setShowBadge(false);
             mNotificationManager.createNotificationChannel(statusChan);
 
-            // 2. Critical Threats Channel (High: sound, vibration, heads-up card)
+            // 2. Critical Threats Channel (Silent visual heads-up card without noise)
             NotificationChannel threatsChan = new NotificationChannel(
                     CHAN_THREATS,
                     "Security Threats & Intrusions",
                     NotificationManager.IMPORTANCE_HIGH
             );
             threatsChan.setDescription("Urgent alerts when malware, ransomware drops, or hostile C2s are detected.");
-            threatsChan.enableVibration(true);
+            threatsChan.setSound(null, null);
+            threatsChan.enableVibration(false);
             threatsChan.setShowBadge(true);
             mNotificationManager.createNotificationChannel(threatsChan);
 
@@ -333,7 +334,7 @@ public class SecurityNotificationHub {
                 .setGroup(NOTIF_GROUP_THREATS)
                 .setGroupSummary(true)
                 .setOnlyAlertOnce(!interrupt)
-                .setSilent(!interrupt)
+                .setSilent(true)
                 .setAutoCancel(true);
 
         ThreatAlertItem primaryThreat = null;
