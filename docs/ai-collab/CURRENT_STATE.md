@@ -2,33 +2,20 @@
 Last updated: 2026-11-15 20:21 IST by Antigravity
 
 ## Goal right now
-Task T012 completed. Synchronized Quarantine Vault state with antivirus scan cache and live score recalculation, verified live on physical device.
+Task T013 completed. Restored and hardened Hostinger Threat Intelligence backend and composer runtime. Verified live HTTP 200 responses.
 
 ## Stopped at
-- Fixed quarantine score persistence and live reconciliation across all quarantine channels:
-  1. `QuarantineVaultManager.java`:
-     - Added `isFileOrHashQuarantined(String filePath, String sha256)`: checks active records in vault.
-     - Added `reconcileScanResultWithQuarantine(String originalPath, String sha256)`: immediately marks evidence items in `AntivirusScanService.getLastResult()` as `SEVERITY_RESOLVED` and recalculates `securityScore` dynamically.
-     - On quarantine, immediately clears the threat from `FileHashDbHelper` and updates `ScanReportDbHelper`.
-     - Broadcasts `ACTION_THREAT_QUARANTINED` to notify active UI listeners.
-  2. `AntivirusScanActivity.java`:
-     - Added broadcast listener `mQuarantineReceiver` and `reconcileWithQuarantineVault()` in `onResume()` and `syncScanServiceState()`.
-     - Automatically reconciles cached scan report against Quarantine Vault so any background or notification-quarantined file immediately updates the UI score to 100 / Protected.
-     - In `executeBatchQuarantine()`, handles files that were already shredded/quarantined in the vault.
-  3. `AntivirusScanEngine.java`:
-     - Checks `isFileOrHashQuarantined()` during storage evaluation, ensuring already quarantined artifacts are deleted from `hashDb` and never penalize the score in subsequent scans.
-  4. `ThreatRemediationDialog.java`:
-     - Detects if an item is already quarantined and applies green `QUARANTINED` badge.
-     - Properly unwraps `ContextWrapper` to ensure `reanalyzeAndDisplayScore()` triggers correctly from dialog actions.
-  5. `FileHashDbHelper.java`:
-     - Added `deleteBySha256(String sha256)`.
-- Verification:
-  1. Unit test `QuarantineScoreReanalysisTest.testQuarantineVaultManager_ReconcilesScanResultAndScore` passed (100% of 543 unit tests passing).
-  2. Assembled signed release APKs and Play Store bundle; updated `downloads/SHA256SUMS.txt` and synced to `kotsafe-site`.
-  3. Installed on physical device (`7f55c189` OPPO CPH2061) and verified live:
-     - Antivirus score updated to **100 / COMPLETE** (Device Fully Protected).
-     - Scanned: 1471, Safe: 1471, Threats: 0.
-     - Sandboxed Quarantine Vault displays: "1 isolated threat artifact in vault".
+- Diagnosed and resolved Threat Intelligence Cloud Gateway downtime on Hostinger (`193.203.185.182`):
+  1. Identified that Hostinger's automated Git deployment (`hbuilds`) had replaced `~/domains/kotsafe.com/public_html/backend/` without `.env` and `vendor/` (due to standard `.gitignore` rules), causing `index.php` to return 503 (`Backend temporarily unavailable`).
+  2. Restored `.env` from secure backup (`~/domains/kotsafe.com/private-android-feed.puOvJ24j/backup/.env`) to `public_html/backend/.env` and created a protected copy in `~/domains/kotsafe.com/kotsafe_backend.env`.
+  3. Ran `composer install --no-dev --optimize-autoloader` in `backend/` and copied the full runtime to `~/domains/kotsafe.com/persistent_vendor/`.
+  4. Updated `backend/public/index.php` with self-healing fallback logic: if `.env` or `vendor/` are ever wiped by a Git auto-deploy webhook, `index.php` automatically restores `.env` from `kotsafe_backend.env` and falls back to `persistent_vendor/autoload.php` with zero downtime.
+  5. Cleared and cached Laravel configuration and routes: `php artisan config:cache && php artisan route:cache`.
+  6. Verified live: `https://kotsafe.com/api/v1/threat-intel/lookup` and `https://kotsafe.com/api/v1/threat-intel/coverage` returned immediate HTTP/2 200 responses.
+- Verified Oracle VPS Threat Intelligence Engine (`130.210.16.110`):
+  - `kotsafe-intelligence.service`: Active.
+  - `kotsafe-android-publisher.timer`: Active.
+  - P2P Docker containers (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`): 100% uptime with 0 restarts.
 
 ## Next steps
 1. Upload `KotSafe-standard-release.aab` to Google Play Console when ready to publish update.

@@ -106,5 +106,14 @@
     "status": "done",
     "created": "2026-11-15 22:40 IST",
     "updated": "2026-11-15 23:00 IST"
+  },
+  {
+    "id": "T013",
+    "title": "Restore and harden Hostinger Threat Intelligence backend and composer runtime",
+    "detail": "",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-18 10:59 IST",
+    "updated": "2026-11-18 11:03 IST"
   }
 ]

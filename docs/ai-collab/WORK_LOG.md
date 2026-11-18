@@ -16,6 +16,26 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-18 11:03 | Antigravity
+- **My prompt:** Check and resolve Threat Intelligence problem on Hostinger backend.
+- **Plan:**
+  1. Diagnose why `https://kotsafe.com/api/v1/threat-intel/lookup` returned HTTP 503 (`Backend temporarily unavailable`).
+  2. Restore `.env` from secure backup to `~/domains/kotsafe.com/public_html/backend/.env` and create a persistent copy outside `public_html`.
+  3. Run `composer install --no-dev --optimize-autoloader` on Hostinger.
+  4. Create persistent vendor backup in `~/domains/kotsafe.com/persistent_vendor/`.
+  5. Add self-healing `.env` and `vendor` fallback in `backend/public/index.php` to prevent future Git auto-deploy downtime.
+  6. Clear and warm Laravel caches (`php artisan config:cache && php artisan route:cache`).
+  7. Verify live threat lookup queries return HTTP/2 200.
+- **Changes:**
+  - `backend/public/index.php`: Added auto-healing recovery for missing `.env` and `vendor/autoload.php`.
+  - Hostinger Server: Restored `.env`, ran `composer install`, set storage permissions, cached config and routes.
+- **Result:**
+  - Live query `https://kotsafe.com/api/v1/threat-intel/lookup` returned HTTP/2 200 OK.
+  - Coverage endpoint `https://kotsafe.com/api/v1/threat-intel/coverage` returned HTTP/2 200 OK.
+  - Self-healing safeguard prevents future Git webhooks from wiping the backend.
+- **Stopped at:** Task T013 completed.
+- **Next:** Push ai-collab docs to remotes.
+
 ### 2026-11-15 23:00 | Antigravity
 - **My prompt:** Fix score not changing after moving suspicious file to quarantine.
 - **Plan:**
