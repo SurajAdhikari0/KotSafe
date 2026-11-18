@@ -48,6 +48,8 @@ public class DexStructuralParser {
         public boolean hasSmsAbuse;
         public boolean hasPackerStub;
         public String detectedPackerName = "";
+        public boolean hasHiddenPayload;
+        public String hiddenPayloadDetails = "";
         public int heuristicConfidenceScore; // 0 - 100
         public List<String> detectedFeatures = new ArrayList<>();
     }
@@ -67,34 +69,27 @@ public class DexStructuralParser {
         byte[] firstDexBytes = null;
 
         try (ZipFile zip = new ZipFile(apkFile)) {
+            AndroidPackerDetector.PackerResult packerRes = AndroidPackerDetector.detect(zip);
+            if (packerRes.isPacked) {
+                result.hasPackerStub = true;
+                result.detectedPackerName = packerRes.packerName;
+                result.featureVector.hasPackerStub = 1.0f;
+                for (String ind : packerRes.indicators) {
+                    if (!result.detectedFeatures.contains(ind)) {
+                        result.detectedFeatures.add(ind);
+                    }
+                }
+            }
+            if (packerRes.hasHiddenPayload) {
+                result.hasHiddenPayload = true;
+                result.hiddenPayloadDetails = packerRes.hiddenPayloadDetails;
+                result.detectedFeatures.add("Hidden Payload: " + packerRes.hiddenPayloadDetails);
+            }
+
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 String name = entry.getName();
-
-                // RedNaga APKiD Packer & Protector signatures
-                if (name.contains("libjiagu.so") || name.contains("libprotectClass.so") || name.equals("assets/libjiagu.so")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "Qihoo 360 Jiagu";
-                } else if (name.contains("libsecexe.so") || name.contains("libsecmain.so") || name.contains("bangcleclasses.jar")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "Bangcle SecApk";
-                } else if (name.contains("libshella-") || name.contains("libtup.so") || name.equals("00000000.dex") || name.contains("libshellx-")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "Tencent Legu";
-                } else if (name.contains("libdexprotector.") || name.contains("dp.arm-v7.so") || name.contains("dp.arm-v8.so")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "DexProtector";
-                } else if (name.contains("libexec.so") || name.contains("libexecmain.so") || name.contains("ijiami.dat")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "Ijiami / Alibaba";
-                } else if (name.contains("libDexHelper.so") || name.contains("classes0.jar")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "SecNeo DexHelper";
-                } else if (name.contains("libbaiduprotect.so")) {
-                    result.hasPackerStub = true;
-                    result.detectedPackerName = "Baidu Protect";
-                }
 
                 if (name.endsWith(".dex")) {
                     totalDexBytes += entry.getSize();
@@ -153,6 +148,7 @@ public class DexStructuralParser {
         // Calculate heuristic confidence score (Plan v2 §5)
         int score = 0;
         if (result.hasPackerStub) score += 35;
+        if (result.hasHiddenPayload) score += 40;
         if (result.hasDynamicLoading) score += 25;
         if (result.hasDangerousExec) score += 20;
         if (result.hasSmsAbuse) score += 20;

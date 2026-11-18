@@ -292,7 +292,32 @@ public class ConnectionsRegister {
                         && com.kotsafe.security.model.SecurityBlocklistManager.isOfficialDomain(domain)
                         && !conn.isBlacklisted();
 
-                if (!isGoogleTrustedFlow && adBlockMgr != null && adBlockMgr.isAdBlockEnabled()) {
+                // On-Device Network ML: DGA & C2 Heuristic Sinkholing
+                if (!conn.is_blocked && !isGoogleTrustedFlow) {
+                    com.kotsafe.security.ai.ml.NetworkMlClassifier.DgaResult dga =
+                            com.kotsafe.security.ai.ml.NetworkMlClassifier.getInstance().classifyDomain(domain);
+                    if (dga.isMalicious) {
+                        conn.is_blocked = true;
+                        conn.block_reason = dga.reason;
+                        conn.dns_accounted = true;
+                        com.kotsafe.security.model.DnsActivityDbHelper.getInstance(mContext).logDnsQuery(
+                                domain,
+                                com.kotsafe.security.model.DnsActivityEntry.STATUS_BLOCKED,
+                                dga.reason,
+                                clientApp,
+                                (conn.l7proto != null && !conn.l7proto.isEmpty()) ? conn.l7proto : "DNS"
+                        );
+                        com.kotsafe.security.model.AlertStore.getInstance(mContext).add(
+                                com.kotsafe.security.model.AlertRecord.Severity.HIGH,
+                                com.kotsafe.security.model.AlertRecord.AlertType.MALWARE,
+                                "Malicious DGA / C2 Domain Blocked",
+                                "On-Device Network ML sinkholed algorithmic threat domain (" + domain + ") queried by " + clientApp,
+                                domain
+                        );
+                    }
+                }
+
+                if (!conn.is_blocked && !isGoogleTrustedFlow && adBlockMgr != null && adBlockMgr.isAdBlockEnabled()) {
                     String blockReason = adBlockMgr.checkDomain(domain);
                     if (blockReason != null) {
                         conn.is_blocked = true;

@@ -150,6 +150,10 @@ public class SecurityBlocklistManager {
         if (isLocalOrConnectedDeviceIp(val) && !mFastBlocked.contains(val)) return false;
         if (mFastBlocked.contains(val)) return true;
         if (isKnownMalwareC2(val)) return true;
+        // Fast-path offline bloom filter check if value is a 64-character SHA-256 hex string
+        if (val.length() == 64 && OfflineMalwareBloomFilter.getInstance(mContext).mightContain(val)) {
+            return true;
+        }
         // Check subdomain hierarchy (e.g. sub.vegamoviess.foo -> vegamoviess.foo)
         int dot = val.indexOf('.');
         while (dot > 0 && dot < val.length() - 1) {
@@ -328,7 +332,7 @@ public class SecurityBlocklistManager {
     public static boolean isKnownMalwareC2(String hostOrIp) {
         if (hostOrIp == null || hostOrIp.isEmpty()) return false;
         String v = hostOrIp.trim().toLowerCase(Locale.US);
-        return v.equals("167.160.187.43")
+        if (v.equals("167.160.187.43")
                 || v.equals("api.redalert-israel.org")
                 || v.equals("redalert.zone")
                 || v.equals("185.244.150.170")
@@ -339,7 +343,10 @@ public class SecurityBlocklistManager {
                 || v.equals("flubot-update.cc")
                 || v.equals("cabassous-stage.su")
                 || v.equals("rafel-rat.duckdns.org")
-                || v.equals("spynote-dns.ddns.net");
+                || v.equals("spynote-dns.ddns.net")) {
+            return true;
+        }
+        return com.kotsafe.security.ai.ml.NetworkMlClassifier.getInstance().classifyDomain(v).isMalicious;
     }
 
     /**
@@ -993,9 +1000,13 @@ public class SecurityBlocklistManager {
     public boolean isHashBlocked(String hash) {
         if (hash == null || hash.isEmpty()) return false;
         if (mRulesDb.isWhitelisted(hash)) return false;
+        if (isSystemWhitelisted(hash)) return false;
         SecurityRulesDb.SecurityRule rule = mRulesDb.findBlockRule(hash);
         if (rule != null && rule.enabled) return true;
-        if (isSystemWhitelisted(hash)) return false;
+        // Fast offline bloom filter check (50,000+ threat hashes in RAM)
+        if (OfflineMalwareBloomFilter.getInstance(mContext).mightContain(hash)) {
+            return true;
+        }
         return false;
     }
 

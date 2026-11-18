@@ -566,14 +566,16 @@ public class AntivirusScanEngine {
                             entry.confidenceScore = assessment.confidence;
 
                             BuiltInThreatSignatureCatalog.SignatureRule builtInRule = BuiltInThreatSignatureCatalog.lookup(sha256);
-                            if (!isSys && !isSelf && builtInRule != null) {
+                            boolean isBloomHit = !isSys && !isSelf && OfflineMalwareBloomFilter.getInstance(context).mightContain(sha256);
+                            if (!isSys && !isSelf && (builtInRule != null || isBloomHit)) {
                                 entry.threatStatus = FileHashEntry.THREAT_MALICIOUS;
-                                entry.threatDetails = "[Built-in Signature] " + builtInRule.family + " — " + builtInRule.reason;
+                                String reason = builtInRule != null ? (builtInRule.family + " — " + builtInRule.reason) : "Threat Intelligence Hash Match (Offline Bloom Filter)";
+                                entry.threatDetails = "[Threat Intelligence] " + reason;
                                 result.threatsDetected++;
                                 result.threatItemsCount++;
                                 SecurityRulesDb sigDb = SecurityRulesDb.getInstance(context);
                                 if (sigDb.findBlockRule(sha256) == null) {
-                                    sigDb.blockHash(sha256, builtInRule.reason, SecurityRulesDb.SOURCE_TI);
+                                    sigDb.blockHash(sha256, reason, SecurityRulesDb.SOURCE_TI);
                                 }
                             } else if (isSelf) {
                                 entry.threatStatus = FileHashEntry.THREAT_CLEAN;
@@ -1726,7 +1728,13 @@ public class AntivirusScanEngine {
                                     continue;
                                 }
 
-                                if (yaraEngine != null) {
+                                BuiltInThreatSignatureCatalog.SignatureRule builtInRule = BuiltInThreatSignatureCatalog.lookup(sha256);
+                                boolean isBloomHit = OfflineMalwareBloomFilter.getInstance(context).mightContain(sha256);
+                                if (builtInRule != null || isBloomHit) {
+                                    entry.threatStatus = FileHashEntry.THREAT_MALICIOUS;
+                                    String reason = builtInRule != null ? (builtInRule.family + " — " + builtInRule.reason) : "Threat Intelligence Hash Match (Offline Bloom Filter)";
+                                    entry.threatDetails = "[Threat Intelligence] " + reason;
+                                } else if (yaraEngine != null) {
                                     List<YaraRuleEngine.YaraMatch> matches = yaraEngine.scanFile(f);
                                     if (!matches.isEmpty()) {
                                         YaraRuleEngine.YaraMatch first = matches.get(0);

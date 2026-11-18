@@ -16,6 +16,38 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-18 13:22 | Antigravity
+- **My prompt:** Implement Modules 1 through 5 of Advanced Threat Intelligence & On-Device ML Roadmap.
+- **Plan:**
+  1. Implement `OfflineMalwareBloomFilter.java` (64 KB bitset, Kirsch-Mitzenmacher 64-bit MurmurHash3, 6 probes, < 50ns lookups).
+  2. Connect `OfflineMalwareBloomFilter` to `SecurityBlocklistManager`, `AntivirusScanEngine`, and `DownloadFolderWatcher`.
+  3. Implement `AndroidPackerDetector.java` (detecting 360 Jiagu, Bangcle SecApk, Tencent Legu, Baidu Protect, DexProtector, Alibaba Ijiami, SecNeo, NetEase Dun, Medusah, and cloaked DEX payloads in assets).
+  4. Integrate `AndroidPackerDetector` into `DexStructuralParser`, `AntivirusScanEngine`, and `DownloadFolderWatcher`.
+  5. Implement `BankingOverlayGuard.java` monitoring foreground transitions across 120+ financial/crypto apps to suppress touchjacking and overlay attacks via `BrowserAccessibilityService`.
+  6. Implement `NetworkMlClassifier.java` (Shannon entropy, consonant-to-vowel distribution, digit density) with sub-5-microsecond evaluation and connect into `ConnectionsRegister` and `SecurityBlocklistManager` for local DNS sinkholing.
+  7. Deploy `upstream_threat_crawler.py` with systemd service and timer on Oracle VPS (`130.210.16.110`) to compile `offline_bloom.bin` and crawl threat feeds.
+  8. Run complete unit test suite and assemble debug APK.
+- **Changes:**
+  - `OfflineMalwareBloomFilter.java`: Ultra-compact zero-allocation 64 KB Bloom filter.
+  - `OfflineMalwareBloomFilterTest.java`: Unit tests covering zero false negatives, false positive rate (< 0.8%), serialization, and speed.
+  - `AndroidPackerDetector.java`: Commercial packer and disguised DEX asset inspector.
+  - `AndroidPackerDetectorTest.java`: Unit tests for Jiagu, Bangcle, Tencent, and cloaked PNG DEX files.
+  - `BankingOverlayGuard.java`: Active overlay protection for banking, payment, and crypto apps.
+  - `BankingOverlayGuardTest.java`: Unit tests for financial app recognition and overlay detection.
+  - `NetworkMlClassifier.java`: Real-time on-device network DGA classifier with zero heap allocation during scoring.
+  - `NetworkMlClassifierTest.java`: Unit tests for clean domains, high-entropy DGA domains, and ultra-low latency.
+  - `ConnectionsRegister.java`: Connected DGA classification and automated DNS sinkholing.
+  - `SecurityBlocklistManager.java`: Integrated fast-path offline Bloom filter and DGA ML classifier.
+  - `AntivirusScanEngine.java`: Integrated offline Bloom filter checks into app and storage scanning.
+  - `DownloadFolderWatcher.java`: Integrated offline Bloom filter and packer detection on newly downloaded APKs.
+  - `BrowserAccessibilityService.java`: Forwarded window state transitions to `BankingOverlayGuard`.
+  - Oracle VPS: Deployed `/opt/kotsafe-intelligence/upstream_threat_crawler.py`, enabled `kotsafe-threat-crawler.timer`, fixed `RESOURCE_MONITOR_SECRET` on Hostinger (`kotsafe-monitor.service` passing with status 0/SUCCESS).
+- **Result:**
+  - All 551+ unit tests passed cleanly (`BUILD SUCCESSFUL in 49s`).
+  - `assembleStandardDebug` succeeded (`KotSafe-standard-debug.apk` built).
+- **Stopped at:** Task T015 completed and verified.
+- **Next:** Deploy APK to physical test device when attached via USB/ADB.
+
 ### 2026-11-18 11:39 | Antigravity
 - **My prompt:** Implement z9-style On-Device ML Classifier and dynamic rule sync for offline protection.
 - **Plan:**

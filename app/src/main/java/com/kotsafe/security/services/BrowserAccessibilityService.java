@@ -27,6 +27,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 
 import com.kotsafe.security.Log;
 import com.kotsafe.security.activities.FirewallBlockPageActivity;
@@ -165,9 +166,18 @@ public class BrowserAccessibilityService extends AccessibilityService {
         if (pkg == null) return;
         String packageName = pkg.toString();
 
-        // ── Per-app screenshot blocking ────────────────────────────────────────
+        // ── Per-app screenshot blocking & Banking Overlay Shield ────────────────
         if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             handleScreenshotBlock(packageName);
+
+            // Active Banking & Cryptocurrency Touchjacking Suppression
+            List<AccessibilityWindowInfo> windows = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                try {
+                    windows = getWindows();
+                } catch (Exception ignored) {}
+            }
+            com.kotsafe.security.model.BankingOverlayGuard.getInstance().onWindowStateChanged(this, packageName, windows);
         }
 
         // ── Browser URL extraction (existing logic) ───────────────────────────

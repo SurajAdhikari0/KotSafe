@@ -70,4 +70,8 @@ public final class BuiltInThreatSignatureCatalog {
     public static boolean isKnownMalwareHash(String value) {
         return lookup(value) != null;
     }
+
+    public static java.util.Set<String> allHashes() {
+        return RULES.keySet();
+    }
 }

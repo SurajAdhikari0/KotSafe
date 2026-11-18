@@ -169,9 +169,12 @@ public class DownloadFolderWatcher {
             boolean isMalicious = false;
             String reason = null;
 
-            if (secBl != null && secBl.isFastBlocked(sha256)) {
+            if (secBl != null && (secBl.isFastBlocked(sha256) || secBl.isHashBlocked(sha256))) {
                 isMalicious = true;
                 reason = "Known Malicious Signature (Threat Feed)";
+            } else if (OfflineMalwareBloomFilter.getInstance(mContext).mightContain(sha256)) {
+                isMalicious = true;
+                reason = "Known Malicious Hash (Offline Bloom Filter)";
             }
 
             // Also check YARA rules on APK or scripts
@@ -184,6 +187,24 @@ public class DownloadFolderWatcher {
                         reason = "Matched YARA Rule: " + matches.get(0).ruleName;
                     }
                 } catch (Exception ignored) {}
+            }
+
+            // Also run AndroidPackerDetector on downloaded APK files
+            if (!isMalicious && file.getName().toLowerCase(java.util.Locale.ROOT).endsWith(".apk")) {
+                try {
+                    AndroidPackerDetector.PackerResult packerRes = AndroidPackerDetector.detect(file);
+                    if (packerRes != null) {
+                        if (packerRes.hasHiddenPayload) {
+                            isMalicious = true;
+                            reason = "Cloaked Payload: " + packerRes.hiddenPayloadDetails;
+                        } else if (packerRes.isPacked && packerRes.riskScore >= 75) {
+                            isMalicious = true;
+                            reason = "Suspicious Packer: " + packerRes.packerName;
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "Packer inspection skipped: " + e.getMessage());
+                }
             }
 
             // Also run On-Device ML Classifier on APK files for zero-day & heuristic detection

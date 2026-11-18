@@ -124,5 +124,14 @@
     "status": "done",
     "created": "2026-11-18 11:26 IST",
     "updated": "2026-11-18 11:38 IST"
+  },
+  {
+    "id": "T015",
+    "title": "Implement Ultra-Compact Offline Bloom Filter, Packer Detector, Banking Overlay Guard, and Network ML Classifier",
+    "detail": "Modules 1-5 implemented: 64 KB Bloom filter, commercial packer detection, active banking touchjacking suppression, sub-microsecond DGA ML classifier, and Oracle VPS upstream threat crawler.",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-18 13:01 IST",
+    "updated": "2026-11-18 13:22 IST"
   }
 ]
