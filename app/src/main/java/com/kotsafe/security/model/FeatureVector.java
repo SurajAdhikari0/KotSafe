@@ -17,6 +17,13 @@
 
 package com.kotsafe.security.model;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
+
+import java.io.File;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -118,5 +125,99 @@ public class FeatureVector implements Serializable {
         v[31] = Math.min(1.0f, Math.max(0.0f, targetSdkAntiquity / 15.0f));
 
         return v;
+    }
+
+    /**
+     * Extracts structural bytecode features from classes.dex and manifest permissions from an APK file.
+     */
+    public static FeatureVector extractFromApkFile(Context context, File apkFile) {
+        if (apkFile == null || !apkFile.exists() || !apkFile.canRead()) {
+            return new FeatureVector();
+        }
+        DexStructuralParser.DexAnalysisResult dexRes = DexStructuralParser.analyzeApk(apkFile);
+        FeatureVector fv = (dexRes != null && dexRes.featureVector != null) ? dexRes.featureVector : new FeatureVector();
+
+        if (context != null) {
+            try {
+                PackageManager pm = context.getPackageManager();
+                PackageInfo archiveInfo = pm.getPackageArchiveInfo(apkFile.getAbsolutePath(),
+                        PackageManager.GET_PERMISSIONS | PackageManager.GET_SERVICES);
+                if (archiveInfo != null) {
+                    fv.populateFromPackageInfo(archiveInfo, true);
+                }
+            } catch (Exception ignored) {}
+        }
+        return fv;
+    }
+
+    /**
+     * Enriches this FeatureVector with declared permissions and manifest capabilities.
+     */
+    public void populateFromPackageInfo(PackageInfo pkgInfo, boolean isSideloadedApp) {
+        if (pkgInfo == null) return;
+        this.isSideloaded = isSideloadedApp ? 1.0f : 0.0f;
+        if (pkgInfo.applicationInfo != null) {
+            this.isSystemApp = (pkgInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0 ? 1.0f : 0.0f;
+            if (pkgInfo.applicationInfo.targetSdkVersion > 0 && pkgInfo.applicationInfo.targetSdkVersion < 29) {
+                this.targetSdkAntiquity = (float) (29 - pkgInfo.applicationInfo.targetSdkVersion);
+            }
+        }
+        if (pkgInfo.requestedPermissions != null) {
+            for (String perm : pkgInfo.requestedPermissions) {
+                if (perm == null) continue;
+                switch (perm) {
+                    case "android.permission.SYSTEM_ALERT_WINDOW":
+                        this.permOverlay = 1.0f;
+                        break;
+                    case "android.permission.RECEIVE_BOOT_COMPLETED":
+                        this.permBootCompleted = 1.0f;
+                        break;
+                    case "android.permission.SEND_SMS":
+                    case "android.permission.READ_SMS":
+                    case "android.permission.RECEIVE_SMS":
+                        this.permSms = 1.0f;
+                        break;
+                    case "android.permission.READ_CONTACTS":
+                    case "android.permission.WRITE_CONTACTS":
+                        this.permContacts = 1.0f;
+                        break;
+                    case "android.permission.REQUEST_INSTALL_PACKAGES":
+                        this.permRequestInstall = 1.0f;
+                        break;
+                    case "android.permission.READ_EXTERNAL_STORAGE":
+                    case "android.permission.WRITE_EXTERNAL_STORAGE":
+                    case "android.permission.MANAGE_EXTERNAL_STORAGE":
+                        this.permStorage = 1.0f;
+                        break;
+                    case "android.permission.CAMERA":
+                    case "android.permission.RECORD_AUDIO":
+                        this.permMicCam = 1.0f;
+                        break;
+                    case "android.permission.ACCESS_FINE_LOCATION":
+                    case "android.permission.ACCESS_COARSE_LOCATION":
+                    case "android.permission.ACCESS_BACKGROUND_LOCATION":
+                        this.permLocation = 1.0f;
+                        break;
+                    case "android.permission.KILL_BACKGROUND_PROCESSES":
+                        this.permKillProcesses = 1.0f;
+                        break;
+                    case "android.permission.QUERY_ALL_PACKAGES":
+                        this.permQueryAllPackages = 1.0f;
+                        break;
+                    case "android.permission.USE_BIOMETRIC":
+                    case "android.permission.USE_FINGERPRINT":
+                        this.permBiometric = 1.0f;
+                        break;
+                }
+            }
+        }
+        if (pkgInfo.services != null) {
+            for (ServiceInfo si : pkgInfo.services) {
+                if (si != null && "android.permission.BIND_ACCESSIBILITY_SERVICE".equals(si.permission)) {
+                    this.permAccessibility = 1.0f;
+                    break;
+                }
+            }
+        }
     }
 }

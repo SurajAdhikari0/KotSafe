@@ -115,5 +115,14 @@
     "status": "done",
     "created": "2026-11-18 10:59 IST",
     "updated": "2026-11-18 11:03 IST"
+  },
+  {
+    "id": "T014",
+    "title": "Implement z9-style On-Device ML Classifier and dynamic rule sync for offline protection",
+    "detail": "",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-18 11:26 IST",
+    "updated": "2026-11-18 11:38 IST"
   }
 ]

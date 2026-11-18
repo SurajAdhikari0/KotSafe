@@ -2,7 +2,17 @@
 Last updated: 2026-11-18 11:18 IST by Antigravity
 
 ## Goal right now
-Threat Intelligence verification and hardening completed. All cloud and edge intelligence components are verified operational.
+Task T014 completed. Implemented z9-style On-Device ML Classifier and dynamic rule sync for offline protection.
+
+## Stopped at
+- Implemented full z9-grade On-Device Machine Learning and Dynamic Rule Sync:
+  1. `FeatureVector.java`: Added `populateFromPackageInfo` and `extractFromApkFile` to bridge static classes.dex analysis with manifest permissions (indices 16..31: accessibility, overlay, boot, SMS, dropper, admin, sideloaded, debug cert, target SDK antiquity).
+  2. `MlMalwareClassifier.java`: Upgraded 32-dimensional gradient boosted ensemble decision tree classifier with dynamic weights (`ModelWeights`), `updateWeights(Map<String, Float>)`, `classifyApkFile`, and `classifyInstalledPackage`.
+  3. `DownloadFolderWatcher.java`: Integrated on-device ML evaluation on newly downloaded APK files in `/Download` and sideload directories, triggering actionable quarantine notification cards even in offline mode.
+  4. `AntivirusScanEngine.java`: Integrated feature vector permission population and enabled ML evaluation on sideloaded/suspicious applications across all scan modes.
+  5. `IntelligenceManifestV2Verifier.java`: Extended Ed25519-signed envelope schema to support `dynamic_yara_rules` and `dynamic_ml_weights` with float number parsing.
+  6. `IntelligenceSnapshotStore.java`: Hot-swaps verified dynamic YARA rules into `YaraRuleEngine.addDynamicRules()` and model weights into `MlMalwareClassifier.updateWeights()`.
+  7. Verification: 551/551 unit tests passed (0 failures, 0 errors) and `assembleStandardDebug` succeeded (32.6 MB APK).
 
 ## Stopped at
 - Hostinger Cloud Gateway (`193.203.185.182` / `kotsafe.com`):

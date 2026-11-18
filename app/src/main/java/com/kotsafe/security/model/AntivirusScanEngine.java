@@ -603,11 +603,13 @@ public class AntivirusScanEngine {
                                 entry.threatStatus = FileHashEntry.THREAT_CLEAN;
                             }
 
-                            // DEEP SCAN: Zero-dependency DEX bytecode structural analysis & IOC Extraction
-                            if (mode == ScanModeConfig.ScanMode.DEEP && !isSys && !isSelf) {
+                            // On-Device ML & DEX bytecode structural analysis
+                            boolean shouldRunMl = !isSys && !isSelf && (mode == ScanModeConfig.ScanMode.DEEP || trustProfile.isSideloaded || !AppTrustEvaluator.VERDICT_CLEAN.equals(assessment.verdict));
+                            if (shouldRunMl) {
                                 result.behavioralChecksCount++;
                                 DexStructuralParser.DexAnalysisResult dexRes = DexStructuralParser.analyzeApk(apkFile);
                                 dexRes.featureVector.contentHash = sha256;
+                                dexRes.featureVector.populateFromPackageInfo(pkgInfo, trustProfile.isSideloaded);
                                 hashDb.upsertFeatureVector(dexRes.featureVector);
 
                                 // Phase 1: On-Device ML Malware Classifier & Phase 2: Threat Explainer
@@ -617,9 +619,13 @@ public class AntivirusScanEngine {
                                     result.behavioralAnomaliesCount++;
                                     // Static capabilities alone do not confirm malware.
                                     if (!entry.threatStatus.equals(FileHashEntry.THREAT_MALICIOUS)) {
-                                        entry.threatStatus = FileHashEntry.THREAT_SUSPICIOUS;
-                                        entry.threatDetails = "[Heuristic risk " + mlRes.threatScore + "/100] "
+                                        entry.threatStatus = mlRes.isMalicious ? FileHashEntry.THREAT_MALICIOUS : FileHashEntry.THREAT_SUSPICIOUS;
+                                        entry.threatDetails = "[On-Device ML " + mlRes.threatScore + "/100 " + mlRes.threatCategory + "] "
                                                 + String.join(" | ", mlRes.contributingFeatures);
+                                        if (mlRes.isMalicious) {
+                                            result.threatsDetected++;
+                                            result.threatItemsCount++;
+                                        }
                                     }
                                     hashDb.enqueueVtLookup(sha256, apkFile.getAbsolutePath());
 

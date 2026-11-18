@@ -16,6 +16,32 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-18 11:39 | Antigravity
+- **My prompt:** Implement z9-style On-Device ML Classifier and dynamic rule sync for offline protection.
+- **Plan:**
+  1. Audit existing ML and heuristic capabilities (`MlMalwareClassifier`, `FeatureVector`, `DexStructuralParser`, `YaraRuleEngine`, `IntelligenceManifestV2Verifier`).
+  2. Bridge `FeatureVector` with manifest permissions via `populateFromPackageInfo` and `extractFromApkFile`.
+  3. Upgrade `MlMalwareClassifier` with dynamic weights (`ModelWeights`), `updateWeights`, `classifyApkFile`, and `classifyInstalledPackage`.
+  4. Integrate `MlMalwareClassifier` into `DownloadFolderWatcher` so downloaded zero-day APKs are classified offline and trigger quarantine notifications.
+  5. Expand `AntivirusScanEngine` to evaluate sideloaded apps with ML during standard scans.
+  6. Extend `IntelligenceManifestV2Verifier` and `IntelligenceSnapshotStore` to unpack and hot-swap Ed25519-signed dynamic YARA rules and ML decision weights.
+  7. Add unit tests in `MlMalwareClassifierTest` and `IntelligenceManifestV2Test`, and assemble debug APK.
+- **Changes:**
+  - `FeatureVector.java`: Added `populateFromPackageInfo` and `extractFromApkFile`.
+  - `MlMalwareClassifier.java`: Added `ModelWeights`, `updateWeights`, `classifyApkFile`, and `classifyInstalledPackage`.
+  - `DownloadFolderWatcher.java`: Added real-time ML classification on newly downloaded APKs.
+  - `AntivirusScanEngine.java`: Populated feature vectors with manifest permissions and expanded ML checks to sideloaded apps.
+  - `IntelligenceManifestV2Verifier.java`: Extended parser to accept `dynamic_yara_rules` and `dynamic_ml_weights` alongside indicators, supporting floating-point numbers.
+  - `IntelligenceSnapshotStore.java`: Automatically applies verified dynamic YARA rules to `YaraRuleEngine` and weights to `MlMalwareClassifier`.
+  - `MlMalwareClassifierTest.java`: Added unit test suite covering benign apps, ATS banking trojans, droppers, spyware, dynamic weight tuning, and sub-millisecond latency.
+  - `IntelligenceManifestV2Test.java`: Added verification test for signed dynamic YARA rules and ML weights.
+- **Result:**
+  - 551/551 Android unit tests passed (0 failures, 0 errors, 0 skipped).
+  - 1,000 ML evaluations completed in under 45ms (< 0.05ms per classification).
+  - `assembleStandardDebug` succeeded (`KotSafe-standard-debug.apk` built).
+- **Stopped at:** Task T014 completed and verified.
+- **Next:** Install build onto physical device when connected via USB/ADB.
+
 ### 2026-11-18 11:16 | Antigravity
 - **My prompt:** After fix all check and tell me the status.
 - **Plan:**

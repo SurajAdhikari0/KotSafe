@@ -89,7 +89,8 @@ public final class IntelligenceManifestV2Verifier {
         verifier.update(payloadBytes, 0, payloadBytes.length);
         if (!verifier.verifySignature(signature)) throw invalid();
         Map<String, Object> payload = object(parse(payloadBytes, MAX_PAYLOAD_BYTES));
-        fields(payload, "schema_version", "version", "issued_at", "expires_at", "audience", "tenant_scope", "indicators");
+        requiredFields(payload, "schema_version", "version", "issued_at", "expires_at", "audience", "tenant_scope", "indicators");
+        allowedFields(payload, "schema_version", "version", "issued_at", "expires_at", "audience", "tenant_scope", "indicators", "dynamic_yara_rules", "dynamic_ml_weights");
         if (number(payload.get("schema_version")) != 2 || !"android".equals(payload.get("audience"))
                 || !tenantScope.equals(payload.get("tenant_scope"))) throw invalid();
         long version = number(payload.get("version"));
@@ -112,7 +113,47 @@ public final class IntelligenceManifestV2Verifier {
             if (validUntil <= issued || validUntil > expires) throw invalid();
             rows.add(new Indicator(id, type, value, validUntil));
         }
-        return new Snapshot(version, issued, expires, tenantScope, keyId, rows);
+
+        List<YaraRuleEngine.YaraRule> dynamicRules = new ArrayList<>();
+        if (payload.containsKey("dynamic_yara_rules")) {
+            Object rawRules = payload.get("dynamic_yara_rules");
+            if (rawRules instanceof List) {
+                for (Object item : (List<?>) rawRules) {
+                    if (item instanceof Map) {
+                        Map<?, ?> rMap = (Map<?, ?>) item;
+                        String name = string(rMap.get("name"));
+                        String tags = rMap.get("tags") != null ? string(rMap.get("tags")) : "dynamic";
+                        String desc = rMap.get("description") != null ? string(rMap.get("description")) : "Dynamic YARA rule";
+                        String severity = rMap.get("severity") != null ? string(rMap.get("severity")) : "MALICIOUS";
+                        boolean matchAll = Boolean.TRUE.equals(rMap.get("match_all"));
+                        Object rawPatterns = rMap.get("patterns");
+                        List<String> patterns = new ArrayList<>();
+                        if (rawPatterns instanceof List) {
+                            for (Object p : (List<?>) rawPatterns) {
+                                if (p instanceof String) patterns.add((String) p);
+                            }
+                        }
+                        if (!patterns.isEmpty()) {
+                            dynamicRules.add(new YaraRuleEngine.YaraRule(name, tags, desc, severity, matchAll, patterns.toArray(new String[0])));
+                        }
+                    }
+                }
+            }
+        }
+
+        Map<String, Float> dynamicWeights = new HashMap<>();
+        if (payload.containsKey("dynamic_ml_weights")) {
+            Object rawWeights = payload.get("dynamic_ml_weights");
+            if (rawWeights instanceof Map) {
+                for (Map.Entry<?, ?> entry : ((Map<?, ?>) rawWeights).entrySet()) {
+                    if (entry.getKey() instanceof String && entry.getValue() instanceof Number) {
+                        dynamicWeights.put((String) entry.getKey(), ((Number) entry.getValue()).floatValue());
+                    }
+                }
+            }
+        }
+
+        return new Snapshot(version, issued, expires, tenantScope, keyId, rows, dynamicRules, dynamicWeights);
     }
 
     public static String normalize(String type, String value) throws IOException {
@@ -221,8 +262,12 @@ public final class IntelligenceManifestV2Verifier {
             case STRING: return reader.nextString();
             case NUMBER:
                 String value=reader.nextString();
-                if (!value.matches("0|[1-9][0-9]*")) throw invalid();
-                return Long.parseLong(value);
+                if (value.matches("0|[1-9][0-9]*")) {
+                    return Long.parseLong(value);
+                } else if (value.matches("(?:0|[1-9][0-9]*)\\.[0-9]+")) {
+                    return Double.parseDouble(value);
+                }
+                throw invalid();
             case BOOLEAN: return reader.nextBoolean();
             case NULL: reader.nextNull(); return null;
             default: throw invalid();
@@ -243,6 +288,17 @@ public final class IntelligenceManifestV2Verifier {
     private static void fields(Map<String,Object> object, String... names) throws IOException {
         if (!object.keySet().equals(new HashSet<>(Arrays.asList(names)))) throw invalid();
     }
+    private static void requiredFields(Map<String,Object> object, String... required) throws IOException {
+        for (String req : required) {
+            if (!object.containsKey(req)) throw invalid();
+        }
+    }
+    private static void allowedFields(Map<String,Object> object, String... allowed) throws IOException {
+        Set<String> allowedSet = new HashSet<>(Arrays.asList(allowed));
+        for (String key : object.keySet()) {
+            if (!allowedSet.contains(key)) throw invalid();
+        }
+    }
     private static void identifier(String value) {
         if (value == null || !value.matches("[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}"))
             throw new IllegalArgumentException("Invalid scope or key identifier");
@@ -260,10 +316,23 @@ public final class IntelligenceManifestV2Verifier {
         public final long version, issuedAt, expiresAt;
         public final String tenantScope, keyId;
         public final List<Indicator> indicators;
-        Snapshot(long version,long issuedAt,long expiresAt,String tenantScope,String keyId,List<Indicator> indicators) {
-            this.version=version; this.issuedAt=issuedAt; this.expiresAt=expiresAt;
-            this.tenantScope=tenantScope; this.keyId=keyId;
-            this.indicators=Collections.unmodifiableList(new ArrayList<>(indicators));
+        public final List<YaraRuleEngine.YaraRule> dynamicYaraRules;
+        public final Map<String, Float> dynamicMlWeights;
+
+        Snapshot(long version, long issuedAt, long expiresAt, String tenantScope, String keyId, List<Indicator> indicators) {
+            this(version, issuedAt, expiresAt, tenantScope, keyId, indicators, Collections.emptyList(), Collections.emptyMap());
+        }
+
+        Snapshot(long version, long issuedAt, long expiresAt, String tenantScope, String keyId,
+                 List<Indicator> indicators, List<YaraRuleEngine.YaraRule> yaraRules, Map<String, Float> mlWeights) {
+            this.version = version;
+            this.issuedAt = issuedAt;
+            this.expiresAt = expiresAt;
+            this.tenantScope = tenantScope;
+            this.keyId = keyId;
+            this.indicators = Collections.unmodifiableList(new ArrayList<>(indicators));
+            this.dynamicYaraRules = yaraRules != null ? Collections.unmodifiableList(new ArrayList<>(yaraRules)) : Collections.emptyList();
+            this.dynamicMlWeights = mlWeights != null ? Collections.unmodifiableMap(new HashMap<>(mlWeights)) : Collections.emptyMap();
         }
     }
 }

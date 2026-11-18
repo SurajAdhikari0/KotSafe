@@ -186,6 +186,20 @@ public class DownloadFolderWatcher {
                 } catch (Exception ignored) {}
             }
 
+            // Also run On-Device ML Classifier on APK files for zero-day & heuristic detection
+            if (!isMalicious && file.getName().toLowerCase(java.util.Locale.ROOT).endsWith(".apk")) {
+                try {
+                    com.kotsafe.security.ai.ml.MlMalwareClassifier.ClassificationResult mlRes =
+                            com.kotsafe.security.ai.ml.MlMalwareClassifier.getInstance().classifyApkFile(mContext, file);
+                    if (mlRes != null && mlRes.isMalicious) {
+                        isMalicious = true;
+                        reason = "On-Device ML Detection: " + mlRes.threatCategory + " (" + mlRes.threatScore + "/100 heuristic risk)";
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "On-device ML classification skipped: " + e.getMessage());
+                }
+            }
+
             if (isMalicious) {
                 Log.w(TAG, "DANGEROUS DOWNLOAD DETECTED: " + file.getName() + " -> " + reason);
 

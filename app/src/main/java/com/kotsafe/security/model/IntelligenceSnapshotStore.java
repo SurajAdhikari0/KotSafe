@@ -60,6 +60,7 @@ public final class IntelligenceSnapshotStore {
                     if (output!=null) file.failWrite(output);
                 }
                 current=next; highWatermark=next.version;
+                applyDynamicUpdates(next);
                 return next;
             }
         }
@@ -79,7 +80,26 @@ public final class IntelligenceSnapshotStore {
         catch (FileNotFoundException missing) { return false; }
         IntelligenceManifestV2Verifier.Snapshot restored=verifier.restore(bytes,nowSeconds);
         if (restored.version<highWatermark) throw new IOException("Intelligence cache rollback detected");
-        current=restored; highWatermark=restored.version; return true;
+        current=restored; highWatermark=restored.version;
+        applyDynamicUpdates(restored);
+        return true;
+    }
+
+    private static void applyDynamicUpdates(IntelligenceManifestV2Verifier.Snapshot snapshot) {
+        if (snapshot == null) return;
+        if (snapshot.dynamicYaraRules != null && !snapshot.dynamicYaraRules.isEmpty()) {
+            try {
+                YaraRuleEngine yara = YaraRuleEngine.getInstance(null);
+                if (yara != null) {
+                    yara.addDynamicRules(snapshot.dynamicYaraRules);
+                }
+            } catch (Exception ignored) {}
+        }
+        if (snapshot.dynamicMlWeights != null && !snapshot.dynamicMlWeights.isEmpty()) {
+            try {
+                com.kotsafe.security.ai.ml.MlMalwareClassifier.getInstance().updateWeights(snapshot.dynamicMlWeights);
+            } catch (Exception ignored) {}
+        }
     }
 
     IntelligenceManifestV2Verifier verifier() { return verifier; }

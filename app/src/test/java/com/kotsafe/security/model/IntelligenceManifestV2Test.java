@@ -158,4 +158,45 @@ public class IntelligenceManifestV2Test {
         rejects(()->coordinator.sync(true,approved,credential,200));
         assertEquals(3,store.active(150).size());
     }
+
+    @Test
+    public void dynamicYaraRulesAndMlWeightsAreSignedAndExtracted() throws Exception {
+        IntelligenceManifestV2Verifier verifier = verifier("tenant-a");
+        String payload = new JSONObject()
+                .put("audience", "android")
+                .put("schema_version", 2)
+                .put("tenant_scope", "tenant-a")
+                .put("version", 5)
+                .put("issued_at", 100)
+                .put("expires_at", 300)
+                .put("indicators", new org.json.JSONArray().put(new JSONObject()
+                        .put("id", "ind-1")
+                        .put("type", "sha256")
+                        .put("value", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
+                        .put("valid_until", 250)))
+                .put("dynamic_yara_rules", new org.json.JSONArray().put(new JSONObject()
+                        .put("name", "Dynamic_Trojan_Anatsa")
+                        .put("tags", "trojan,banking")
+                        .put("description", "Dynamic Anatsa Signature")
+                        .put("severity", "MALICIOUS")
+                        .put("match_all", false)
+                        .put("patterns", new org.json.JSONArray().put("com.anatsa.payload").put("inject_overlay"))))
+                .put("dynamic_ml_weights", new JSONObject()
+                        .put("bankBaseWeight", 0.55)
+                        .put("maliciousThreshold", 0.65))
+                .toString();
+
+        byte[] envelope = signed(payload);
+        IntelligenceManifestV2Verifier.Snapshot snapshot = verifier.verify(envelope, 150, 4);
+
+        assertNotNull(snapshot);
+        assertEquals(5, snapshot.version);
+        assertEquals(1, snapshot.indicators.size());
+        assertEquals(1, snapshot.dynamicYaraRules.size());
+        assertEquals("Dynamic_Trojan_Anatsa", snapshot.dynamicYaraRules.get(0).name);
+        assertEquals(2, snapshot.dynamicYaraRules.get(0).stringPatterns.size());
+        assertEquals(2, snapshot.dynamicMlWeights.size());
+        assertEquals(0.55f, snapshot.dynamicMlWeights.get("bankBaseWeight"), 0.001f);
+        assertEquals(0.65f, snapshot.dynamicMlWeights.get("maliciousThreshold"), 0.001f);
+    }
 }
