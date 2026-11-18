@@ -1,21 +1,26 @@
 # Current State
-Last updated: 2026-11-15 20:21 IST by Antigravity
+Last updated: 2026-11-18 11:18 IST by Antigravity
 
 ## Goal right now
-Task T013 completed. Restored and hardened Hostinger Threat Intelligence backend and composer runtime. Verified live HTTP 200 responses.
+Threat Intelligence verification and hardening completed. All cloud and edge intelligence components are verified operational.
 
 ## Stopped at
-- Diagnosed and resolved Threat Intelligence Cloud Gateway downtime on Hostinger (`193.203.185.182`):
-  1. Identified that Hostinger's automated Git deployment (`hbuilds`) had replaced `~/domains/kotsafe.com/public_html/backend/` without `.env` and `vendor/` (due to standard `.gitignore` rules), causing `index.php` to return 503 (`Backend temporarily unavailable`).
-  2. Restored `.env` from secure backup (`~/domains/kotsafe.com/private-android-feed.puOvJ24j/backup/.env`) to `public_html/backend/.env` and created a protected copy in `~/domains/kotsafe.com/kotsafe_backend.env`.
-  3. Ran `composer install --no-dev --optimize-autoloader` in `backend/` and copied the full runtime to `~/domains/kotsafe.com/persistent_vendor/`.
-  4. Updated `backend/public/index.php` with self-healing fallback logic: if `.env` or `vendor/` are ever wiped by a Git auto-deploy webhook, `index.php` automatically restores `.env` from `kotsafe_backend.env` and falls back to `persistent_vendor/autoload.php` with zero downtime.
-  5. Cleared and cached Laravel configuration and routes: `php artisan config:cache && php artisan route:cache`.
-  6. Verified live: `https://kotsafe.com/api/v1/threat-intel/lookup` and `https://kotsafe.com/api/v1/threat-intel/coverage` returned immediate HTTP/2 200 responses.
-- Verified Oracle VPS Threat Intelligence Engine (`130.210.16.110`):
-  - `kotsafe-intelligence.service`: Active.
-  - `kotsafe-android-publisher.timer`: Active.
-  - P2P Docker containers (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`): 100% uptime with 0 restarts.
+- Hostinger Cloud Gateway (`193.203.185.182` / `kotsafe.com`):
+  1. Resolved Composer relative path autoload conflict by configuring Hostinger's Git auto-deploy pipeline (`package.json`) to automatically run `composer install --no-dev --optimize-autoloader` in `backend/` upon push.
+  2. Implemented resilient fallback in `backend/public/index.php` that copies from persistent `backup_vendor` if vendor dependencies are missing.
+  3. Configured `ANDROID_INTELLIGENCE_PUBLISHER_TOKEN` in `.env` and `kotsafe_backend.env` for secure feed ingestion.
+  4. Enabled `public_lookup = 1` for reviewed threat indicators in MySQL database.
+  5. Verified live endpoints:
+     - `https://kotsafe.com/api/v1/threat-intel/lookup`: HTTP/2 200 OK (verified Hash, Domain, IP, and URL lookup accuracy).
+     - `https://kotsafe.com/api/v1/threat-intel/coverage`: HTTP/2 200 OK (`published_count: 5`).
+- Oracle VPS Engine (`130.210.16.110`):
+  - `kotsafe-intelligence.service`: Active (running).
+  - `kotsafe-android-publisher.timer`: Active (waiting).
+  - `kotsafe-android-publisher.service`: Verified executing with status 0 (SUCCESS), successfully signing and publishing 5 indicators to Hostinger.
+  - P2P Docker Mesh (`netpdroid-signaling`, `netpdroid-coturn`, `kotsafe-p2p-relay-1`): 100% uptime with 0 restarts.
+- Android Client:
+  - Quarantine Vault reconciliation and live score calculation verified on physical device.
+  - Client-side threat queries seamlessly utilize `https://kotsafe.com/api/v1/threat-intel/lookup`.
 
 ## Next steps
 1. Upload `KotSafe-standard-release.aab` to Google Play Console when ready to publish update.

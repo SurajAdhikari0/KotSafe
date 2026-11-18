@@ -16,6 +16,33 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-18 11:16 | Antigravity
+- **My prompt:** After fix all check and tell me the status.
+- **Plan:**
+  1. Fix the Composer relative autoload path conflict where external `persistent_vendor` broke `app/Providers/AppServiceProvider.php` discovery.
+  2. Embed `composer install --no-dev --optimize-autoloader` into `package.json` build script in `kotsafe-site` so Hostinger's Git webhook builds dependencies automatically in `public_html/backend/vendor`.
+  3. Update `index.php` auto-healing fallback to copy from `backup_vendor` rather than referencing external autoload directly.
+  4. Fix `ANDROID_INTELLIGENCE_PUBLISHER_TOKEN` authentication in Hostinger `.env` and sync to `kotsafe_backend.env`.
+  5. Enable `public_lookup = 1` for active reviewed indicators in MySQL `threat_indicators`.
+  6. Trigger and verify Oracle VPS `kotsafe-android-publisher.service` and timer.
+  7. Conduct full verification of lookup and coverage endpoints.
+- **Changes:**
+  - `package.json` (`kotsafe-site`): Updated build script to automatically run composer in `backend/` during Hostinger deploy.
+  - `backend/public/index.php` (`kotsafe-site` & Hostinger): Auto-healing copy from `backup_vendor` if vendor is missing.
+  - Hostinger `.env` & `kotsafe_backend.env`: Configured `ANDROID_INTELLIGENCE_PUBLISHER_TOKEN`.
+  - Hostinger MySQL: Activated public lookup for reviewed threat indicators.
+  - Oracle VPS: Restarted `kotsafe-android-publisher.service`, ran with exit code 0 / SUCCESS.
+- **Result:**
+  - `https://kotsafe.com/api/v1/threat-intel/lookup` returns HTTP/2 200 OK across all indicator types:
+    - Malicious Hash (SharkBot): `verdict: "malicious"`, `maliciousScore: 98`, `severity: "CRITICAL"`
+    - Malicious Domain: `verdict: "malicious"`, `maliciousScore: 96`, `severity: "CRITICAL"`
+    - Malicious IP: `verdict: "malicious"`, `maliciousScore: 90`, `severity: "HIGH"`
+    - Unknown URL: `verdict: "unknown"`, `isMalicious: false`, `maliciousScore: 0`
+  - `https://kotsafe.com/api/v1/threat-intel/coverage`: `{"published_count": 5, "latest_record_update": "..."}`
+  - Hostinger Git webhook deploy tested with commit `30cf24c`: automated build ran `composer install` cleanly with zero downtime.
+- **Stopped at:** All Threat Intelligence pipelines, gateways, and publisher services 100% operational and verified.
+- **Next:** Ready for normal operations.
+
 ### 2026-11-18 11:03 | Antigravity
 - **My prompt:** Check and resolve Threat Intelligence problem on Hostinger backend.
 - **Plan:**
