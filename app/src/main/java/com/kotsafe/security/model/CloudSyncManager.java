@@ -834,17 +834,54 @@ public class CloudSyncManager {
                             Log.i(TAG, "Cross-device rule removed: " + target);
                             blm.unblock(target);
                         } else if (dc.getType() == DocumentChange.Type.ADDED || dc.getType() == DocumentChange.Type.MODIFIED) {
-                            if ("DROP".equalsIgnoreCase(action)) {
-                                String reason = "Mesh Sync: " + (category != null ? category : "Cross-Device Threat");
-                                String source = "Mesh:" + (origin != null ? origin : "Remote");
+                            if ("DROP".equalsIgnoreCase(action) || "BLOCK".equalsIgnoreCase(action)) {
+                                String reason = "Blocked by user";
+                                if (category != null && !category.isEmpty() && !category.equalsIgnoreCase("Custom Rule")) {
+                                    reason = "Blocked by user (" + category + ")";
+                                }
+                                String source = "Mesh:" + (origin != null ? origin : "Web Dashboard");
                                 if ("IP_BLOCK".equalsIgnoreCase(type)) {
                                     blm.blockIp(target, reason, source);
                                 } else {
                                     blm.blockDomain(target, reason, source);
                                 }
                                 Log.i(TAG, "Cross-device rule applied locally: " + target + " [" + type + "]");
+                            } else if ("ALLOW".equalsIgnoreCase(action)) {
+                                blm.unblock(target);
                             }
                         }
+                    }
+                });
+
+        // Also listen to users/{uid} document for cloudFirewallRules array sync from Web Dashboard
+        db.collection(COL_USERS).document(uid)
+                .addSnapshotListener((doc, e) -> {
+                    if (e != null || doc == null || !doc.exists()) return;
+                    try {
+                        Object rawRules = doc.get("cloudFirewallRules");
+                        if (!(rawRules instanceof List)) return;
+                        List<?> list = (List<?>) rawRules;
+                        SecurityBlocklistManager blm = SecurityBlocklistManager.getInstance(mContext);
+                        for (Object item : list) {
+                            if (!(item instanceof Map)) continue;
+                            Map<?, ?> r = (Map<?, ?>) item;
+                            String domain = (String) r.get("domain");
+                            String action = (String) r.get("action");
+                            Boolean enabled = (Boolean) r.get("enabled");
+                            if (domain == null || domain.trim().isEmpty()) continue;
+                            String cleanDomain = domain.trim().toLowerCase();
+                            if (enabled == null || enabled) {
+                                if ("BLOCK".equalsIgnoreCase(action) || "DROP".equalsIgnoreCase(action)) {
+                                    blm.blockDomain(cleanDomain, "Blocked by user", "Web Dashboard");
+                                } else if ("ALLOW".equalsIgnoreCase(action)) {
+                                    blm.unblock(cleanDomain);
+                                }
+                            } else {
+                                blm.unblock(cleanDomain);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        Log.w(TAG, "Failed syncing cloudFirewallRules: " + ex.getMessage());
                     }
                 });
     }

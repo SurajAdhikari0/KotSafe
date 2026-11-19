@@ -14,7 +14,8 @@ service cloud.firestore {
     function isAdmin() {
       return isAuthenticated() && 
         (request.auth.token.admin == true || 
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -27,7 +28,7 @@ service cloud.firestore {
       // User can create/update their own profile
       allow create: if isOwner(userId) &&
         request.resource.data.uid == userId &&
-        request.resource.data.keys().hasAll(['uid', 'email', 'createdAt', 'isActive']) &&
+        request.resource.data.keys().hasAll(['uid', 'email', 'isActive']) &&
         (!('role' in request.resource.data) || request.resource.data.role == 'user') &&
         (!('tier' in request.resource.data) || request.resource.data.tier == 'freemium');
 
@@ -36,6 +37,11 @@ service cloud.firestore {
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'tier']) || isAdmin());
 
       allow delete: if isAdmin();
+
+      // Nested cross-device firewall rules for this user
+      match /rules/{ruleId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
 
       // Nested devices subcollection for this user
       match /devices/{deviceId} {

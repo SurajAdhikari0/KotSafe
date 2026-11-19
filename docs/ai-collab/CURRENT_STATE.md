@@ -1,13 +1,19 @@
 # Current State
-Last updated: 2026-11-19 14:26 IST by Codex
+Last updated: 2026-11-19 15:35 IST by Antigravity
 
 ## Goal right now
-Task T017 completed: Enable real-time P2P Exit Node discovery and synchronization between Android client and web dashboard.
+Task T018 completed: Cross-device website firewall blocking, system whitelist protection, and Blocked by User screen.
 
 ## In Progress
-None. All tasks through T017 completed and verified across all unit tests.
+None. All tasks through T018 completed and verified across all unit tests.
 
 ## Stopped at
+- Completed Task T018:
+  - Guarded `isAdmin()` with `exists()` check in `firestore.rules` and allowed nested `rules` subcollection access.
+  - Added official domain protection for `kotsafe.com`, `firebaseio.com`, `firebaseapp.com`, `google.com`, `android.com` in `SecurityBlocklistManager.java`.
+  - Added dual cross-device rule sync in `CloudSyncManager.java` (listening to both `cloudFirewallRules` array and `rules` subcollection).
+  - Customized HTTP block screen in `FirewallBlockHttpServer.java` with "Blocked by user" UI, explanation, and link to `kotsafe.com/dashboard`.
+  - All unit tests verified via `./gradlew testStandardDebugUnitTest` (BUILD SUCCESSFUL).
 - Completed Task T017:
   - Added dual `uid` and `ownerUid` keys in `CloudSyncManager.publishP2PNodeState()`.
   - Verified `./gradlew testStandardDebugUnitTest` (BUILD SUCCESSFUL).

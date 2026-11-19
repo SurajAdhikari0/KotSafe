@@ -16,6 +16,26 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-19 15:35 | Antigravity
+- **My prompt:** Complete Task T018: Cross-device website firewall blocking, system whitelist protection, and Blocked by User screen.
+- **Plan:**
+  1. Add system whitelist protection for `kotsafe.com`, `google.com`, `android.com`, `firebaseio.com`, `firebaseapp.com` in `SecurityBlocklistManager.java` and web `dashboard.js`.
+  2. Implement dual-sync in `CloudSyncManager.java` listening to both `cloudFirewallRules` array and `users/{uid}/rules` subcollection.
+  3. Custom "Blocked by User" block screen in `FirewallBlockHttpServer.java` with direct link to `kotsafe.com/dashboard`.
+  4. Fix Firestore rules `isAdmin()` check and allow `users/{uid}/rules` subcollection access.
+  5. Validate with `./gradlew testStandardDebugUnitTest`.
+- **Changes:**
+  - `firestore.rules`: Guarded `isAdmin()` with `exists()` check to prevent runtime exceptions on uninitialized user documents; allowed read/write to `users/{userId}/rules/{ruleId}`.
+  - `app/src/main/java/com/kotsafe/security/model/SecurityBlocklistManager.java`: Added `kotsafe.com`, `*.kotsafe.com`, `firebaseio.com`, `*.firebaseio.com`, `firebaseapp.com`, `*.firebaseapp.com` to `isOfficialDomain()` to prevent blocking core KotSafe and system infrastructure.
+  - `app/src/main/java/com/kotsafe/security/model/CloudSyncManager.java`: Added real-time listener to `cloudFirewallRules` on `users/{uid}`; mapped "BLOCK" and "DROP" actions with reason "Blocked by user"; unblocked on "ALLOW" or when rule is disabled/removed.
+  - `app/src/main/java/com/kotsafe/security/server/FirewallBlockHttpServer.java`: Added specialized "Blocked by user" UI, subtitle with instructions to visit `kotsafe.com/dashboard`, and direct action button "Go to Website to Remove".
+  - `docs/ai-collab/TASKS.json`: Added Task T018 and marked as done.
+- **Result:**
+  - `./gradlew testStandardDebugUnitTest`: BUILD SUCCESSFUL (all 551+ tests pass).
+- **Stopped at:** Android implementation verified and ready for commit.
+- **Next:** Push Android changes, push web updates, and deploy to Hostinger.
+
+
 ### 2026-11-19 14:26 | Codex
 - **My prompt:** Redesign the user dashboard for nontechnical users with a premium classic layout.
 - **Plan:** Simplify navigation, retain real integrations, verify responsive light/dark views.

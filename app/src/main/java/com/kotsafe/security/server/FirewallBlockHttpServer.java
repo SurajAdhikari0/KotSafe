@@ -332,10 +332,17 @@ public class FirewallBlockHttpServer implements Runnable {
             hostPart = hostPart.substring(0, hostPart.length() - 3);
         }
 
-        String pageTitle = "Site Blocked by Administrator";
-        String mainHeading = "This site is blocked by your administrator";
+        boolean isUserBlocked = safeCat.toLowerCase().contains("blocked by user") 
+                || safeCat.toLowerCase().contains("user rule")
+                || safeCat.toLowerCase().contains("custom rule")
+                || "USER".equalsIgnoreCase(targetType);
+
+        String pageTitle = isUserBlocked ? "Blocked by User" : "Site Blocked by Administrator";
+        String mainHeading = isUserBlocked ? "Blocked by user" : "This site is blocked by your administrator";
         String targetKey = "domain";
-        String entityDesc = "Your network administrator has restricted access to this domain in accordance with security policy. Contact your network administrator if you believe this is in error.";
+        String entityDesc = isUserBlocked
+                ? "This website was blocked by your KotSafe website rules. If you want to use it, go to your website dashboard at kotsafe.com/dashboard and remove it."
+                : "Your network administrator has restricted access to this domain in accordance with security policy. Contact your network administrator if you believe this is in error.";
 
         if ("IP".equalsIgnoreCase(targetType)) {
             pageTitle = "IP Address Blocked by Administrator";
@@ -817,13 +824,13 @@ public class FirewallBlockHttpServer implements Runnable {
                 + "        </svg>\n"
                 + "\n"
                 + "        <div class=\"stamp\" style=\"position:absolute; left:50%; top:2px; background:var(--red); color:#fff; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; letter-spacing:1px; padding:4px 12px; border-radius:4px; border:2px solid #fff2; box-shadow:0 4px 14px rgba(255,71,87,.35);\">\n"
-                + "          BLOCKED BY ADMINISTRATOR\n"
+                + "          " + (isUserBlocked ? "BLOCKED BY USER" : "BLOCKED BY ADMINISTRATOR") + "\n"
                 + "        </div>\n"
                 + "      </div>\n"
                 + "\n"
                 + "      <div class=\"title\">\n"
                 + "        <h1>" + mainHeading + "</h1>\n"
-                + "        <p>Your network administrator doesn't allow access to this site. Contact your network administrator for assistance or if you think this site was blocked by mistake.</p>\n"
+                + "        <p>" + (isUserBlocked ? "This website was blocked by your custom website rules. If you want to use it, go to the website at kotsafe.com/dashboard and remove it." : "Your network administrator doesn't allow access to this site. Contact your network administrator for assistance or if you think this site was blocked by mistake.") + "</p>\n"
                 + "      </div>\n"
                 + "\n"
                 + "      <div class=\"log\">\n"
@@ -832,8 +839,8 @@ public class FirewallBlockHttpServer implements Runnable {
                 + "          <div class=\"log-row\"><span class=\"log-key\">" + targetKey + "</span><span class=\"log-val flag\" id=\"targetDisplay\">" + safeUrl + "</span></div>\n"
                 + "          <div class=\"log-row\"><span class=\"log-key\">category</span><span class=\"log-val flag\">" + safeCat + "</span></div>\n"
                 + "          <div class=\"log-row\"><span class=\"log-key\">app</span><span class=\"log-val\">" + safeApp + "</span></div>\n"
-                + "          <div class=\"log-row\"><span class=\"log-key\">action</span><span class=\"log-val\">blocked by administrator</span></div>\n"
-                + "          <div class=\"log-row\"><span class=\"log-key\">rule</span><span class=\"log-val\">enterprise security policy</span></div>\n"
+                + "          <div class=\"log-row\"><span class=\"log-key\">action</span><span class=\"log-val\">" + (isUserBlocked ? "blocked by user" : "blocked by administrator") + "</span></div>\n"
+                + "          <div class=\"log-row\"><span class=\"log-key\">rule</span><span class=\"log-val\">" + (isUserBlocked ? "user website rules" : "enterprise security policy") + "</span></div>\n"
                 + "          <div class=\"log-row\"><span class=\"log-key\">timestamp</span><span class=\"log-val\">" + timestamp + "</span></div>\n"
                 + "          <div class=\"log-divider\"></div>\n"
                 + "          <p class=\"log-note\">" + entityDesc + "</p>\n"
@@ -843,7 +850,7 @@ public class FirewallBlockHttpServer implements Runnable {
                 + "      <div class=\"meaning\">\n"
                 + "        <div class=\"meaning-row\">\n"
                 + "          <span class=\"meaning-mark\">&#x2713;</span>\n"
-                + "          <p><b>Access restricted by administrator.</b> Your network administrator or organization policy prevents access to this destination.</p>\n"
+                + "          <p><b>" + (isUserBlocked ? "Blocked by user." : "Access restricted by administrator.") + "</b> " + (isUserBlocked ? "You chose to block this website in your KotSafe website protection settings." : "Your network administrator or organization policy prevents access to this destination.") + "</p>\n"
                 + "        </div>\n"
                 + "        <div class=\"meaning-row\">\n"
                 + "          <span class=\"meaning-mark\">&#x25D0;</span>\n"
@@ -851,13 +858,13 @@ public class FirewallBlockHttpServer implements Runnable {
                 + "        </div>\n"
                 + "        <div class=\"meaning-row\">\n"
                 + "          <span class=\"meaning-mark\">&#x21BA;</span>\n"
-                + "          <p><b>Need access or think this is wrong?</b> Contact your network administrator to request access or report a false positive.</p>\n"
+                + "          <p><b>" + (isUserBlocked ? "Want to use this website?" : "Need access or think this is wrong?") + "</b> " + (isUserBlocked ? "Go to your website dashboard at kotsafe.com/dashboard and remove it from your website rules." : "Contact your network administrator to request access or report a false positive.") + "</p>\n"
                 + "        </div>\n"
                 + "      </div>\n"
                 + "\n"
                 + "      <div class=\"actions\">\n"
                 + "        <button class=\"btn btn-primary\" onclick=\"history.back()\">Go back (Recommended)</button>\n"
-                + "        <button class=\"btn btn-secondary\" type=\"button\" onclick=\"contactAdmin()\">Contact administrator</button>\n"
+                + (isUserBlocked ? "        <a class=\"btn btn-secondary\" href=\"https://kotsafe.com/dashboard\" target=\"_blank\" style=\"text-decoration:none;\">Go to Website to Remove</a>\n" : "        <button class=\"btn btn-secondary\" type=\"button\" onclick=\"contactAdmin()\">Contact administrator</button>\n")
                 + "      </div>\n"
                 + "\n"
                 + "    </div>\n"

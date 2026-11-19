@@ -151,5 +151,14 @@
     "status": "done",
     "created": "2026-11-19 11:26 IST",
     "updated": "2026-11-19 11:28 IST"
+  },
+  {
+    "id": "T018",
+    "title": "Cross-device website firewall blocking, system whitelist protection, and Blocked by User screen",
+    "detail": "Protect kotsafe.com, Google, and Android system services from being blocked. Sync website rules in real-time to Android firewall. Serve custom Blocked by User screen with link to dashboard.",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-19 14:45 IST",
+    "updated": "2026-11-19 15:35 IST"
   }
 ]

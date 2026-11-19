@@ -194,7 +194,10 @@ public class SecurityBlocklistManager {
         if (domain == null || domain.isEmpty()) return false;
         String d = domain.toLowerCase().trim();
         if (d.startsWith("www.")) d = d.substring(4);
-        return d.equals("google.com") || d.endsWith(".google.com")
+        return d.equals("kotsafe.com") || d.endsWith(".kotsafe.com")
+                || d.equals("firebaseio.com") || d.endsWith(".firebaseio.com")
+                || d.equals("firebaseapp.com") || d.endsWith(".firebaseapp.com")
+                || d.equals("google.com") || d.endsWith(".google.com")
                 || d.equals("googleapis.com") || d.endsWith(".googleapis.com")
                 || d.equals("gstatic.com") || d.endsWith(".gstatic.com")
                 || d.equals("googleusercontent.com") || d.endsWith(".googleusercontent.com")
