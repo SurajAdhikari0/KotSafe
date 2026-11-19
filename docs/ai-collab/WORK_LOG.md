@@ -16,6 +16,13 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-19 14:26 | Codex
+- **My prompt:** Redesign the user dashboard for nontechnical users with a premium classic layout.
+- **Plan:** Simplify navigation, retain real integrations, verify responsive light/dark views.
+- **Changes:** Replaced dashboard.html; added assets/dashboard.css and assets/dashboard.js. Plain-language Home, devices, website protection, setup and account sections. Advanced gateway/DNS guidance collapsed. Removed simulated pairing and audit claims. Retained scoped Firebase device/rule access, scan requests, license and threat lookup APIs. Added rule transactions, duplicate prevention, request timeouts, stale-account guards and clear error states.
+- **Result:** Syntax, HTML IDs/assets and diff checks passed. Isolated browser fixture verified desktop/mobile light/dark, browser-device exclusion, threat/unknown lookup, rule add/pause/remove/duplicates, scan success/failure, sign-out, empty devices and service failures. No console errors in final preview. Screenshots saved to Codex cj/artifacts.
+- **Stopped at:** Local implementation complete; not deployed. No production account data changed. Fixture validation does not prove live app delivery.
+- **Next:** Deploy dashboard.html and both dashboard assets together, then verify real account access, scan receipt and rule sync on an enrolled app.
 ### 2026-11-19 11:28 | Antigravity
 - **My prompt:** Complete Task T017: Enable real-time P2P Exit Node discovery and synchronization between Android client and web dashboard.
 - **Plan:**
