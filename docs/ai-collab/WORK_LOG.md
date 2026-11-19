@@ -16,6 +16,20 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-19 16:38 | Antigravity
+- **My prompt:** Push new update on device.
+- **Plan:**
+  1. Assemble fresh `KotSafe-standard-debug.apk`.
+  2. Install and launch on connected handset (`7f55c189`) via `adb install -r -d`.
+- **Changes:** None (runtime deployment of compiled build).
+- **Result:**
+  - `assembleStandardDebug`: BUILD SUCCESSFUL.
+  - `adb -s 7f55c189 install -r -d`: Success.
+  - App launched cleanly on device.
+- **Stopped at:** Update installed and verified on handset `7f55c189`.
+- **Next:** Ready for testing.
+
+
 ### 2026-11-19 16:00 | Antigravity
 - **My prompt:** Complete Task T019: Connect a KotSafe TV option inside Settings after user successfully signs in (hide in guest mode), and resolve sign-in account security settings error.
 - **Plan:**
