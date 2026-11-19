@@ -1,13 +1,23 @@
 # Current State
-Last updated: 2026-11-19 15:35 IST by Antigravity
+Last updated: 2026-11-19 16:00 IST by Antigravity
 
 ## Goal right now
-Task T018 completed: Cross-device website firewall blocking, system whitelist protection, and Blocked by User screen.
+Task T019 completed: Connect a KotSafe TV option in Settings for authenticated users and resilient sign-in 2FA verification.
 
 ## In Progress
-None. All tasks through T018 completed and verified across all unit tests.
+None. All tasks through T019 completed and verified across all unit tests.
 
 ## Stopped at
+- Completed Task T019:
+  - Resolved sign-in failure ("Could not verify account security settings. Check your connection and retry") in `KotSafeUserManager.loadSignInChallenge()` by gracefully handling unprovisioned profiles (`PERMISSION_DENIED` / `NOT_FOUND`) and adding `Source.DEFAULT` fallback.
+  - Added `createdAt` timestamp in `CloudSyncManager.syncUserOnAuth()`.
+  - Created `ic_cat_tv.xml` vector icon matching the settings squircle gradient design.
+  - Added `pref_connect_kotsafe_tv` preference in `root_preferences.xml`.
+  - Bound dynamic visibility in `SettingsActivity.java` so "Connect KotSafe TV" is strictly shown only after a user successfully signs in and is hidden in guest mode or unauthenticated sessions.
+  - Handled click on `pref_connect_kotsafe_tv` to launch `TvLinkActivity` for scanning QR code or entering device pairing codes.
+  - Included TV item in `SettingsSearchDialog.java` only for authenticated non-guest sessions.
+  - Verified `./gradlew testStandardDebugUnitTest` and assembled `./gradlew assembleStandardDebug` (BUILD SUCCESSFUL).
+  - Installed and verified on test phone `RZGLA0HTXJV` (`Success`).
 - Completed Task T018:
   - Guarded `isAdmin()` with `exists()` check in `firestore.rules` and allowed nested `rules` subcollection access.
   - Added official domain protection for `kotsafe.com`, `firebaseio.com`, `firebaseapp.com`, `google.com`, `android.com` in `SecurityBlocklistManager.java`.

@@ -160,5 +160,14 @@
     "status": "done",
     "created": "2026-11-19 14:45 IST",
     "updated": "2026-11-19 15:35 IST"
+  },
+  {
+    "id": "T019",
+    "title": "Connect KotSafe TV option in Settings and resilient sign-in 2FA verification",
+    "detail": "Add Connect KotSafe TV preference in Settings shown only for authenticated non-guest users. Resolve sign-in security settings verification failure on uninitialized or denied Firestore profiles.",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-19 15:52 IST",
+    "updated": "2026-11-19 16:00 IST"
   }
 ]

@@ -16,6 +16,32 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-19 16:00 | Antigravity
+- **My prompt:** Complete Task T019: Connect a KotSafe TV option inside Settings after user successfully signs in (hide in guest mode), and resolve sign-in account security settings error.
+- **Plan:**
+  1. Fix sign-in failure in `KotSafeUserManager.loadSignInChallenge()` by handling unprovisioned user docs (`PERMISSION_DENIED` / `NOT_FOUND`) and adding `Source.DEFAULT` fallback so users are not blocked with "Could not verify account security settings. Check your connection and retry."
+  2. Add `createdAt` to `userData` in `CloudSyncManager.syncUserOnAuth()`.
+  3. Create vector icon `app/src/main/res/drawable/ic_cat_tv.xml` matching squircle liquid gradient style.
+  4. Add `pref_connect_kotsafe_tv` to `app/src/main/res/xml/root_preferences.xml`.
+  5. In `SettingsActivity.java`, bind `pref_connect_kotsafe_tv` visibility strictly to `!isGuestMode && isUserAuthenticated`, and launch `TvLinkActivity` on click.
+  6. In `SettingsSearchDialog.java`, index the TV option only for authenticated non-guest sessions.
+  7. Verify with `./gradlew testStandardDebugUnitTest` and `./gradlew assembleStandardDebug`.
+- **Changes:**
+  - `app/src/main/java/com/kotsafe/security/model/KotSafeUserManager.java`: Added resilient 2FA challenge handling that allows unprovisioned accounts without 2FA to complete sign-in without throwing security settings network error; added fallback to cached/default Firestore source.
+  - `app/src/main/java/com/kotsafe/security/model/CloudSyncManager.java`: Added `createdAt` timestamp to `syncUserOnAuth()` for Firestore schema compliance.
+  - `app/src/main/res/drawable/ic_cat_tv.xml`: Added vector drawable for KotSafe TV with purple-to-electric indigo gradient.
+  - `app/src/main/res/xml/root_preferences.xml`: Added `pref_connect_kotsafe_tv` preference item.
+  - `app/src/main/java/com/kotsafe/security/activities/prefs/SettingsActivity.java`: Added `updateTvPreferenceVisibility()` to toggle TV preference visibility based on auth and guest status; wired click to `TvLinkActivity`.
+  - `app/src/main/java/com/kotsafe/security/activities/prefs/SettingsSearchDialog.java`: Conditionally included TV search item for authenticated sessions only.
+  - `docs/ai-collab/TASKS.json`: Added Task T019 and marked done.
+- **Result:**
+  - `./gradlew testStandardDebugUnitTest`: BUILD SUCCESSFUL (all unit tests pass).
+  - `./gradlew assembleStandardDebug`: BUILD SUCCESSFUL.
+  - Installed and verified on test phone `RZGLA0HTXJV` via `adb install -r -d`.
+- **Stopped at:** Task T019 completed.
+- **Next:** Ready for user testing on device.
+
+
 ### 2026-11-19 15:35 | Antigravity
 - **My prompt:** Complete Task T018: Cross-device website firewall blocking, system whitelist protection, and Blocked by User screen.
 - **Plan:**

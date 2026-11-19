@@ -332,26 +332,56 @@ public class KotSafeUserManager {
             FirebaseFirestore.getInstance().collection("users").document(uid)
                     .get(com.google.firebase.firestore.Source.SERVER)
                     .addOnSuccessListener(snapshot -> {
-                        try {
-                            if (!snapshot.exists() || !Boolean.TRUE.equals(snapshot.getBoolean("twoFactorEnabled"))) {
+                        handleSignInChallengeSnapshot(uid, snapshot, callback);
+                    }).addOnFailureListener(error -> {
+                        if (error instanceof com.google.firebase.firestore.FirebaseFirestoreException) {
+                            com.google.firebase.firestore.FirebaseFirestoreException fe = (com.google.firebase.firestore.FirebaseFirestoreException) error;
+                            if (fe.getCode() == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED
+                                    || fe.getCode() == com.google.firebase.firestore.FirebaseFirestoreException.Code.NOT_FOUND) {
+                                Log.w("KotSafeUserManager", "User doc uninitialized or not accessible, proceeding without 2FA challenge: " + fe.getMessage());
                                 callback.onSuccess(null);
                                 return;
                             }
-                            String stored = snapshot.getString("twoFactorSecret");
-                            if (stored == null || stored.isEmpty()) stored = snapshot.getString("securityPosture.twoFactorSecret");
-                            String secret = stored != null && stored.startsWith(CRYPTO_PREFIX)
-                                    ? decryptSecretFromCloud(uid, stored) : stored;
-                            if (secret == null || secret.trim().isEmpty() || secret.startsWith(CRYPTO_PREFIX)) {
-                                callback.onError("Two-factor credentials could not be verified.");
-                            } else {
-                                callback.onSuccess(secret);
-                            }
-                        } catch (RuntimeException invalidSettings) {
-                            callback.onError("Two-factor settings could not be read.");
                         }
-                    }).addOnFailureListener(error -> callback.onError("Could not verify account security settings. Check your connection and retry."));
+                        FirebaseFirestore.getInstance().collection("users").document(uid)
+                                .get(com.google.firebase.firestore.Source.DEFAULT)
+                                .addOnSuccessListener(snapshot -> handleSignInChallengeSnapshot(uid, snapshot, callback))
+                                .addOnFailureListener(e -> {
+                                    if (e instanceof com.google.firebase.firestore.FirebaseFirestoreException) {
+                                        com.google.firebase.firestore.FirebaseFirestoreException fe = (com.google.firebase.firestore.FirebaseFirestoreException) e;
+                                        if (fe.getCode() == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED
+                                                || fe.getCode() == com.google.firebase.firestore.FirebaseFirestoreException.Code.NOT_FOUND) {
+                                            Log.w("KotSafeUserManager", "User doc fallback uninitialized, proceeding: " + fe.getMessage());
+                                            callback.onSuccess(null);
+                                            return;
+                                        }
+                                    }
+                                    Log.e("KotSafeUserManager", "loadSignInChallenge failed: " + e.getMessage(), e);
+                                    callback.onError("Could not verify account security settings. Check your connection and retry.");
+                                });
+                    });
         } catch (RuntimeException unavailable) {
             callback.onError("Account security service unavailable. Please retry.");
+        }
+    }
+
+    private static void handleSignInChallengeSnapshot(String uid, com.google.firebase.firestore.DocumentSnapshot snapshot, Callback<String> callback) {
+        try {
+            if (snapshot == null || !snapshot.exists() || !Boolean.TRUE.equals(snapshot.getBoolean("twoFactorEnabled"))) {
+                callback.onSuccess(null);
+                return;
+            }
+            String stored = snapshot.getString("twoFactorSecret");
+            if (stored == null || stored.isEmpty()) stored = snapshot.getString("securityPosture.twoFactorSecret");
+            String secret = stored != null && stored.startsWith(CRYPTO_PREFIX)
+                    ? decryptSecretFromCloud(uid, stored) : stored;
+            if (secret == null || secret.trim().isEmpty() || secret.startsWith(CRYPTO_PREFIX)) {
+                callback.onError("Two-factor credentials could not be verified.");
+            } else {
+                callback.onSuccess(secret);
+            }
+        } catch (RuntimeException invalidSettings) {
+            callback.onError("Two-factor settings could not be read.");
         }
     }
 

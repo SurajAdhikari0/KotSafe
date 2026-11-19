@@ -498,6 +498,20 @@ public class SettingsSearchDialog extends BottomSheetDialogFragment {
                 "http server live stream endpoint raw packet wireshark remote"
         ));
 
+        if (!com.kotsafe.security.model.KotSafeUserManager.isGuestMode(ctx)
+                && com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(ctx)) {
+            mAllItems.add(new SearchItem(
+                    "pref_connect_kotsafe_tv",
+                    "Connect KotSafe TV",
+                    "Pair and sign in to KotSafe on your Smart TV or Android TV",
+                    "Streaming & Mesh",
+                    R.drawable.ic_cat_tv,
+                    ActionType.ACTIVITY,
+                    com.kotsafe.security.activities.TvLinkActivity.class,
+                    "tv television android tv smart tv pair link scan qr device code"
+            ));
+        }
+
         mAllItems.add(new SearchItem(
                 "collector_host",
                 "Remote Exporter Host & Port",

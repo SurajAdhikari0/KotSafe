@@ -142,6 +142,7 @@ public class CloudSyncManager {
             userData.put("email", user.getEmail() != null ? user.getEmail() : "");
             userData.put("displayName", user.getDisplayName() != null ? user.getDisplayName() : "KotSafe Sentinel");
             userData.put("isActive", true);
+            userData.put("createdAt", FieldValue.serverTimestamp());
             userData.put("deviceStatus", "ONLINE");
             userData.put("activeDeviceId", deviceId);
             userData.put("activeDeviceModel", Build.MANUFACTURER + " " + Build.MODEL);

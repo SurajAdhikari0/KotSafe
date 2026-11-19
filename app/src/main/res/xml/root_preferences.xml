@@ -66,6 +66,15 @@
         app:icon="@drawable/ic_cat_streaming"
         app:iconSpaceReserved="true" />
 
+    <!-- Connect KotSafe TV (Shown for authenticated accounts only) -->
+    <Preference
+        android:key="pref_connect_kotsafe_tv"
+        app:key="pref_connect_kotsafe_tv"
+        app:title="Connect KotSafe TV"
+        app:summary="Pair and sign in to KotSafe on your Smart TV or Android TV"
+        app:icon="@drawable/ic_cat_tv"
+        app:iconSpaceReserved="true" />
+
     <!-- License & Activation -->
     <Preference
         android:key="activation_license_settings"

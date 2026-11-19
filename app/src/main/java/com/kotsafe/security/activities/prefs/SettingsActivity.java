@@ -409,6 +409,7 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
             mBackupHandler = new SettingsBackupHandler(this);
 
             setupSearchPref();
+            updateTvPreferenceVisibility();
 
             Intent intent = requireActivity().getIntent();
             if(intent != null) {
@@ -435,6 +436,11 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
         @Override
         public boolean onPreferenceTreeClick(@NonNull Preference preference) {
             String key = preference.getKey();
+            if ("pref_connect_kotsafe_tv".equals(key)) {
+                Intent intent = new Intent(requireContext(), com.kotsafe.security.activities.TvLinkActivity.class);
+                startActivity(intent);
+                return true;
+            }
             if (key != null && (key.endsWith("_settings") || key.equals("geolocation") || key.equals("dns_settings"))) {
                 if (getActivity() instanceof PreferenceFragmentCompat.OnPreferenceStartFragmentCallback) {
                     return ((PreferenceFragmentCompat.OnPreferenceStartFragmentCallback) getActivity())
@@ -456,6 +462,8 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
             com.kotsafe.security.model.AdvancedSettingsVisibility.apply(getPreferenceScreen(),
                     Prefs.isAdvancedFeaturesEnabled(PreferenceManager.getDefaultSharedPreferences(requireContext())));
 
+            updateTvPreferenceVisibility();
+
             Preference devPref = findPreference("advanced_developer_settings");
             if (devPref != null) {
                 if (!com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext())) {
@@ -471,6 +479,15 @@ public class SettingsActivity extends BaseActivity implements PreferenceFragment
                 mFullPayloadEnabled.setChecked(true);
             }
             mHasStartedMitmWizard = false;
+        }
+
+        private void updateTvPreferenceVisibility() {
+            Preference tvPref = findPreference("pref_connect_kotsafe_tv");
+            if (tvPref != null) {
+                boolean isGuest = com.kotsafe.security.model.KotSafeUserManager.isGuestMode(requireContext());
+                boolean isAuth = com.kotsafe.security.model.KotSafeUserManager.isUserAuthenticated(requireContext());
+                tvPref.setVisible(!isGuest && isAuth);
+            }
         }
 
         private @NonNull <T extends Preference> T requirePreference(String key) {
