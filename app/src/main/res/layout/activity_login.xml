@@ -511,6 +511,19 @@
                     android:letterSpacing="0.03"/>
             </LinearLayout>
 
+            <!-- Legal Terms & Privacy Policy Links -->
+            <TextView
+                android:id="@+id/tv_login_legal_disclaimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:text="By continuing, you agree to our Terms &amp; Privacy Policy"
+                android:textColor="@color/metricTextSecondary"
+                android:textColorLink="@color/authLinkColor"
+                android:textSize="11sp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

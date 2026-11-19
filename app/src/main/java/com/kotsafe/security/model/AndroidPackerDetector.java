@@ -245,3 +245,4 @@ public final class AndroidPackerDetector {
         result.riskScore = Math.max(result.riskScore, score);
     }
 }
+

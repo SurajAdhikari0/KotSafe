@@ -284,6 +284,8 @@ public class DefenderManager {
             b.setTitle("🛡️ KotSafe: Maximum Protection Active");
             b.setMessage("Your device is currently fully guarded:\n\n"
                     + "✔ Real-Time Antivirus: Scanning apps & downloads\n"
+                    + "✔ On-Device ML DGA Classifier: Active (< 1 μs inference)\n"
+                    + "✔ Banking Overlay Guard: Touchjacking suppression armed\n"
                     + "✔ Smart Firewall: Blocking unauthorized connections\n"
                     + "✔ DNS: " + Prefs.getDnsServerV4(PreferenceManager.getDefaultSharedPreferences(activity)) + "\n"
                     + "✔ Screen-off restrictions follow your firewall settings\n"

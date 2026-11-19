@@ -151,3 +151,4 @@ public class AndroidPackerDetectorTest {
         assertTrue("Risk score must be at least 90 for hidden executable code", result.riskScore >= 90);
     }
 }
+

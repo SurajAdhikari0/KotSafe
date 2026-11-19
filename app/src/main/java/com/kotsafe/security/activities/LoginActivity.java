@@ -206,6 +206,13 @@ public class LoginActivity extends BaseActivity {
         mLayoutAuthRequiredPill = findViewById(R.id.layout_auth_required_pill);
         mTvAuthRequiredPill = findViewById(R.id.tv_auth_required_pill);
 
+        TextView tvLegal = findViewById(R.id.tv_login_legal_disclaimer);
+        if (tvLegal != null) {
+            String text = "By continuing, you agree to our <a href='https://kotsafe.com/terms'>Terms</a> &amp; <a href='https://kotsafe.com/privacy'>Privacy Policy</a>";
+            tvLegal.setText(androidx.core.text.HtmlCompat.fromHtml(text, androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY));
+            tvLegal.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+        }
+
         SharedPreferences prefs = getSharedPreferences(PREF_AUTH, Context.MODE_PRIVATE);
         boolean rememberMe = prefs.getBoolean(KEY_REMEMBER_ME, false);
         mCbRememberMe.setChecked(rememberMe);

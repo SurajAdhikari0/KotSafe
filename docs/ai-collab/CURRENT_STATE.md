@@ -1,13 +1,22 @@
 # Current State
-Last updated: 2026-11-18 13:22 IST by Antigravity
+Last updated: 2026-11-19 11:00 IST by Antigravity
 
 ## Goal right now
-Task T015 completed: Advanced Threat Intelligence & On-Device ML Pipeline (Modules 1-5).
+Task T016 completed: Upgrade User Dashboard Panel with dynamic Threat Intel, On-Device ML status, Security Health metrics, and Google Play compliant legal links.
 
 ## In Progress
-None. Task T015 completed and verified across all unit test suites, Android build, Oracle VPS systemd services, and Hostinger API.
+None. All tasks through T016 completed and verified across all unit tests and full APK assembly.
 
 ## Stopped at
+- Completed Task T016:
+  - Bound dynamic Threat Intelligence and On-Device ML posture pill (`mPostureTiText` / `mPostureTiIcon`) in `StatusFragment.java`.
+  - Added live `QuarantineVaultManager` count to Antivirus radar workbench subtext.
+  - Added "GRADE A" health badge to Privacy Scorecard workbench card.
+  - Upgraded `showSocSentinelDialog()` in `StatusFragment.java` to showcase the complete 5-layer on-device ML & Bloom filter stack.
+  - Updated `DefenderManager.java` to reflect live On-Device ML and Banking Overlay Guard protection.
+  - Added `Utils.openWebLink()` and Google Play compliant legal disclaimer links (`Terms` & `Privacy Policy`) in `LoginActivity.java` and `activity_login.xml`.
+  - Verified `./gradlew testStandardDebugUnitTest` (BUILD SUCCESSFUL).
+  - Verified `./gradlew assembleStandardDebug` across all 4 ABIs (BUILD SUCCESSFUL).
 - Fully implemented and verified all 5 advanced security modules:
   1. **Module 1 (Ultra-Compact Offline Bloom Filter)**:
      - Implemented `OfflineMalwareBloomFilter.java`: 64 KB bitset (524,288 bits) encoding 50,000+ hashes using Kirsch-Mitzenmacher MurmurHash3 probes.

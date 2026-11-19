@@ -2682,4 +2682,20 @@ public class Utils {
             }
         }
     }
+
+    /**
+     * Opens an external web URL using the system browser Intent.
+     */
+    public static void openWebLink(Context context, String url) {
+        if (context == null || url == null || url.trim().isEmpty()) return;
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            if (!(context instanceof Activity)) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(context, "Could not open web link", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

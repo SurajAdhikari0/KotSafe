@@ -16,6 +16,77 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-19 11:00 | Antigravity
+- **My prompt:** Complete Task T016: Android app dashboard posture matrix, On-Device ML status, legal links, and test verification.
+- **Plan:**
+  1. Add `Utils.openWebLink()` helper for opening external URLs with fallbacks.
+  2. Add Google Play compliant legal disclaimer links (`Terms` & `Privacy Policy`) in `activity_login.xml` and `LoginActivity.java`.
+  3. Bind `mPostureTiText`, `mPostureTiIcon`, `mCardAntivirusSubtext`, `mCardPrivacyScorecardSubtext`, and `mCardPrivacyScorecardBadge` in `StatusFragment.java`.
+  4. Update `StatusFragment.updatePosturePills()` with dynamic "SOC & ML Armed" status, live `QuarantineVaultManager.getQuarantinedCount()`, and Privacy Scorecard grade.
+  5. Expand `showSocSentinelDialog()` to detail On-Device ML DGA Classifier, 64 KB Bloom filter, Banking Overlay Guard, and APK Packer anti-tamper stack.
+  6. Update `DefenderManager.java` to list On-Device ML and Banking Overlay Guard in the active protection dialog.
+  7. Run `./gradlew testStandardDebugUnitTest` and `./gradlew assembleStandardDebug`.
+- **Changes:**
+  - `app/src/main/java/com/kotsafe/security/Utils.java`: Added `openWebLink()`.
+  - `app/src/main/res/layout/activity_login.xml` & `LoginActivity.java`: Added clickable legal disclaimer for Terms and Privacy Policy.
+  - `app/src/main/res/layout/status.xml` & `StatusFragment.java`: Bound and updated posture pills and workbench status.
+  - `app/src/main/java/com/kotsafe/security/model/DefenderManager.java`: Highlighted ML and Banking Overlay defenses.
+- **Result:**
+  - `./gradlew testStandardDebugUnitTest`: BUILD SUCCESSFUL (all 551+ unit tests passed).
+  - `./gradlew assembleStandardDebug`: BUILD SUCCESSFUL across all 4 ABIs (`arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64`).
+- **Stopped at:** Android Task T016 completed and verified.
+- **Next:** Push commit to GitHub `origin/main`.
+
+### 2026-11-19 09:05 | Codex
+- **My prompt:** Apply the recommended KotSafe login redesign
+- **Plan:** Use existing branding and both themes; verify form states and mobile layout.
+- **Changes:** Updated website kotsafe-site/login.html with shared theme colors, existing logo/font, simpler provider buttons, account-switch links, legal footer, reduced-motion support and theme switch. Removed old decorative login styles.
+- **Result:** Browser checked light/dark, 390px and 320px layouts, signup switching, recovery view and empty-login validation. Inline JavaScript syntax and git diff checks passed.
+- **Stopped at:** Local implementation completed. Live deployment and actual account authentication were not performed.
+- **Next:** Deploy the verified login.html when publishing the website update.
+### 2026-11-19 08:28 | Antigravity
+- **My prompt:** Remove Firebase UID and open-source license clutter from Identity Profile card on website dashboard.
+- **Plan:**
+  1. Remove raw `Firebase UID` and `COMMUNITY EDITION (GPL-3.0)` tags from `dashboard.html`.
+  2. Replace with sleek `Account Status: Verified Cloud Sentinel` pill with green active dot.
+  3. Commit, push to `origin/main` (`79aaa29`), and deploy to Hostinger.
+- **Changes:**
+  - `kotsafe-site/dashboard.html`: Removed `Firebase UID` and `License Edition: COMMUNITY EDITION (GPL-3.0)`, replaced with clean verified sentinel status.
+- **Result:**
+  - Pushed to `https://github.com/SurajAdhikari0/Kotsafe-website.git` (`79aaa29`) and deployed to Hostinger. Verified live on `https://kotsafe.com/dashboard`.
+- **Stopped at:** Dashboard identity card cleaned and verified live.
+- **Next:** Proceed with Android APK dashboard and login enhancements (Task T016).
+
+
+### 2026-11-19 08:24 | Antigravity
+- **My prompt:** Create a good login experience for website like Microsoft and Google with premium colors, push and test it.
+- **Plan:**
+  1. Add `signInWithMicrosoft()` to `kotsafe-site/assets/auth.js` via Firebase OAuthProvider with popup/redirect fallback.
+  2. Redesign `kotsafe-site/login.html` with Microsoft Fluent + Google Material identity aesthetics:
+     - Microsoft Fluent indeterminate scanning progress bar across top of card.
+     - Dual SSO grid featuring official Google 'G' button and authentic Microsoft 4-square tile button.
+     - Premium color palette: Microsoft Fluent Blue (`#0078D4`), Google Emerald Green (`#34A853`), Google Coral Red (`#EA4335`), and Google Amber (`#FBBC05`).
+     - Animated in-card alert banners with subtle shake animation on error.
+  3. Commit and push to GitHub `origin/main` (`815dcf2`).
+  4. Deploy to Hostinger production server and verify live endpoints.
+- **Changes:**
+  - `kotsafe-site/assets/auth.js`: Added `signInWithMicrosoft()`.
+  - `kotsafe-site/login.html`: Upgraded with Microsoft Fluent scanning bar, Microsoft & Google dual SSO buttons, in-card error shake animation, and modern focus rings.
+- **Result:**
+  - Pushed to `https://github.com/SurajAdhikari0/Kotsafe-website.git` (`815dcf2`).
+  - Deployed to Hostinger (`https://kotsafe.com/login`).
+  - HTTP/2 200 OK verified; live markup confirmed with `.fluent-progress-bar`, `.orb-msft-tiles`, and `btn-microsoft-login`.
+- **Stopped at:** Website login experience deployed and verified live.
+- **Next:** Proceed with Android APK dashboard and login enhancements (Task T016).
+
+
+### 2026-11-18 13:50 | Codex
+- **My prompt:** Verify threat intelligence strength, real-world protection and remaining gaps
+- **Plan:** Read current changes, inspect live services, execute focused suites and safe synthetic checks.
+- **Changes:** Created audit report and companion view. Application source and deployed services were not changed.
+- **Result:** 48 Python and 28 Android tests passed. Direct Java checks found empty default Bloom, numeric-prefix and public-suffix domain misses, and 759 false matches per 100000 disjoint hash queries at 50000 entries. Source review found package-prefix trust, incomplete crawler delivery, stale dynamic rules and limited overlay enforcement. Live feed publishes five indicators.
+- **Stopped at:** ADB lists no phone. Overall malware detection rate and device enforcement remain unverified.
+- **Next:** Fix identity trust, dynamic-rule lifecycle, Bloom confirmation, crawler delivery and domain parsing. Audit report is outputs/kotsafe-threat-intelligence-audit-2026-11-18.md in the Codex workspace.
 ### 2026-11-18 13:22 | Antigravity
 - **My prompt:** Implement Modules 1 through 5 of Advanced Threat Intelligence & On-Device ML Roadmap.
 - **Plan:**

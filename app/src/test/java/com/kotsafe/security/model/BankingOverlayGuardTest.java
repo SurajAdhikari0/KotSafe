@@ -58,3 +58,4 @@ public class BankingOverlayGuardTest {
         assertFalse(guard.isFinancialApp("com.facebook.katana"));
     }
 }
+
