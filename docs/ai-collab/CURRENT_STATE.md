@@ -1,13 +1,16 @@
 # Current State
-Last updated: 2026-11-19 11:00 IST by Antigravity
+Last updated: 2026-11-19 11:28 IST by Antigravity
 
 ## Goal right now
-Task T016 completed: Upgrade User Dashboard Panel with dynamic Threat Intel, On-Device ML status, Security Health metrics, and Google Play compliant legal links.
+Task T017 completed: Enable real-time P2P Exit Node discovery and synchronization between Android client and web dashboard.
 
 ## In Progress
-None. All tasks through T016 completed and verified across all unit tests and full APK assembly.
+None. All tasks through T017 completed and verified across all unit tests.
 
 ## Stopped at
+- Completed Task T017:
+  - Added dual `uid` and `ownerUid` keys in `CloudSyncManager.publishP2PNodeState()`.
+  - Verified `./gradlew testStandardDebugUnitTest` (BUILD SUCCESSFUL).
 - Completed Task T016:
   - Bound dynamic Threat Intelligence and On-Device ML posture pill (`mPostureTiText` / `mPostureTiIcon`) in `StatusFragment.java`.
   - Added live `QuarantineVaultManager` count to Antivirus radar workbench subtext.

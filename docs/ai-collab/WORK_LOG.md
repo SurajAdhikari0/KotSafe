@@ -16,6 +16,19 @@
 
 <!-- LOG START: newest entries go directly below this line -->
 
+### 2026-11-19 11:28 | Antigravity
+- **My prompt:** Complete Task T017: Enable real-time P2P Exit Node discovery and synchronization between Android client and web dashboard.
+- **Plan:**
+  1. Add dual `uid` and `ownerUid` keys in `CloudSyncManager.publishP2PNodeState()`.
+  2. Verify `./gradlew testStandardDebugUnitTest`.
+  3. Update `TASKS.json`, `CURRENT_STATE.md`, and `WORK_LOG.md`.
+- **Changes:**
+  - `app/src/main/java/com/kotsafe/security/model/CloudSyncManager.java`: Added `node.put("uid", ownerUid);` alongside `ownerUid` for dual compatibility with Firestore queries and security rules.
+- **Result:**
+  - `./gradlew testStandardDebugUnitTest`: BUILD SUCCESSFUL.
+- **Stopped at:** Android Task T017 completed.
+- **Next:** Deploy website updates to `dashboard.html` and push commits.
+
 ### 2026-11-19 11:00 | Antigravity
 - **My prompt:** Complete Task T016: Android app dashboard posture matrix, On-Device ML status, legal links, and test verification.
 - **Plan:**

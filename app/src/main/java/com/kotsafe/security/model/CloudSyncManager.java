@@ -253,6 +253,7 @@ public class CloudSyncManager {
             Map<String, Object> node = new HashMap<>();
             node.put("nodeId", nodeId);
             node.put("ownerUid", ownerUid);
+            node.put("uid", ownerUid);
             node.put("nodeName", nodeName);
             node.put("nodeType", nodeType != null ? nodeType : "exit_node");
             node.put("status", status != null ? status : "STANDBY");

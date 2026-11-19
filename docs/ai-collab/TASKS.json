@@ -142,5 +142,14 @@
     "status": "done",
     "created": "2026-11-18 18:31 IST",
     "updated": "2026-11-19 11:00 IST"
+  },
+  {
+    "id": "T017",
+    "title": "Enable real-time P2P Exit Node discovery and synchronization between Android client and web dashboard",
+    "detail": "Store dual ownerUid and uid keys in CloudSyncManager, update dashboard.html Firestore listener to query ownerUid, eliminate hardcoded preview mock nodes, and dynamically render enrolled gateway fleet.",
+    "owner": "Antigravity",
+    "status": "done",
+    "created": "2026-11-19 11:26 IST",
+    "updated": "2026-11-19 11:28 IST"
   }
 ]
